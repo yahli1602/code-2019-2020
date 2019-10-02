@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-@TeleOp(name = "Basic: Linear OpMode", group = "Linear Opmode")
+@TeleOp(name = "test", group = "Linear Opmode")
 public class test extends LinearOpMode {
 
     // Declare OpMode members.
