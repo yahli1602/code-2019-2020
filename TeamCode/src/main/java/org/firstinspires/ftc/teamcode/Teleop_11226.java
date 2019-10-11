@@ -20,7 +20,6 @@ public class Teleop_11226 extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             funcs.drive();
             funcs.arm();
