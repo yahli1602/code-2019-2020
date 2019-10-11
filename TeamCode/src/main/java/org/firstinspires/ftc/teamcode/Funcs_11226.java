@@ -56,7 +56,7 @@ public class Funcs_11226 extends LinearOpMode {
 
 
 
-    public void rotateByDirction(String direction, float rotationPower){
+    public void rotateByDirection(String direction, float rotationPower){
         if (rDrive1.isBusy()){
             lDrive1.setPower(0);
             lDrive2.setPower(0);
