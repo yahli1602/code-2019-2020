@@ -17,7 +17,6 @@ public class Teleop_11226 extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
         while (opModeIsActive()) {
