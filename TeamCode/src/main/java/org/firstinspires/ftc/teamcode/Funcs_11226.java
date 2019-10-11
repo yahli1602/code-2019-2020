@@ -54,36 +54,7 @@ public class Funcs_11226 extends LinearOpMode {
 
     }
 
-
-
-    public void rotateByDirection(String direction, float rotationPower){
-        if (rDrive1.isBusy()){
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-            rDrive1.setPower(0);
-            rDrive2.setPower(0);
-        }else{
-            if (direction == "right"){
-                while(rotationPower > 0) {
-                    lDrive1.setPower(rotationPower);
-                    lDrive2.setPower(rotationPower);
-                    rDrive1.setPower(-rotationPower);
-                    rDrive2.setPower(-rotationPower);
-                }
-            }
-            else if(direction == "left"){
-                while(rotationPower > 0) {
-                    lDrive1.setPower(-rotationPower);
-                    lDrive2.setPower(-rotationPower);
-                    rDrive1.setPower(rotationPower);
-                    rDrive2.setPower(rotationPower);
-                }
-            }
-        }
-    }
-
-
-
+//Functions for Teleop
 
     public void drive() {
         if (leftPower > 0.2 || leftPower < -0.2) {
@@ -143,6 +114,35 @@ public class Funcs_11226 extends LinearOpMode {
        }
        else{}
     }
+
+//Functions for Autonomus
+
+    public void rotateByDirection(String direction, float rotationPower){
+        if (rDrive1.isBusy()){
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+            rDrive1.setPower(0);
+            rDrive2.setPower(0);
+        }else{
+            if (direction == "right"){
+                while(rotationPower > 0) {
+                    lDrive1.setPower(rotationPower);
+                    lDrive2.setPower(rotationPower);
+                    rDrive1.setPower(-rotationPower);
+                    rDrive2.setPower(-rotationPower);
+                }
+            }
+            else if(direction == "left"){
+                while(rotationPower > 0) {
+                    lDrive1.setPower(-rotationPower);
+                    lDrive2.setPower(-rotationPower);
+                    rDrive1.setPower(rotationPower);
+                    rDrive2.setPower(rotationPower);
+                }
+            }
+        }
+    }
+
 
 
     @Override

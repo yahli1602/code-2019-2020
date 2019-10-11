@@ -57,33 +57,7 @@ public class Funcs_11229 extends LinearOpMode {
         fourBar.setDirection(DcMotor.Direction.FORWARD);
         collect.setDirection(DcMotor.Direction.FORWARD);
     }
-
-    public void rotateByDirction(String direction, float rotationPower){
-        if (rDrive1.isBusy()){
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-            rDrive1.setPower(0);
-            rDrive2.setPower(0);
-        }else{
-            if (direction == "right"){
-                while(rotationPower > 0) {
-                    lDrive1.setPower(rotationPower);
-                    lDrive2.setPower(rotationPower);
-                    rDrive1.setPower(-rotationPower);
-                    rDrive2.setPower(-rotationPower);
-                }
-            }
-            else if(direction == "left"){
-                while(rotationPower > 0) {
-                    lDrive1.setPower(-rotationPower);
-                    lDrive2.setPower(-rotationPower);
-                    rDrive1.setPower(rotationPower);
-                    rDrive2.setPower(rotationPower);
-                }
-            }
-        }
-    }
-
+//Functions for Teleop
 
     public void drive() {
         if (leftPower > 0.2 || leftPower < -0.2) {
@@ -139,17 +113,36 @@ public class Funcs_11229 extends LinearOpMode {
             collect.setPower(-1);
         }
     }
+//Functions for Autonumus
 
+public void rotateByDirction(String direction, float rotationPower){
+    if (rDrive1.isBusy()){
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+    }else{
+        if (direction == "right"){
+            while(rotationPower > 0) {
+                lDrive1.setPower(rotationPower);
+                lDrive2.setPower(rotationPower);
+                rDrive1.setPower(-rotationPower);
+                rDrive2.setPower(-rotationPower);
+            }
+        }
+        else if(direction == "left"){
+            while(rotationPower > 0) {
+                lDrive1.setPower(-rotationPower);
+                lDrive2.setPower(-rotationPower);
+                rDrive1.setPower(rotationPower);
+                rDrive2.setPower(rotationPower);
+            }
+        }
+    }
+}
     @Override
     public void runOpMode() {
 
 
-        waitForStart();
-
-
-        while (opModeIsActive()) {
-
-
         }
     }
-}
