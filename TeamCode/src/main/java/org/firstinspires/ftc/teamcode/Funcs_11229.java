@@ -16,8 +16,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @TeleOp(name = "Basic: Linear OpMode", group = "Linear Opmode")
-@Disabled
 public class Funcs_11229 extends LinearOpMode {
+
+    private ElapsedTime elapsedTime = new ElapsedTime();
 
     private DcMotor rDrive1 = null;
     private DcMotor rDrive2 = null;
@@ -26,6 +27,17 @@ public class Funcs_11229 extends LinearOpMode {
     private DcMotor slide = null;
     private DcMotor fourBar = null;
     private DcMotor collect = null;
+
+    private double rightPower = gamepad1.right_stick_y;
+    private double leftPower = gamepad1.left_stick_y;
+    private double slidePower(){
+        if(gamepad1.right_trigger > gamepad1.left_trigger){
+            return gamepad1.right_trigger;
+        }
+        return -gamepad1.left_trigger;
+    }
+
+
 
     public void init(HardwareMap HM) {
 
@@ -47,36 +59,41 @@ public class Funcs_11229 extends LinearOpMode {
     }
 
     public void drive() {
-        if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
-            lDrive1.setPower(gamepad1.left_stick_y);
-            lDrive2.setPower(gamepad1.left_stick_y);
+        if (leftPower > 0.2 || leftPower < -0.2) {
+            lDrive1.setPower(leftPower);
+            lDrive2.setPower(leftPower);
         } else {
             slide.setPower(0);
             lDrive1.setPower(0);
             lDrive2.setPower(0);
         }
-        if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
-            rDrive1.setPower(gamepad1.right_stick_y);
-            rDrive2.setPower(gamepad1.right_stick_y);
+        if (rightPower > 0.2 || rightPower < -0.2) {
+            rDrive1.setPower(rightPower);
+            rDrive2.setPower(rightPower);
         } else {
             slide.setPower(0);
             rDrive1.setPower(0);
             rDrive2.setPower(0);
         }
-        if (gamepad1.right_trigger > 0.2) {
-            slide.setPower(gamepad1.right_trigger);
-        } else if (gamepad1.left_trigger > 0.2) {
-            slide.setPower(-gamepad1.left_trigger);
+        if (slidePower() > 0.2) {
+            slide.setPower(slidePower());
+        } else if (slidePower() < -0.2) {
+            slide.setPower(slidePower());
         } else {
             slide.setPower(0);
         }
+    }
+
+    public void timer(long miliseconds){
+        long x = (long)elapsedTime.milliseconds();
+        while(x < miliseconds + (long)elapsedTime.milliseconds()){}
     }
 
     public void fourBar(){
         if(gamepad2.left_stick_y > 0){
             for(double i = 1.0; i >= 0; i -= 0.1){
                 fourBar.setPower(i);
-                sleep(100);
+                timer(100);
             }
         }
         else if(gamepad2.left_stick_y < 0){
