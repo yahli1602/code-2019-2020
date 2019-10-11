@@ -67,16 +67,16 @@ public class Funcs_11226 extends LinearOpMode {
                 while(rotationPower > 0) {
                     lDrive1.setPower(rotationPower);
                     lDrive2.setPower(rotationPower);
-                    rDrive1.setPower(rotationPower * -1);
-                    rDrive2.setPower(rotationPower * -1);
+                    rDrive1.setPower(-rotationPower);
+                    rDrive2.setPower(-rotationPower);
                 }
             }
             else if(direction == "left"){
                 while(rotationPower > 0) {
-                    lDrive1.setPower(rotationPower);
-                    lDrive2.setPower(rotationPower);
-                    rDrive1.setPower(rotationPower * -1);
-                    rDrive2.setPower(rotationPower * -1);
+                    lDrive1.setPower(-rotationPower);
+                    lDrive2.setPower(-rotationPower);
+                    rDrive1.setPower(rotationPower);
+                    rDrive2.setPower(rotationPower);
                 }
             }
         }
