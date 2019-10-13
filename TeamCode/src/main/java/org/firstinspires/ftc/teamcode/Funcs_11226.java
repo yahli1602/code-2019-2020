@@ -10,7 +10,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name = "Basic: Linear OpMode", group = "Linear Opmode")
+@TeleOp(name = "Funcs 11226", group = "Linear Opmode")
+@Disabled
 public class Funcs_11226 extends LinearOpMode {
 
     // Declare OpMode members.
