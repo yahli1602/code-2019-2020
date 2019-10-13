@@ -25,11 +25,20 @@ public class vuforiaOp11226 extends LinearOpMode{
         VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(prams);
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS , 4);
 
-        VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
-        beacons.get(0).setName("Wheels");
-        beacons.get(1).setName("Tools");
-        beacons.get(2).setName("Lego");
-        beacons.get(3).setName("Geers");
+        VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("Skystone");
+        beacons.get(0).setName("TargetElement");
+        beacons.get(1).setName("1");
+        beacons.get(2).setName("2");
+        beacons.get(3).setName("3");
+        beacons.get(4).setName("4");
+        beacons.get(5).setName("5");
+        beacons.get(6).setName("6");
+        beacons.get(7).setName("7");
+        beacons.get(8).setName("8");
+        beacons.get(9).setName("9");
+        beacons.get(10).setName("10");
+        beacons.get(11).setName("11");
+        beacons.get(12).setName("12");
 
         waitForStart();
 
