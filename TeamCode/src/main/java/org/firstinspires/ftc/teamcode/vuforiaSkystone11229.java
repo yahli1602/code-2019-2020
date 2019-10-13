@@ -84,7 +84,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 @TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
 
-public class vuforia_skystone extends LinearOpMode {
+public class vuforiaSkystone11229 extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -352,6 +352,7 @@ public class vuforia_skystone extends LinearOpMode {
             else {
                 telemetry.addData("Visible Target", "none");
             }
+
             telemetry.update();
         }
 

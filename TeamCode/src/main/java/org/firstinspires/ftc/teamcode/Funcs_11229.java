@@ -1,24 +1,17 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @TeleOp(name = "Basic: Linear OpMode", group = "Linear Opmode")
 public class Funcs_11229 extends LinearOpMode {
 
     private ElapsedTime elapsedTime = new ElapsedTime();
+    private vuforiaSkystone11229 vuforia = new vuforiaSkystone11229();
 
     private DcMotor rDrive1 = null;
     private DcMotor rDrive2 = null;
@@ -115,31 +108,42 @@ public class Funcs_11229 extends LinearOpMode {
     }
 //Functions for Autonumus
 
-public void rotateByDirction(String direction, float rotationPower){
-    if (rDrive1.isBusy()){
-        lDrive1.setPower(0);
-        lDrive2.setPower(0);
-        rDrive1.setPower(0);
-        rDrive2.setPower(0);
-    }else{
-        if (direction == "right"){
-            while(rotationPower > 0) {
-                lDrive1.setPower(rotationPower);
-                lDrive2.setPower(rotationPower);
-                rDrive1.setPower(-rotationPower);
-                rDrive2.setPower(-rotationPower);
+    public void rotateByDirction(String direction, float rotationPower){ //rotation by direction call it again to turn off
+        if (rDrive1.isBusy()){
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+            rDrive1.setPower(0);
+            rDrive2.setPower(0);
+        }else{
+            if (direction == "right"){
+                while(rotationPower > 0) {
+                    lDrive1.setPower(rotationPower);
+                    lDrive2.setPower(rotationPower);
+                    rDrive1.setPower(-rotationPower);
+                    rDrive2.setPower(-rotationPower);
+                }
+            }
+            else if(direction == "left"){
+                while(rotationPower > 0) {
+                    lDrive1.setPower(-rotationPower);
+                    lDrive2.setPower(-rotationPower);
+                    rDrive1.setPower(rotationPower);
+                    rDrive2.setPower(rotationPower);
+                }
             }
         }
-        else if(direction == "left"){
-            while(rotationPower > 0) {
-                lDrive1.setPower(-rotationPower);
-                lDrive2.setPower(-rotationPower);
-                rDrive1.setPower(rotationPower);
-                rDrive2.setPower(rotationPower);
-            }
-        }
+
+
     }
-}
+
+
+    public void spinUntilTarget(vuforiaSkystone11229 target){
+
+    }
+
+
+
+
     @Override
     public void runOpMode() {
 
