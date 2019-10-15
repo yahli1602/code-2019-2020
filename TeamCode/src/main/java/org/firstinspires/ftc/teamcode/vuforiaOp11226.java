@@ -26,6 +26,7 @@ public class vuforiaOp11226 extends LinearOpMode{
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS , 4);
 
         VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("Skystone");
+        //names of pictures
         beacons.get(0).setName("TargetElement");
         beacons.get(1).setName("1");
         beacons.get(2).setName("2");
