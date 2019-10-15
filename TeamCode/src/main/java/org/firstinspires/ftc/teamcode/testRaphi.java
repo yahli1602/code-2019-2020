@@ -36,7 +36,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "test 1 motor", group = "Linear Opmode")
+@TeleOp(name = "test Raphi", group = "Linear Opmode")
 public class testRaphi extends LinearOpMode {
 
     // Declare OpMode members.

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 
 
-@TeleOp(name = "Basic: Linear OpMode", group = "Linear Opmode")
+@TeleOp(name = "Teleop 11226", group = "Linear Opmode")
 public class Teleop_11226 extends LinearOpMode {
     private Funcs_11226 funcs = new Funcs_11226();
 
