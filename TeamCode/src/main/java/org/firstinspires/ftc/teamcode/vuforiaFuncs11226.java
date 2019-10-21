@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 @TeleOp(name = "Vuforia 11226", group = "Concept")
-public class vuforiaOp11226 extends LinearOpMode{
+public class vuforiaFuncs11226 extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
         VuforiaLocalizer.Parameters prams = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);

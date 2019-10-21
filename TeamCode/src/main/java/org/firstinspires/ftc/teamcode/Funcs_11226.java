@@ -14,9 +14,7 @@ import com.qualcomm.robotcore.util.Range;
 @Disabled
 public class Funcs_11226 extends LinearOpMode {
 
-    // Declare OpMode members.
-
-    private ElapsedTime elapsedTime = new ElapsedTime();
+    public ElapsedTime elapsedTime = new ElapsedTime();
 
     private DcMotor rDrive1 = null;
     private DcMotor rDrive2 = null;
@@ -26,9 +24,9 @@ public class Funcs_11226 extends LinearOpMode {
     private DcMotor arm = null;
     private Servo grab = null;
 
-    private double rightPower = gamepad1.right_stick_y;
-    private double leftPower = gamepad1.left_stick_y;
-    private double slidePower(){
+    public double rightPower = gamepad1.right_stick_y;
+    public double leftPower = gamepad1.left_stick_y;
+    public double slidePower(){
         if(gamepad1.right_trigger > gamepad1.left_trigger){
             return gamepad1.right_trigger;
         }
@@ -82,7 +80,6 @@ public class Funcs_11226 extends LinearOpMode {
             slide.setPower(0);
         }
     }
-
 
     public void arm(){
         if(armPower > 0.2 || armPower < -0.2){
