@@ -103,24 +103,24 @@ public class Funcs_11226 extends LinearOpMode {
        if(gamepad2.y){
            if(grabLeft.getPosition() != 0){
                grabLeft.setPosition(0.2);
-               grabRight.setPosition(0.2);
+               grabRight.setPosition(0.7);
                timer(1000);
            }
            else{
                grabLeft.setPosition(0.7);
-               grabRight.setPosition(0.7);
+               grabRight.setPosition(0.2);
                timer(1000);
            }
        }
        else if (gamepad2.a){
            if(grabRight.getPosition() == 0){
                grabLeft.setPosition(0.2);
-               grabRight.setPosition(0.2);
+               grabRight.setPosition(0.7);
                timer(100);
            }
            else{
                grabLeft.setPosition(0.7);
-               grabRight.setPosition(0.7);
+               grabRight.setPosition(0.2);
                timer(100);
            }
        }

@@ -84,8 +84,7 @@ public class Funcs_11229 extends LinearOpMode {
 
     public void timer(long miliseconds) {
         long x = (long) elapsedTime.milliseconds();
-        while (x < miliseconds + (long) elapsedTime.milliseconds()) {
-        }
+        while (x < miliseconds + (long) elapsedTime.milliseconds()) {}
     }
 
     public void fourBar() {
