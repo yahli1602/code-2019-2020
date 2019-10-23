@@ -15,7 +15,6 @@ public class Teleop_11226 extends LinearOpMode {
     private Funcs_11226 funcs = new Funcs_11226();
 
     @Override
-    //
     public void runOpMode() {
 
         waitForStart();
