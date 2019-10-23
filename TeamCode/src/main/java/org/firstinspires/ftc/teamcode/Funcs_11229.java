@@ -31,8 +31,9 @@ public class Funcs_11229 extends LinearOpMode {
     private double slidePower() {
         if (gamepad1.right_trigger > gamepad1.left_trigger) {
             return gamepad1.right_trigger;
+        } else {
+            return -gamepad1.left_trigger;
         }
-        return -gamepad1.left_trigger;
     }
 
 
