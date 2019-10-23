@@ -14,6 +14,8 @@ import com.qualcomm.robotcore.util.Range;
 @Disabled
 public class Funcs_11226 extends LinearOpMode {
 
+    vuforiaFuncs11226 vuforia = new vuforiaFuncs11226();
+
     public ElapsedTime elapsedTime = new ElapsedTime();
 
     private DcMotor rDrive1 = null;
@@ -22,7 +24,8 @@ public class Funcs_11226 extends LinearOpMode {
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
     private DcMotor arm = null;
-    private Servo grab = null;
+    private Servo grabLeft = null;
+    private Servo grabRight = null;
 
     public double rightPower = gamepad1.right_stick_y;
     public double leftPower = gamepad1.left_stick_y;
@@ -42,7 +45,8 @@ public class Funcs_11226 extends LinearOpMode {
         lDrive2 = HM.get(DcMotor.class, "lDrive2");
         slide = HM.get(DcMotor.class, "slide");
         arm = HM.get(DcMotor.class, "arm");
-        grab = HM.get(Servo.class, "grab");
+        grabLeft = HM.get(Servo.class, "grabLeft");
+        grabRight = HM.get(Servo.class, "grabRight");
 
         rDrive1.setDirection(DcMotor.Direction.FORWARD);
         rDrive2.setDirection(DcMotor.Direction.FORWARD);
@@ -97,21 +101,33 @@ public class Funcs_11226 extends LinearOpMode {
 
     public void grab(){
        if(gamepad2.y){
-           if(grab.getPosition() != 0){
-               grab.setPosition(0.2);
+           if(grabLeft.getPosition() != 0){
+               grabLeft.setPosition(0.2);
+               grabRight.setPosition(0.7);
                timer(1000);
            }
            else{
-               grab.setPosition(0.7);
+               grabLeft.setPosition(0.7);
+               grabRight.setPosition(0.2);
                timer(1000);
            }
        }
        else if (gamepad2.a){
-           grab.setPosition(0.7);
-           timer(100);
+           if(grabRight.getPosition() == 0){
+               grabLeft.setPosition(0.2);
+               grabRight.setPosition(0.7);
+               timer(100);
+           }
+           else{
+               grabLeft.setPosition(0.7);
+               grabRight.setPosition(0.2);
+               timer(100);
+           }
        }
        else{}
     }
+
+
 
 //Functions for Autonomus
 
@@ -140,8 +156,6 @@ public class Funcs_11226 extends LinearOpMode {
             }
         }
     }
-
-
 
     @Override
     public void runOpMode() {
