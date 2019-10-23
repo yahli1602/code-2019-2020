@@ -23,43 +23,43 @@ public class vuforiaFuncs11226 extends LinearOpMode{
         prams.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
 
         VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(prams);
-        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS , 4);
+        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS , 5);
 
-        VuforiaTrackables targetsSkyStone = vuforia.loadTrackablesFromAsset("Skystone");
+        VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("Skystone");
 
-        VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
+        VuforiaTrackable stoneTarget = beacons.get(0);
         stoneTarget.setName("Stone Target");
-        VuforiaTrackable blueRearBridge = targetsSkyStone.get(1);
+        VuforiaTrackable blueRearBridge = beacons.get(1);
         blueRearBridge.setName("Blue Rear Bridge");
-        VuforiaTrackable redRearBridge = targetsSkyStone.get(2);
+        VuforiaTrackable redRearBridge = beacons.get(2);
         redRearBridge.setName("Red Rear Bridge");
-        VuforiaTrackable redFrontBridge = targetsSkyStone.get(3);
+        VuforiaTrackable redFrontBridge = beacons.get(3);
         redFrontBridge.setName("Red Front Bridge");
-        VuforiaTrackable blueFrontBridge = targetsSkyStone.get(4);
+        VuforiaTrackable blueFrontBridge = beacons.get(4);
         blueFrontBridge.setName("Blue Front Bridge");
-        VuforiaTrackable red1 = targetsSkyStone.get(5);
+        VuforiaTrackable red1 = beacons.get(5);
         red1.setName("Red Perimeter 1");
-        VuforiaTrackable red2 = targetsSkyStone.get(6);
+        VuforiaTrackable red2 = beacons.get(6);
         red2.setName("Red Perimeter 2");
-        VuforiaTrackable front1 = targetsSkyStone.get(7);
+        VuforiaTrackable front1 = beacons.get(7);
         front1.setName("Front Perimeter 1");
-        VuforiaTrackable front2 = targetsSkyStone.get(8);
+        VuforiaTrackable front2 = beacons.get(8);
         front2.setName("Front Perimeter 2");
-        VuforiaTrackable blue1 = targetsSkyStone.get(9);
+        VuforiaTrackable blue1 = beacons.get(9);
         blue1.setName("Blue Perimeter 1");
-        VuforiaTrackable blue2 = targetsSkyStone.get(10);
+        VuforiaTrackable blue2 = beacons.get(10);
         blue2.setName("Blue Perimeter 2");
-        VuforiaTrackable rear1 = targetsSkyStone.get(11);
+        VuforiaTrackable rear1 = beacons.get(11);
         rear1.setName("Rear Perimeter 1");
-        VuforiaTrackable rear2 = targetsSkyStone.get(12);
+        VuforiaTrackable rear2 = beacons.get(12);
         rear2.setName("Rear Perimeter 2");
 
         waitForStart();
 
-        targetsSkyStone.activate();
+        beacons.activate();
 
         while(opModeIsActive()){
-            for (VuforiaTrackable beac : targetsSkyStone){
+            for (VuforiaTrackable beac : beacons){
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getPose();
 
                 if(pose != null){

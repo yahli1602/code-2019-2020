@@ -97,7 +97,7 @@ public class Funcs_11229 extends LinearOpMode {
         } else if (gamepad2.left_stick_y < 0) {
             for (double i = -1.0; i <= 0; i += 0.1) {
                 fourBar.setPower(i);
-                sleep(100);
+                timer(100);
             }
         }
     }
