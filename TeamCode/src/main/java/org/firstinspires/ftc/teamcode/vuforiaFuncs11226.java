@@ -64,13 +64,17 @@ public class vuforiaFuncs11226 extends LinearOpMode{
 
                 if(pose != null){
                     VectorF translation = pose.getTranslation();
+                    if(beac == stoneTarget){
+                        telemetry.addData(beac.getName() + "-Tranlation" , translation);
 
-                    telemetry.addData(beac.getName() + "-Tranlation" , translation);
+                        double degreesToTurn = Math.toDegrees(Math.atan2(translation.get(1), translation.get(2)));
 
-                    double degreesToTurn = Math.toDegrees(Math.atan2(translation.get(1), translation.get(2)));
+                        telemetry.addData(beac.getName() + "-Degrees",degreesToTurn);
+                        telemetry.update();
+                    }
 
-                    telemetry.addData(beac.getName() + "-Degrees",degreesToTurn);
-                    telemetry.update();
+
+
                 }
             }
             telemetry.update();
