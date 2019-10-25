@@ -62,7 +62,6 @@ public class Funcs_11229 extends LinearOpMode {
             lDrive1.setPower(leftPower);
             lDrive2.setPower(leftPower);
         } else {
-            slide.setPower(0);
             lDrive1.setPower(0);
             lDrive2.setPower(0);
         }
@@ -70,7 +69,6 @@ public class Funcs_11229 extends LinearOpMode {
             rDrive1.setPower(rightPower);
             rDrive2.setPower(rightPower);
         } else {
-            slide.setPower(0);
             rDrive1.setPower(0);
             rDrive2.setPower(0);
         }
@@ -90,16 +88,22 @@ public class Funcs_11229 extends LinearOpMode {
 
     public void fourBar() {
         if (gamepad2.left_stick_y > 0) {
-            for (double i = 1.0; i >= 0; i -= 0.1) {
-                fourBar.setPower(i);
-                timer(100);
-            }
-        } else if (gamepad2.left_stick_y < 0) {
-            for (double i = -1.0; i <= 0; i += 0.1) {
-                fourBar.setPower(i);
-                timer(100);
+            while (fourBar.getCurrentPosition() < 1440 * gamepad2.left_stick_y) {
+                for (double i = gamepad2.left_stick_y; i >= 0; i -= 0.1) {
+                    fourBar.setPower(i);
+                    timer((long)(100 / gamepad1.left_stick_y));
+                }
             }
         }
+        else if (gamepad2.left_stick_y < 0){
+            while(fourBar.getCurrentPosition() < 1440 * gamepad2.left_stick_y){
+                for(double i = gamepad2.left_stick_y; i <= 0; i += 0.1){
+                    fourBar.setPower(i);
+                    timer((long)(100 / gamepad1.left_stick_y));
+                }
+            }
+        }
+        else{}
     }
 
     public void collect() {

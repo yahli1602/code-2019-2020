@@ -59,24 +59,21 @@ public class vuforiaFuncs11226 extends LinearOpMode{
         beacons.activate();
 
         while(opModeIsActive()){
-            for (VuforiaTrackable beac : beacons){
-                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getPose();
-
-                if(pose != null){
+            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beacons.get(0).getListener()).getPose();
+            if(pose != null){
                     VectorF translation = pose.getTranslation();
-                    if(beac == stoneTarget){
-                        telemetry.addData(beac.getName() + "-Tranlation" , translation);
+                    telemetry.addData(beacons.get(0).getName() + "-Tranlation" , translation);
 
-                        double degreesToTurn = Math.toDegrees(Math.atan2(translation.get(1), translation.get(2)));
+                    double degreesToTurn = Math.toDegrees(Math.atan2(translation.get(0), translation.get(1)));
 
-                        telemetry.addData(beac.getName() + "-Degrees",degreesToTurn);
-                        telemetry.update();
-                    }
-
-
-
-                }
+                    telemetry.addData(beacons.get(0).getName() + "-Degrees",degreesToTurn);
+                    telemetry.update();
             }
+
+
+
+
+
             telemetry.update();
         }
 

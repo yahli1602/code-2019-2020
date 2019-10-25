@@ -29,6 +29,7 @@ public class Funcs_11226 extends LinearOpMode {
 
     public double rightPower = gamepad1.right_stick_y;
     public double leftPower = gamepad1.left_stick_y;
+
     public double slidePower(){
         if(gamepad1.right_trigger > gamepad1.left_trigger){
             return gamepad1.right_trigger;
@@ -57,14 +58,13 @@ public class Funcs_11226 extends LinearOpMode {
 
     }
 
-//Functions for Teleop
+// Functions for Teleop
 
     public void drive() {
         if (leftPower > 0.2 || leftPower < -0.2) {
             lDrive1.setPower(leftPower);
             lDrive2.setPower(leftPower);
         } else {
-            slide.setPower(0);
             lDrive1.setPower(0);
             lDrive2.setPower(0);
         }
@@ -72,7 +72,6 @@ public class Funcs_11226 extends LinearOpMode {
             rDrive1.setPower(rightPower);
             rDrive2.setPower(rightPower);
         } else {
-            slide.setPower(0);
             rDrive1.setPower(0);
             rDrive2.setPower(0);
         }
@@ -105,11 +104,15 @@ public class Funcs_11226 extends LinearOpMode {
                grabLeft.setPosition(0.2);
                grabRight.setPosition(0.7);
                timer(1000);
+               grabLeft.setPosition(0);
+               grabRight.setPosition(0);
            }
            else{
                grabLeft.setPosition(0.7);
                grabRight.setPosition(0.2);
                timer(1000);
+               grabLeft.setPosition(0);
+               grabRight.setPosition(0);
            }
        }
        else if (gamepad2.a){
@@ -117,14 +120,18 @@ public class Funcs_11226 extends LinearOpMode {
                grabLeft.setPosition(0.2);
                grabRight.setPosition(0.7);
                timer(100);
+               grabLeft.setPosition(0);
+               grabRight.setPosition(0);
+
            }
            else{
                grabLeft.setPosition(0.7);
                grabRight.setPosition(0.2);
                timer(100);
+               grabLeft.setPosition(0);
+               grabRight.setPosition(0);
            }
        }
-       else{}
     }
 
 
