@@ -9,10 +9,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name = "Teleop gecko", group = "Linear Opmode")
 public class teleopGecko extends LinearOpMode {
-private DcMotor rdrive1 = null;
-private DcMotor rdrive2 = null;
-private DcMotor ldrive1 = null;
-private DcMotor ldrive2 = null;
+public DcMotor rdrive1 = null;
+public DcMotor rdrive2 = null;
+public DcMotor ldrive1 = null;
+public DcMotor ldrive2 = null;
 
 
     @Override
@@ -29,24 +29,19 @@ private DcMotor ldrive2 = null;
         ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
         ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
         while (opModeIsActive()) {
-            rdrive1.setPower(gamepad1.right_stick_y);
-            rdrive2.setPower(gamepad1.right_stick_y);
-            ldrive1.setPower(gamepad1.right_stick_y);
-            ldrive2.setPower(gamepad1.right_stick_y);
-
 
             if (gamepad1.left_trigger > 0.2){
-                rdrive1.setPower(-gamepad1.left_trigger);
-                rdrive2.setPower(-gamepad1.left_trigger);
-                ldrive1.setPower(gamepad1.left_trigger);
-                ldrive2.setPower(gamepad1.left_trigger);
+                rdrive1.setPower(gamepad1.left_trigger);
+                rdrive2.setPower(gamepad1.left_trigger);
+                ldrive1.setPower(-gamepad1.left_trigger);
+                ldrive2.setPower(-gamepad1.left_trigger);
 
             }
             else if (gamepad1.right_trigger > 0.2){
-                rdrive1.setPower(gamepad1.right_trigger);
-                rdrive2.setPower(gamepad1.right_trigger);
-                ldrive1.setPower(-gamepad1.right_trigger);
-                ldrive2.setPower(-gamepad1.right_trigger);
+                rdrive1.setPower(-gamepad1.right_trigger);
+                rdrive2.setPower(-gamepad1.right_trigger);
+                ldrive1.setPower(gamepad1.right_trigger);
+                ldrive2.setPower(gamepad1.right_trigger);
 
             }
             else {
