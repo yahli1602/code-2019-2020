@@ -8,7 +8,6 @@
  * of conditions and the following disclaimer.
  *
  * Redistributions in binary form must reproduce the above copyright notice, this
- * other materials provided with the distribution.
  *
  * Neither the name of FIRST nor the names of its contributors may be used to endorse or
  * promote products derived from this software without specific prior written permission.
@@ -42,14 +41,17 @@ import com.qualcomm.robotcore.util.Range;
 public class gecko_autonomus extends LinearOpMode {
 
     PID pid = new PID();
+    Funcs_11229 funcs = new Funcs_11229();
 
     public DcMotor rdrive1 = null;
     public DcMotor rdrive2 = null;
     public DcMotor ldrive1 = null;
     public DcMotor ldrive2 = null;
 
-    private void driveInches (double inches){
-        while(ldrive1.getCurrentPosition() < inches*1440){
+
+
+    private void driveInches(double inches) {
+        while (ldrive1.getCurrentPosition() < inches * 1440) {
             ldrive1.setPower(pid.uT(inches));
             ldrive2.setPower(pid.uT(inches));
             rdrive1.setPower(pid.uT(inches));
@@ -58,12 +60,12 @@ public class gecko_autonomus extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
 
 
         rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
         rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
-        ldrive1 = hardwareMap.get(DcMotor.class,"left_drive1");
+        ldrive1 = hardwareMap.get(DcMotor.class, "left_drive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
         waitForStart();
         rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -72,9 +74,7 @@ public class gecko_autonomus extends LinearOpMode {
         ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
-
-driveInches(24);
-
+        driveInches(24);
 
 
     }
