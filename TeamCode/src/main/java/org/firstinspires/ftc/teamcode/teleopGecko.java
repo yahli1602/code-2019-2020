@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
 @TeleOp(name = "Teleop gecko", group = "Linear Opmode")
@@ -14,20 +15,22 @@ public DcMotor rdrive2 = null;
 public DcMotor ldrive1 = null;
 public DcMotor ldrive2 = null;
 
+public void init(HardwareMap HM){
+    rdrive1 = HM.get(DcMotor.class, "right_drive1");
+    rdrive2 = HM.get(DcMotor.class, "right_drive2");
+    ldrive1 = HM.get(DcMotor.class,"left_drive1");
+    ldrive2 = HM.get(DcMotor.class, "left_drive2");
+    waitForStart();
+    rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
+    rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+    ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
+    ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+
+}
 
     @Override
     public void runOpMode() {
 
-
-        rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
-        rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
-        ldrive1 = hardwareMap.get(DcMotor.class,"left_drive1");
-        ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
-        waitForStart();
-        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
-        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
         while (opModeIsActive()) {
 
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2){
