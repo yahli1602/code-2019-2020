@@ -16,10 +16,10 @@ public DcMotor ldrive1 = null;
 public DcMotor ldrive2 = null;
 
 public void init(HardwareMap HM){
-    rdrive1 = HM.get(DcMotor.class, "right_drive1");
-    rdrive2 = HM.get(DcMotor.class, "right_drive2");
-    ldrive1 = HM.get(DcMotor.class,"left_drive1");
-    ldrive2 = HM.get(DcMotor.class, "left_drive2");
+    rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
+    rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
+    ldrive1 = hardwareMap.get(DcMotor.class,"left_drive1");
+    ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
     waitForStart();
     rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
     rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
