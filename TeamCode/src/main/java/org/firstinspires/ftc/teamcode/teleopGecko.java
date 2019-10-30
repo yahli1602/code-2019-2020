@@ -30,6 +30,13 @@ public DcMotor ldrive2 = null;
         ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
         while (opModeIsActive()) {
 
+            if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2){
+                rdrive1.setPower(gamepad1.right_stick_y);
+                rdrive2.setPower(gamepad1.right_stick_y);
+                ldrive1.setPower(gamepad1.right_stick_y);
+                ldrive2.setPower(gamepad1.right_stick_y);
+            }
+
             if (gamepad1.left_trigger > 0.2){
                 rdrive1.setPower(gamepad1.left_trigger);
                 rdrive2.setPower(gamepad1.left_trigger);
