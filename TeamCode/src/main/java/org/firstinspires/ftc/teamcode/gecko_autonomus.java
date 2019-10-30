@@ -49,21 +49,7 @@ public class gecko_autonomus extends LinearOpMode {
     public DcMotor ldrive1 = null;
     public DcMotor ldrive2 = null;
 
-    public void init(HardwareMap HM){
-        rdrive1 = HM.get(DcMotor.class, "right_drive1");
-        rdrive2 = HM.get(DcMotor.class, "right_drive2");
-        ldrive1 = HM.get(DcMotor.class,"left_drive1");
-        ldrive2 = HM.get(DcMotor.class, "left_drive2");
-        waitForStart();
-        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
-        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
-
-    }
-
-
-    private void driveInches(double inches){
+    private void driveInches (double inches){
         while(ldrive1.getCurrentPosition() < inches*1440){
             ldrive1.setPower(pid.uT(inches));
             ldrive2.setPower(pid.uT(inches));
@@ -74,6 +60,23 @@ public class gecko_autonomus extends LinearOpMode {
 
     @Override
     public void runOpMode(){
-        driveInches(24);
+
+
+        rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
+        rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
+        ldrive1 = hardwareMap.get(DcMotor.class,"left_drive1");
+        ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
+        waitForStart();
+        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
+        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
+        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+
+driveInches(24);
+
+
+
     }
 }

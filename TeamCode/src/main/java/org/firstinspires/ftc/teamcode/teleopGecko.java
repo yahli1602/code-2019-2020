@@ -14,8 +14,8 @@ public DcMotor rdrive1 = null;
 public DcMotor rdrive2 = null;
 public DcMotor ldrive1 = null;
 public DcMotor ldrive2 = null;
-
-public void init(HardwareMap HM){
+    @Override
+    public void runOpMode() {
     rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
     rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
     ldrive1 = hardwareMap.get(DcMotor.class,"left_drive1");
@@ -26,10 +26,9 @@ public void init(HardwareMap HM){
     ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
     ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-}
 
-    @Override
-    public void runOpMode() {
+
+
 
         while (opModeIsActive()) {
 
@@ -37,22 +36,22 @@ public void init(HardwareMap HM){
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2){
                 rdrive1.setPower(gamepad1.right_stick_y);
                 rdrive2.setPower(gamepad1.right_stick_y);
-                ldrive1.setPower(gamepad1.right_stick_y);
-                ldrive2.setPower(gamepad1.right_stick_y);
+                ldrive1.setPower(-gamepad1.right_stick_y);
+                ldrive2.setPower(-gamepad1.right_stick_y);
             }
 
             if (gamepad1.left_trigger > 0.2){
                 rdrive1.setPower(gamepad1.left_trigger);
                 rdrive2.setPower(gamepad1.left_trigger);
-                ldrive1.setPower(-gamepad1.left_trigger);
-                ldrive2.setPower(-gamepad1.left_trigger);
+                ldrive1.setPower(gamepad1.left_trigger);
+                ldrive2.setPower(gamepad1.left_trigger);
 
             }
             else if (gamepad1.right_trigger > 0.2){
                 rdrive1.setPower(-gamepad1.right_trigger);
                 rdrive2.setPower(-gamepad1.right_trigger);
-                ldrive1.setPower(gamepad1.right_trigger);
-                ldrive2.setPower(gamepad1.right_trigger);
+                ldrive1.setPower(-gamepad1.right_trigger);
+                ldrive2.setPower(-gamepad1.right_trigger);
 
             }
             else {
