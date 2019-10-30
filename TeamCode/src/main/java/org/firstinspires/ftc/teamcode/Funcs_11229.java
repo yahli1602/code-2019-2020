@@ -58,19 +58,18 @@ public class Funcs_11229 extends LinearOpMode {
 //Functions for Teleop
 
     public void drive() {
-        if (leftPower > 0.2 || leftPower < -0.2) {
-            lDrive1.setPower(leftPower);
-            lDrive2.setPower(leftPower);
-        } else {
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-        }
+
         if (rightPower > 0.2 || rightPower < -0.2) {
             rDrive1.setPower(rightPower);
             rDrive2.setPower(rightPower);
-        } else {
+            lDrive1.setPower(rightPower);
+            lDrive2.setPower(rightPower);
+        }
+        else {
             rDrive1.setPower(0);
             rDrive2.setPower(0);
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
         }
         if (slidePower() > 0.2) {
             slide.setPower(slidePower());
