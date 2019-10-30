@@ -29,25 +29,51 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-@Disabled
-public class gecko_autonomus {
-    teleopGecko teleop = new teleopGecko();
+@Autonomous(name="Auto Gecko", group="Autonomous")
+public class gecko_autonomus extends LinearOpMode {
+
     PID pid = new PID();
 
-    private void driveInches(double inches){
+    public DcMotor rdrive1 = null;
+    public DcMotor rdrive2 = null;
+    public DcMotor ldrive1 = null;
+    public DcMotor ldrive2 = null;
+
+    public void init(HardwareMap HM){
+        rdrive1 = HM.get(DcMotor.class, "right_drive1");
+        rdrive2 = HM.get(DcMotor.class, "right_drive2");
+        ldrive1 = HM.get(DcMotor.class,"left_drive1");
+        ldrive2 = HM.get(DcMotor.class, "left_drive2");
+        waitForStart();
+        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
+        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
+        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
 
     }
 
-    public void runAutonomous{
 
+    private void driveInches(double inches){
+        while(ldrive1.getCurrentPosition() < inches*1440){
+            ldrive1.setPower(pid.uT(inches));
+            ldrive2.setPower(pid.uT(inches));
+            rdrive1.setPower(pid.uT(inches));
+            rdrive2.setPower(pid.uT(inches));
+        }
+    }
+
+    @Override
+    public void runOpMode(){
+        driveInches(24);
     }
 }
