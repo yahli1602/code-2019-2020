@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 public class PID {
 
-    Funcs_11226 funcs = new Funcs_11226();
     vuforiaFuncs11226 vuforia = new vuforiaFuncs11226();
+    ElapsedTime elapsedTime = new ElapsedTime();
 
     private double kp = 1.3;
     private double ki = 0.1;
@@ -27,10 +29,10 @@ public class PID {
         }
         else{}
         errorN = errorT;
-        Ti  = ki/funcs.elapsedTime.milliseconds() * (errorN + errorL);
+        Ti  = ki/elapsedTime.milliseconds() * (errorN + errorL);
 
         errorL += (ki/Ti) * errorT;
-        Ti = funcs.elapsedTime.milliseconds() - Ti;
+        Ti = elapsedTime.milliseconds() - Ti;
         uT = kp * errorT + errorL; //+ (kd/Ti) * (errorN - errorL);
 
         errorT = errorL;

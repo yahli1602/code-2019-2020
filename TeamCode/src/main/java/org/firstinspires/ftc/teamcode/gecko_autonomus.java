@@ -43,11 +43,14 @@ import com.qualcomm.robotcore.util.Range;
 public class gecko_autonomus extends LinearOpMode {
 
     PID pid = new PID();
+    Funcs_11229 funcs = new Funcs_11229();
 
     public DcMotor rdrive1 = null;
     public DcMotor rdrive2 = null;
     public DcMotor ldrive1 = null;
     public DcMotor ldrive2 = null;
+
+
 
     public void init(HardwareMap HM){
         rdrive1 = HM.get(DcMotor.class, "right_drive1");
@@ -63,17 +66,8 @@ public class gecko_autonomus extends LinearOpMode {
     }
 
 
-    private void driveInches(double inches){
-        while(ldrive1.getCurrentPosition() < inches*1440){
-            ldrive1.setPower(pid.uT(inches));
-            ldrive2.setPower(pid.uT(inches));
-            rdrive1.setPower(pid.uT(inches));
-            rdrive2.setPower(pid.uT(inches));
-        }
-    }
-
     @Override
     public void runOpMode(){
-        driveInches(24);
+        funcs.driveInches(24);
     }
 }
