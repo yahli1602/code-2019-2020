@@ -36,22 +36,22 @@ public DcMotor ldrive2 = null;
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2){
                 rdrive1.setPower(gamepad1.right_stick_y);
                 rdrive2.setPower(gamepad1.right_stick_y);
-                ldrive1.setPower(-gamepad1.right_stick_y);
-                ldrive2.setPower(-gamepad1.right_stick_y);
+                ldrive1.setPower(gamepad1.right_stick_y);
+                ldrive2.setPower(gamepad1.right_stick_y);
             }
 
             if (gamepad1.left_trigger > 0.2){
                 rdrive1.setPower(gamepad1.left_trigger);
                 rdrive2.setPower(gamepad1.left_trigger);
-                ldrive1.setPower(gamepad1.left_trigger);
-                ldrive2.setPower(gamepad1.left_trigger);
+                ldrive1.setPower(-gamepad1.left_trigger);
+                ldrive2.setPower(-gamepad1.left_trigger);
 
             }
             else if (gamepad1.right_trigger > 0.2){
                 rdrive1.setPower(-gamepad1.right_trigger);
                 rdrive2.setPower(-gamepad1.right_trigger);
-                ldrive1.setPower(-gamepad1.right_trigger);
-                ldrive2.setPower(-gamepad1.right_trigger);
+                ldrive1.setPower(gamepad1.right_trigger);
+                ldrive2.setPower(gamepad1.right_trigger);
 
             }
             else {

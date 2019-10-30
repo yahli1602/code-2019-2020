@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class PID {
 
-    vuforiaFuncs11226 vuforia = new vuforiaFuncs11226();
     ElapsedTime elapsedTime = new ElapsedTime();
 
     private double kp = 1.3;
