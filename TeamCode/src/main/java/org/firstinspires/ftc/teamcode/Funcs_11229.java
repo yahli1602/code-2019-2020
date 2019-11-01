@@ -39,10 +39,10 @@ public class Funcs_11229 extends LinearOpMode {
 
     public void init(HardwareMap HM) {
 
-        rDrive1 = HM.get(DcMotor.class, "rightDrive1");
-        rDrive2 = HM.get(DcMotor.class, "rightDrive2");
-        lDrive1 = HM.get(DcMotor.class, "leftDrive1");
-        lDrive2 = HM.get(DcMotor.class, "leftDrive2");
+        rDrive1 = HM.get(DcMotor.class, "rDrive1");
+        rDrive2 = HM.get(DcMotor.class, "rDrive2");
+        lDrive1 = HM.get(DcMotor.class, "lDrive1");
+        lDrive2 = HM.get(DcMotor.class, "lDrive2");
         slide = HM.get(DcMotor.class, "slide");
         fourBar = HM.get(DcMotor.class, "4bar");
         collectRight = HM.get(Servo.class, "collectRight");
