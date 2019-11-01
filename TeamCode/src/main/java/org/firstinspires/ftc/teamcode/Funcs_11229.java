@@ -90,7 +90,7 @@ public class Funcs_11229 extends LinearOpMode {
             while (fourBar.getCurrentPosition() < 1440 * gamepad2.left_stick_y) {
                 for (double i = gamepad2.left_stick_y; i >= fourBar.getCurrentPosition()/1440; i -= 0.1) {
                     fourBar.setPower(i - (fourBar.getCurrentPosition()/1440));
-                    timer((long)(100 / gamepad1.left_stick_y));
+                    timer((long)(100 / (gamepad1.left_stick_y - fourBar.getCurrentPosition()/1440)));
                 }
             }
         }

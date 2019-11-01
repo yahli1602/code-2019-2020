@@ -15,15 +15,11 @@ public class PID {
     public double errorT;
     public double errorN;
 
-    private double ticksPerSpin = 1440;
-    private double reduction = 40;
-    private double perimeter = 4*Math.PI;
-    private double ticksPerInch = ticksPerSpin * reduction / perimeter;
 
     public double uT(double errort){
         double count = 1;
         if(count == 1){
-            errorT = errort * ticksPerInch;
+            errorT = errort;
             errorL = 0;
         }
         else{}
