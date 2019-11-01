@@ -8,15 +8,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class PID {
 
     ElapsedTime elapsedTime = new ElapsedTime();
 
-    private double kp = 1.3;
+    private double kp = 1.4;
     private double ki = 0.1;
-    private double kd = 0.2;
+    private double kd = 0.1;
     public double Ti;
     public double uT;
     public double errorL;
@@ -36,11 +35,13 @@ public class PID {
 
         errorL += (ki/Ti) * errorT;
         Ti = elapsedTime.milliseconds() - Ti;
-        uT = kp * errorT + errorL; //+ (kd/Ti) * (errorN - errorL);
+        uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
 
         errorT = errorL;
         errorL = errorN;
         count++;
+
+
         return uT;
     }
 
