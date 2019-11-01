@@ -49,23 +49,7 @@ public class gecko_autonomus extends LinearOpMode {
 
 
 
-    private void driveFeet(double inches) {
-        while (ldrive1.getCurrentPosition() < inches * 28 * 4) {
-            ldrive1.setPower(pid.uT(inches));
-            ldrive2.setPower(pid.uT(inches));
-            rdrive1.setPower(pid.uT(inches));
-            rdrive2.setPower(pid.uT(inches));
-            telemetry.addData("Output:", pid.uT);
-        }
-        ldrive1.setPower(0);
-        ldrive2.setPower(0);
-        rdrive1.setPower(0);
-        rdrive2.setPower(0);
-    }
-
-    @Override
-    public void runOpMode() {
-
+    public void init(HardwareMap hardwareMap){
 
         rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
         rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
@@ -77,8 +61,12 @@ public class gecko_autonomus extends LinearOpMode {
         ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
         ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
 
+    }
 
-        driveFeet(12);
+    @Override
+    public void runOpMode() {
+
+        pid.driveInches(12);
 
 
     }

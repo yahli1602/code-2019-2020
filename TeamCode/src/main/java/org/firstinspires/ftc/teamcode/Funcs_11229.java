@@ -119,27 +119,7 @@ public class Funcs_11229 extends LinearOpMode {
     }
 //Functions for Autonumus
 
-    public void driveInches(double errort){
-        while(pid.errorT > 0){
-            lDrive1.setPower(pid.uT(errort));
-            lDrive2.setPower(pid.uT(errort));
-            rDrive1.setPower(pid.uT(errort));
-            rDrive2.setPower(pid.uT(errort));
-        }
-    }
 
-    //to be declared later
-    private double diameter;
-
-    //function turns right naturally
-    public void turnDeg(double deg){
-        while(pid.errorT > 0){
-            rDrive1.setPower(pid.uT((deg/360)*diameter*Math.PI));
-            rDrive1.setPower(pid.uT((deg/360)*diameter*Math.PI));
-            lDrive1.setPower(-pid.uT((deg/360)*diameter*Math.PI));
-            lDrive2.setPower(-pid.uT((deg/360)*diameter*Math.PI));
-        }
-    }
 
     public void rotateByDirction(String direction, float rotationPower) { //rotation by direction call it again to turn off
         if (rDrive1.isBusy()) {

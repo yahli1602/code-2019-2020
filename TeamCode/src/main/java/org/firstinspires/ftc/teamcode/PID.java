@@ -9,13 +9,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-public class PID {
+public class PID extends LinearOpMode {
 
     ElapsedTime elapsedTime = new ElapsedTime();
+    gecko_autonomus gecko = new gecko_autonomus();
 
-    private double kp = 1.4;
+    private double kp = 1.1;
     private double ki = 0.1;
-    private double kd = 0.1;
+    private double kd = 0.3;
     public double Ti;
     public double uT;
     public double errorL;
@@ -23,26 +24,37 @@ public class PID {
     public double errorN;
 
 
-    public double uT(double errort){
-        double count = 1;
-        if(count == 1){
-            errorT = errort;
-            errorL = 0;
+    public void driveInches(double inches){
+        while(gecko.ldrive1.getCurrentPosition() < inches * 28 * 4){
+            double count = 1;
+            if(count == 1){
+                errorT = inches;
+                errorL = 0;
+            }
+            else{}
+            errorN = errorT;
+            Ti  = ki/elapsedTime.milliseconds() * (errorN + errorL);
+
+            errorL += (ki/Ti) * errorT;
+            Ti = elapsedTime.milliseconds() - Ti;
+            uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
+
+            gecko.ldrive1.setPower(uT);
+            gecko.ldrive2.setPower(uT);
+            gecko.rdrive1.setPower(uT);
+            gecko.rdrive2.setPower(uT);
+
+            telemetry.addData("Drive Power", gecko.ldrive1.getPower());
+            telemetry.update();
+
+            errorT = errorL;
+            errorL = errorN;
+            count++;
         }
-        else{}
-        errorN = errorT;
-        Ti  = ki/elapsedTime.milliseconds() * (errorN + errorL);
-
-        errorL += (ki/Ti) * errorT;
-        Ti = elapsedTime.milliseconds() - Ti;
-        uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
-
-        errorT = errorL;
-        errorL = errorN;
-        count++;
-
-
-        return uT;
+        gecko.ldrive1.setPower(0);
+        gecko.ldrive2.setPower(0);
+        gecko.rdrive1.setPower(0);
+        gecko.rdrive2.setPower(0);
     }
 
     public void runOpMode(){
