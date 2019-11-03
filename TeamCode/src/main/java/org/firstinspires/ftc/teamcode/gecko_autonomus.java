@@ -30,6 +30,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -40,17 +41,31 @@ import com.qualcomm.robotcore.util.Range;
 @Autonomous(name="Auto Gecko", group="Autonomous")
 public class gecko_autonomus extends LinearOpMode {
 
-   private PID pid = new PID();
+    private PID pid = new PID();
 
     public DcMotor rdrive1 = null;
     public DcMotor rdrive2 = null;
     public DcMotor ldrive1 = null;
     public DcMotor ldrive2 = null;
 
+    /*public void driveByInch(double inches) {
+        for (double i = inches / 10; i > 0; i -= 0.1) {
+            if (i > 1) {
+                ldrive1.setPower(1);
+                ldrive2.setPower(1);
+                rdrive1.setPower(1);
+                rdrive2.setPower(1);
+            } else {
+                ldrive1.setPower(i);
+                ldrive2.setPower(i);
+                rdrive1.setPower(i);
+                rdrive2.setPower(i);
+            }
+        }
+    }*/
 
-
-    public void init(HardwareMap hardwareMap){
-
+    @Override
+    public void runOpMode() {
         rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
         rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
         ldrive1 = hardwareMap.get(DcMotor.class, "left_drive1");
@@ -61,13 +76,11 @@ public class gecko_autonomus extends LinearOpMode {
         ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
         ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
 
+            pid.driveInches(2);
+
+            telemetry.addData("Drive Power", ldrive1.getPower());
+            telemetry.update();
+
+
+        }
     }
-
-    @Override
-    public void runOpMode() {
-
-        pid.driveInches(12);
-
-
-    }
-}

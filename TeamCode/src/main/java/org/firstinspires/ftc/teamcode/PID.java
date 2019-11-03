@@ -9,7 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-public class PID extends LinearOpMode {
+
+public class PID {
 
     ElapsedTime elapsedTime = new ElapsedTime();
     gecko_autonomus gecko = new gecko_autonomus();
@@ -31,7 +32,7 @@ public class PID extends LinearOpMode {
                 errorT = inches;
                 errorL = 0;
             }
-            else{}
+            else{ }
             errorN = errorT;
             Ti  = ki/elapsedTime.milliseconds() * (errorN + errorL);
 
@@ -44,11 +45,9 @@ public class PID extends LinearOpMode {
             gecko.rdrive1.setPower(uT);
             gecko.rdrive2.setPower(uT);
 
-            telemetry.addData("Drive Power", gecko.ldrive1.getPower());
-            telemetry.update();
 
-            errorT = errorL;
-            errorL = errorN;
+
+            errorT -= errorL;
             count++;
         }
         gecko.ldrive1.setPower(0);
@@ -57,7 +56,5 @@ public class PID extends LinearOpMode {
         gecko.rdrive2.setPower(0);
     }
 
-    public void runOpMode(){
 
-    }
 }
