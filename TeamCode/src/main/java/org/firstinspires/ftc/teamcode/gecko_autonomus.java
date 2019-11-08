@@ -27,6 +27,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Path;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -76,11 +78,12 @@ public class gecko_autonomus extends LinearOpMode {
         ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
         ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
 
-            pid.driveInches(2);
+        while(opModeIsActive()) {
+            pid.driveInches(5, ldrive1, ldrive2, rdrive1, rdrive2);
 
             telemetry.addData("Drive Power", ldrive1.getPower());
             telemetry.update();
 
-
+        }
         }
     }

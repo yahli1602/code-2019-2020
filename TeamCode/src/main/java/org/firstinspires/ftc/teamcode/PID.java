@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.util.Range;
 public class PID {
 
     ElapsedTime elapsedTime = new ElapsedTime();
-    gecko_autonomus gecko = new gecko_autonomus();
 
     private double kp = 1.1;
     private double ki = 0.1;
@@ -24,11 +23,14 @@ public class PID {
     public double errorT;
     public double errorN;
 
+    public void timer(long miliseconds){
+        long x = (long)elapsedTime.milliseconds();
+        while(x < miliseconds + (long)elapsedTime.milliseconds()){}
+    }
 
-    public void driveInches(double inches){
-        while(gecko.ldrive1.getCurrentPosition() < inches * 28 * 4){
-            double count = 1;
-            if(count == 1){
+    public void driveInches(double inches, DcMotor ldrive1, DcMotor ldrive2, DcMotor rdrive1, DcMotor rdrive2){
+        while(errorT > 0){
+            if(!ldrive1.isBusy()){
                 errorT = inches;
                 errorL = 0;
             }
@@ -40,20 +42,18 @@ public class PID {
             Ti = elapsedTime.milliseconds() - Ti;
             uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
 
-            gecko.ldrive1.setPower(uT);
-            gecko.ldrive2.setPower(uT);
-            gecko.rdrive1.setPower(uT);
-            gecko.rdrive2.setPower(uT);
-
-
+            ldrive1.setPower(uT);
+            ldrive2.setPower(uT);
+            rdrive1.setPower(uT);
+            rdrive2.setPower(uT);
 
             errorT -= errorL;
-            count++;
+            timer(10);
         }
-        gecko.ldrive1.setPower(0);
-        gecko.ldrive2.setPower(0);
-        gecko.rdrive1.setPower(0);
-        gecko.rdrive2.setPower(0);
+        ldrive1.setPower(0);
+        ldrive2.setPower(0);
+        rdrive1.setPower(0);
+        rdrive2.setPower(0);
     }
 
 
