@@ -82,6 +82,7 @@ public class gecko_autonomus extends LinearOpMode {
             pid.driveInches(5, ldrive1, ldrive2, rdrive1, rdrive2);
 
             telemetry.addData("Drive Power", ldrive1.getPower());
+            telemetry.addData("Output", pid.uT);
             telemetry.update();
 
         }

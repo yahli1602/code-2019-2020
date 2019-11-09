@@ -62,9 +62,11 @@ public class vuforiaFuncs11226 extends LinearOpMode{
             OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beacons.get(0).getListener()).getPose();
             if(pose != null){
                     VectorF translation = pose.getTranslation();
-                    telemetry.addData(beacons.get(0).getName() + "-Tranlation" , translation);
+                    telemetry.addData(beacons.get(0).getName() + "-Tranlation(0): " , translation.get(0));
+                    telemetry.addData(beacons.get(0).getName() + "-Tranlation(1): " , translation.get(1));
+                    telemetry.addData(beacons.get(0).getName() + "-Tranlation(2): " , translation.get(2));
 
-                    double degreesToTurn = Math.toDegrees(Math.atan2(translation.get(0), translation.get(1)));
+                    double degreesToTurn = translation.get(1);
 
                     telemetry.addData(beacons.get(0).getName() + "-Degrees",degreesToTurn);
                     telemetry.update();

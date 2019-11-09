@@ -17,29 +17,26 @@ public class PID {
     private double kp = 1.1;
     private double ki = 0.1;
     private double kd = 0.3;
-    public double Ti;
+    private double Ti;
     public double uT;
-    public double errorL;
-    public double errorT;
-    public double errorN;
+    private double errorL;
+    private double errorT;
+    private double errorN;
+    int count = 1;
 
-    public void timer(long miliseconds){
-        long x = (long)elapsedTime.milliseconds();
-        while(x < miliseconds + (long)elapsedTime.milliseconds()){}
-    }
 
     public void driveInches(double inches, DcMotor ldrive1, DcMotor ldrive2, DcMotor rdrive1, DcMotor rdrive2){
-        while(errorT > 0){
-            if(!ldrive1.isBusy()){
+        while(ldrive1.getCurrentPosition() < inches * 28 * 4){
+            if(count == 1){
                 errorT = inches;
                 errorL = 0;
+                count++;
             }
             else{ }
             errorN = errorT;
             Ti  = ki/elapsedTime.milliseconds() * (errorN + errorL);
 
             errorL += (ki/Ti) * errorT;
-            Ti = elapsedTime.milliseconds() - Ti;
             uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
 
             ldrive1.setPower(uT);
@@ -48,7 +45,6 @@ public class PID {
             rdrive2.setPower(uT);
 
             errorT -= errorL;
-            timer(10);
         }
         ldrive1.setPower(0);
         ldrive2.setPower(0);
