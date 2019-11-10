@@ -25,14 +25,15 @@ public class Funcs_11229 extends LinearOpMode {
     private Servo collectRight = null;
     private Servo collectLeft = null;
 
-    private double rightPower = gamepad1.right_stick_y;
-    private double leftPower = gamepad1.left_stick_y;
+
+    private double rightPower = gamepad1.right_trigger;
+    private double leftPower = gamepad1.left_trigger;
 
     private double slidePower() {
-        if (gamepad1.right_trigger > gamepad1.left_trigger) {
-            return gamepad1.right_trigger;
+        if (rightPower > leftPower) {
+            return rightPower;
         } else {
-            return -gamepad1.left_trigger;
+            return -leftPower;
         }
     }
 
@@ -117,7 +118,7 @@ public class Funcs_11229 extends LinearOpMode {
             collectLeft.setPosition(0);
         }
     }
-//Functions for Autonumus
+//Functions for Autonomous
 
 
 

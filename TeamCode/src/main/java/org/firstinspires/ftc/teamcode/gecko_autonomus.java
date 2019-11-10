@@ -35,12 +35,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 
-@Autonomous(name="Auto Gecko", group="Autonomous")
+import org.firstinspires.ftc.robotcore.internal.android.dex.EncodedValueReader;
+
+@Autonomous(name = "Auto Gecko", group = "Autonomous")
 public class gecko_autonomus extends LinearOpMode {
 
     private PID pid = new PID();
@@ -67,24 +70,29 @@ public class gecko_autonomus extends LinearOpMode {
     }*/
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
         rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
         ldrive1 = hardwareMap.get(DcMotor.class, "left_drive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
+
         waitForStart();
         rdrive1.setDirection(DcMotorSimple.Direction.REVERSE);
         rdrive2.setDirection(DcMotorSimple.Direction.REVERSE);
         ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
         ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        while(opModeIsActive()) {
-            pid.driveInches(5, ldrive1, ldrive2, rdrive1, rdrive2);
 
-            telemetry.addData("Drive Power", ldrive1.getPower());
-            telemetry.addData("Output", pid.uT);
-            telemetry.update();
+        while (opModeIsActive()) {
+            if (isStopRequested()) {
+                stop();
+            } else {
+                pid.driveInches(10, ldrive1, ldrive2, rdrive1, rdrive2);
 
-        }
+                telemetry.addData("Drive Power", ldrive1.getPower());
+                telemetry.addData("Output", pid.uT);
+                telemetry.update();
+            }
         }
     }
+}

@@ -61,6 +61,8 @@ public DcMotor ldrive2 = null;
                 ldrive2.setPower(0);
 
             }
+            telemetry.addData("", ldrive1.getCurrentPosition());
+            telemetry.update();
         }
     }
 }
