@@ -21,7 +21,7 @@ public class Funcs_11229 extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
-    private DcMotor fourBar = null;
+    private DcMotor elevator = null;
     private Servo collectRight = null;
     private Servo collectLeft = null;
 
@@ -45,7 +45,7 @@ public class Funcs_11229 extends LinearOpMode {
         lDrive1 = HM.get(DcMotor.class, "lDrive1");
         lDrive2 = HM.get(DcMotor.class, "lDrive2");
         slide = HM.get(DcMotor.class, "slide");
-        fourBar = HM.get(DcMotor.class, "4bar");
+        elevator = HM.get(DcMotor.class, "elevator");
         collectRight = HM.get(Servo.class, "collectRight");
         collectLeft = HM.get(Servo.class, "collectLeft");
 
@@ -54,7 +54,7 @@ public class Funcs_11229 extends LinearOpMode {
         lDrive1.setDirection(DcMotor.Direction.REVERSE);
         lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        fourBar.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.FORWARD);
     }
 //Functions for Teleop
 
@@ -86,24 +86,16 @@ public class Funcs_11229 extends LinearOpMode {
         while (x < miliseconds + (long) elapsedTime.milliseconds()) {}
     }
 
-    public void fourBar() {
-        if (gamepad2.left_stick_y > 0) {
-            while (fourBar.getCurrentPosition() < 1440 * gamepad2.left_stick_y) {
-                for (double i = gamepad2.left_stick_y; i >= fourBar.getCurrentPosition()/1440; i -= 0.1) {
-                    fourBar.setPower(i - (fourBar.getCurrentPosition()/1440));
-                    timer((long)(100 / (gamepad1.left_stick_y - fourBar.getCurrentPosition()/1440)));
-                }
-            }
+    public void elevator() {
+        if (gamepad2.right_trigger > 0) {
+            elevator.setPower(1);
         }
-        else if (gamepad2.left_stick_y < 0){
-            while(fourBar.getCurrentPosition() < 1440 * gamepad2.left_stick_y){
-                for(double i = gamepad2.left_stick_y; i <= 0; i += 0.1){
-                    fourBar.setPower(i);
-                    timer((long)(100 / gamepad1.left_stick_y));
-                }
-            }
+        else if (gamepad2.left_trigger > 0){
+            elevator.setPower(-1);
         }
-        else{}
+        else{
+            elevator.setPower(0);
+        }
     }
 
     public void collect() {
