@@ -41,23 +41,19 @@ public class testNir extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
     private Servo edr1 = null;
     private Servo edr2 = null;
 
     @Override
 
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
 
 
-        leftDrive = hardwareMap.get(DcMotor.class, "testMotor");
-        edr1 = hardwareMap.get(Servo.class, "edr1");
-        edr2 = hardwareMap.get(Servo.class, "edr2");
+
+        edr1 = hardwareMap.get(Servo.class, "servo1");
+        edr2 = hardwareMap.get(Servo.class, "servo2");
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -67,41 +63,20 @@ public class testNir extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Setup a variable for each drive wheel to save power level for telemetry
-            double leftPower;
-
-
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            //      double drive = -gamepad1.left_stick_y;
-            //        double turn  =  gamepad1.right_stick_x;
-            //          leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-
-
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            leftPower = -gamepad1.left_stick_y;
-
 
             // Send calculated power to wheels
-            leftDrive.setPower(leftPower);
             if (gamepad1.right_bumper) {
-                edr1.setPosition(0.7);
-                edr2.setPosition(0.2);
-            } else if (gamepad1.left_bumper) {
-                edr1.setPosition(0.2);
-                edr2.setPosition(0.7);
-            } else {
                 edr1.setPosition(0);
+                edr2.setPosition(90);
+            } else if (gamepad1.left_bumper) {
+                edr1.setPosition(180);
+                edr2.setPosition(180);
+            } else {
+                edr1.setPosition(90);
                 edr2.setPosition(0);
             }
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
+
         }
     }
 }

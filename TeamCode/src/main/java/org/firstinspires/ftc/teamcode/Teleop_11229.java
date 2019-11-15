@@ -21,10 +21,9 @@ private Funcs_11229 funcs = new Funcs_11229();
         waitForStart();
 
 
-        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             funcs.drive();
-            funcs.fourBar();
+            funcs.elevator();
             funcs.collect();
         }
     }
