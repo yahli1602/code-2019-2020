@@ -23,7 +23,7 @@ private Funcs_11229 funcs = new Funcs_11229();
 
         while (opModeIsActive()) {
             funcs.drive();
-            funcs.fourBar();
+            funcs.elevator();
             funcs.collect();
         }
     }

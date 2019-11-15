@@ -66,14 +66,14 @@ public class testNir extends LinearOpMode {
 
             // Send calculated power to wheels
             if (gamepad1.right_bumper) {
-                edr1.setPosition(90);
-                edr2.setPosition(0);
+                edr1.setPosition(0);
+                edr2.setPosition(90);
             } else if (gamepad1.left_bumper) {
                 edr1.setPosition(180);
                 edr2.setPosition(180);
             } else {
-                edr1.setPosition(0);
-                edr2.setPosition(90);
+                edr1.setPosition(90);
+                edr2.setPosition(0);
             }
 
 

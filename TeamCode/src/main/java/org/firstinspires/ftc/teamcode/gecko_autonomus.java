@@ -46,7 +46,72 @@ import org.firstinspires.ftc.robotcore.internal.android.dex.EncodedValueReader;
 @Autonomous(name = "Auto Gecko", group = "Autonomous")
 public class gecko_autonomus extends LinearOpMode {
 
-    private PID pid = new PID();
+    ElapsedTime elapsedTime = new ElapsedTime();
+
+    private double kp = 0.3;
+    private double ki = 0.1;
+    private double kd = 0.2;
+    private double Ti;
+    public double uT;
+    private double errorL;
+    private double errorT;
+    private double errorN;
+    private int count;
+
+
+    public void driveInches(double inches){
+        if(inches > 0 && opModeIsActive()){
+            errorT = inches;
+            errorL = 0;
+            while(errorT > 0 && opModeIsActive()){
+                errorN = errorT;
+                Ti  = ki/(elapsedTime.milliseconds()/100) * (errorN + errorL);
+
+                errorL += (ki/Ti) * errorT;
+                uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
+
+                ldrive1.setPower(uT);
+                ldrive2.setPower(uT);
+                rdrive1.setPower(uT);
+                rdrive2.setPower(uT);
+
+                errorT -= errorL;
+            }
+
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+        }
+        /*else if (inches < 0 && opModeIsActive()){
+            while(errorT > 0 && opModeIsActive()){
+                if(count == 1 && opModeIsActive()){
+                    errorT = -inches;
+                    errorL = 0;
+                    count++;
+                }
+                else{ }
+                errorN = errorT;
+                Ti  = ki/elapsedTime.milliseconds() * (errorN + errorL);
+
+                errorL += (ki/Ti) * errorT;
+                uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
+
+                ldrive1.setPower(-uT);
+                ldrive2.setPower(-uT);
+                rdrive1.setPower(-uT);
+                rdrive2.setPower(-uT);
+
+                errorT -= errorL;
+            }
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+        }*/
+
+    }
+
 
     public DcMotor rdrive1 = null;
     public DcMotor rdrive2 = null;
@@ -81,18 +146,16 @@ public class gecko_autonomus extends LinearOpMode {
         rdrive2.setDirection(DcMotorSimple.Direction.REVERSE);
         ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
         ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("Drive Power", ldrive1.getPower());
+        telemetry.update();
 
 
         while (opModeIsActive()) {
-            if (isStopRequested()) {
-                stop();
-            } else {
-                pid.driveInches(10, ldrive1, ldrive2, rdrive1, rdrive2);
+            driveInches(10);
 
-                telemetry.addData("Drive Power", ldrive1.getPower());
-                telemetry.addData("Output", pid.uT);
-                telemetry.update();
-            }
+            telemetry.addData("Drive Power", ldrive1.getPower());
+            telemetry.addData("Output", uT);
+            telemetry.update();
         }
     }
 }
