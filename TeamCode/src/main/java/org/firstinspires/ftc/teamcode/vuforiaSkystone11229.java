@@ -29,9 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -41,6 +44,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Funcs_11229;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +89,11 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 @TeleOp(name="Vuforia 11229", group ="Concept")
 
 public class vuforiaSkystone11229 extends LinearOpMode {
+    public DcMotor rdrive1 = null;
+    public DcMotor rdrive2 = null;
+    public DcMotor ldrive1 = null;
+    public DcMotor ldrive2 = null;
+
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -93,7 +102,10 @@ public class vuforiaSkystone11229 extends LinearOpMode {
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     //
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
+    private static final boolean PHONE_IS_PORTRAIT = false;
+
+    // creating a funcs bariable that contains all of the driving fuctions
+
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -112,8 +124,14 @@ public class vuforiaSkystone11229 extends LinearOpMode {
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
-    private static final float mmPerInch        = 25.4f;
-    private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
+    private static final float mmPerInch = 25.4f;
+    private static final float mmTargetHeight = (6) * mmPerInch;          // the height of the center of the target image above the floor
+    private static final float tarX = 5;
+    private static final float tarY = 0;
+
+    //TODO: add the distnces from the center of the robot to the phone
+    private static final float phoneDistanceFromCenterX = 0;
+    private static final float phoneDistanceFromCenterY = 0;
 
     // Constant for Stone Target
     private static final float stoneZ = 2.00f * mmPerInch;
@@ -127,17 +145,20 @@ public class vuforiaSkystone11229 extends LinearOpMode {
 
     // Constants for perimeter targets
     private static final float halfField = 72 * mmPerInch;
-    private static final float quadField  = 36 * mmPerInch;
+    private static final float quadField = 36 * mmPerInch;
 
     // Class Members
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
     private boolean targetVisible = false;
-    private float phoneXRotate    = 0;
-    private float phoneYRotate    = 0;
-    private float phoneZRotate    = 0;
+    private boolean skyStoneVisible = false;
+    private boolean BP1Visible = false;
+    private float phoneXRotate = 0;
+    private float phoneYRotate = 0;
+    private float phoneZRotate = 0;
 
-    @Override public void runOpMode() {
+    @Override
+    public void runOpMode() {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -145,11 +166,21 @@ public class vuforiaSkystone11229 extends LinearOpMode {
          */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
+        rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
+        ldrive1 = hardwareMap.get(DcMotor.class, "left_drive1");
+        ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
+
+
+        rdrive1.setDirection(DcMotorSimple.Direction.REVERSE);
+        rdrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+        ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
+        ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection   = CAMERA_CHOICE;
+        parameters.cameraDirection = CAMERA_CHOICE;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -242,7 +273,7 @@ public class vuforiaSkystone11229 extends LinearOpMode {
 
         front1.setLocation(OpenGLMatrix
                 .translation(-halfField, -quadField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , 90)));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90)));
 
         front2.setLocation(OpenGLMatrix
                 .translation(-halfField, quadField, mmTargetHeight)
@@ -258,7 +289,7 @@ public class vuforiaSkystone11229 extends LinearOpMode {
 
         rear1.setLocation(OpenGLMatrix
                 .translation(halfField, quadField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , -90)));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
 
         rear2.setLocation(OpenGLMatrix
                 .translation(halfField, -quadField, mmTargetHeight)
@@ -287,19 +318,19 @@ public class vuforiaSkystone11229 extends LinearOpMode {
 
         // Rotate the phone vertical about the X axis if it's in portrait mode
         if (PHONE_IS_PORTRAIT) {
-            phoneXRotate = 90 ;
+            phoneXRotate = 90;
         }
 
 
         // Next, translate the camera lens to where it is on the robot.
         // In this example, it is centered (left to right), but forward of the middle of the robot, and above ground level.
-        final float CAMERA_FORWARD_DISPLACEMENT  = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
+        final float CAMERA_FORWARD_DISPLACEMENT = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
         final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
-        final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
+        final float CAMERA_LEFT_DISPLACEMENT = 0;     // eg: Camera is ON the robot's center line
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
-                    .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
+                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
         /**  Let all the trackable listeners know where the phone is.  */
         for (VuforiaTrackable trackable : allTrackables) {
@@ -312,25 +343,33 @@ public class vuforiaSkystone11229 extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-        // waitForStart();
+        waitForStart();
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
 
         targetsSkyStone.activate();
-        while (!isStopRequested()) {
+        while (opModeIsActive() && !isStopRequested()) {
 
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
+            skyStoneVisible = false;
+            BP1Visible = false;
             for (VuforiaTrackable trackable : allTrackables) {
-                if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
+                if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
+                    if (trackable == targetsSkyStone.get(0)) {
+                        skyStoneVisible = true;
+                    }
+                    if (trackable == targetsSkyStone.get(9)) {
+                        BP1Visible = true;
+                    }
 
                     // getUpdatedRobotLocation() will return null if no new information is available since
                     // the last time that call was made, or if the trackable is not currently visible.
-                    OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                    OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
                     if (robotLocationTransform != null) {
                         lastLocation = robotLocationTransform;
                     }
@@ -339,7 +378,8 @@ public class vuforiaSkystone11229 extends LinearOpMode {
             }
 
             // Provide feedback as to where the robot is located (if we know).
-            if (targetVisible) {
+
+            if (targetVisible && opModeIsActive()) {
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
@@ -348,15 +388,80 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
-            }
-            else {
+            } else {
+                targetVisible = false;
                 telemetry.addData("Visible Target", "none");
             }
+            if (skyStoneVisible && opModeIsActive()) {
+                Orientation rotation2 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+                if (rotation2.thirdAngle > 0 && opModeIsActive()) {
+                    telemetry.addData("turn:", "left");
+                    rdrive1.setPower(0.2);
+                    rdrive2.setPower(0.2);
+                    ldrive1.setPower(-0.2);
+                    ldrive2.setPower(-0.2);
+                } else if (rotation2.thirdAngle < 0 && opModeIsActive()) {
+                    telemetry.addData("turn:", "right");
+                    rdrive1.setPower(-0.2);
+                    rdrive2.setPower(-0.2);
+                    ldrive1.setPower(0.2);
+                    ldrive2.setPower(0.2);
+                } else if (targetVisible == false && opModeIsActive()) {
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                } else if (rotation2.thirdAngle == 0) {
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                } else {
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                }
+            }
+            if (BP1Visible && opModeIsActive()) {
+                Orientation rotation3 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+                if (rotation3.thirdAngle > 0 && opModeIsActive()) {
+                    telemetry.addData("turn:", "left");
+                    rdrive1.setPower(0.2);
+                    rdrive2.setPower(0.2);
+                    ldrive1.setPower(-0.2);
+                    ldrive2.setPower(-0.2);
+                } else if (rotation3.thirdAngle < 0 && opModeIsActive()) {
+                    telemetry.addData("turn:", "right");
+                    rdrive1.setPower(-0.2);
+                    rdrive2.setPower(-0.2);
+                    ldrive1.setPower(0.2);
+                    ldrive2.setPower(0.2);
+                } else if (targetVisible == false && opModeIsActive()) {
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                } else if (rotation3.thirdAngle == 0 && opModeIsActive()) {
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                } else {
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                }
+            }
+
 
             telemetry.update();
+
         }
 
         // Disable Tracking when we are done;
-        targetsSkyStone.deactivate();
+        //targetsSkyStone.deactivate();
     }
 }
+
