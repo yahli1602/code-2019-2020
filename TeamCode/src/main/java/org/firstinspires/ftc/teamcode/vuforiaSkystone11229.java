@@ -406,12 +406,12 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                     rdrive2.setPower(-0.2);
                     ldrive1.setPower(0.2);
                     ldrive2.setPower(0.2);
-                } else if (targetVisible == false && opModeIsActive()) {
+                } else if (targetVisible == false || skyStoneVisible == false && opModeIsActive()) {
                     rdrive1.setPower(0);
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);
                     ldrive2.setPower(0);
-                } else if (rotation2.thirdAngle == 0) {
+                } else if (rotation2.thirdAngle <= 1 && rotation2.thirdAngle >= -1 && opModeIsActive()) {
                     rdrive1.setPower(0);
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);
