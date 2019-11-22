@@ -57,7 +57,7 @@ public class Funcs_11226 extends LinearOpMode {
 
     }
 
-// Functions for Teleop
+// Functions for Teleop 11226
 
     public void drive() {
         if (leftPower > 0.2 || leftPower < -0.2) {
