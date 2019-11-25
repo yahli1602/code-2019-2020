@@ -1,7 +1,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Funcs 11226", group = "Linear Opmode")
 public class Funcs_11226 extends LinearOpMode {
 
-    vuforiaFuncs11226 vuforia = new vuforiaFuncs11226();
+    vuforiaFuncs11229 vuforia = new vuforiaFuncs11229();
 
     public ElapsedTime elapsedTime = new ElapsedTime();
 

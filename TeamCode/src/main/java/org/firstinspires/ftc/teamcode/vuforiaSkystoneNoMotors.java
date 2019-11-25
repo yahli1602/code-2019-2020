@@ -382,15 +382,15 @@ public class vuforiaSkystoneNoMotors extends LinearOpMode {
             }
             if (skyStoneVisible && opModeIsActive()) {
                 Orientation rotation2 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                if (rotation2.thirdAngle > 0 && opModeIsActive()) {
+                if (rotation2.thirdAngle > 5 && opModeIsActive()) {
                     telemetry.addData("turn:", "left");
 
-                } else if (rotation2.thirdAngle < 0 && opModeIsActive()) {
+                } else if (rotation2.thirdAngle < -5 && opModeIsActive()) {
                     telemetry.addData("turn:", "right");
 
                 } else if (targetVisible == false && opModeIsActive()) {
                     telemetry.addData("cant see target","stoping");
-                } else if (rotation2.thirdAngle == 0) {
+                } else if (rotation2.thirdAngle <= 5 && rotation2.thirdAngle >= -5 && opModeIsActive()) {
                     telemetry.addData("on taregt", "dont need to turn");
                 } else {
                     telemetry.addData("don't see target: ","stoping");
