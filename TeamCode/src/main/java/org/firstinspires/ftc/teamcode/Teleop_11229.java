@@ -25,6 +25,7 @@ private Funcs_11229 funcs = new Funcs_11229();
             funcs.drive();
             funcs.elevator();
             funcs.collect();
+            funcs.grabber();
         }
     }
 }

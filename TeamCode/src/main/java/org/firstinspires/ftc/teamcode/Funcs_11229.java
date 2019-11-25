@@ -22,24 +22,14 @@ public class Funcs_11229 extends LinearOpMode {
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
     private DcMotor elevator = null;
+    private DcMotor foldcollect = null;
     private Servo collectRight = null;
     private Servo collectLeft = null;
-
-
-    private double rightPower = gamepad1.right_trigger;
-    private double leftPower = gamepad1.left_trigger;
-
-    private double slidePower() {
-        if (rightPower > leftPower) {
-            return rightPower;
-        } else {
-            return -leftPower;
-        }
-    }
+    private Servo grabber = null;
 
 
     public void init(HardwareMap HM) {
-
+        foldcollect = HM.get(DcMotor.class, "foldCollect");
         rDrive1 = HM.get(DcMotor.class, "rDrive1");
         rDrive2 = HM.get(DcMotor.class, "rDrive2");
         lDrive1 = HM.get(DcMotor.class, "lDrive1");
@@ -48,7 +38,9 @@ public class Funcs_11229 extends LinearOpMode {
         elevator = HM.get(DcMotor.class, "elevator");
         collectRight = HM.get(Servo.class, "collectRight");
         collectLeft = HM.get(Servo.class, "collectLeft");
+        grabber = HM.get(Servo.class, "grabber");
 
+        foldcollect.setDirection(DcMotor.Direction.FORWARD);
         rDrive1.setDirection(DcMotor.Direction.FORWARD);
         rDrive2.setDirection(DcMotor.Direction.FORWARD);
         lDrive1.setDirection(DcMotor.Direction.REVERSE);
@@ -58,58 +50,87 @@ public class Funcs_11229 extends LinearOpMode {
     }
 //Functions for Teleop
 
-    public void drive() {
-
-        if (rightPower > 0.2 || rightPower < -0.2) {
-            rDrive1.setPower(rightPower);
-            rDrive2.setPower(rightPower);
-            lDrive1.setPower(rightPower);
-            lDrive2.setPower(rightPower);
+    //timer
+    public void timer(long miliseconds) {
+        long x = (long) elapsedTime.milliseconds();
+        while (x < miliseconds + (long) elapsedTime.milliseconds()) {
         }
-        else {
+    }
+
+    public void drive() {
+//forward
+        if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
+            rDrive1.setPower(gamepad1.right_stick_y);
+            rDrive2.setPower(gamepad1.right_stick_y);
+            lDrive1.setPower(gamepad1.right_stick_y);
+            lDrive2.setPower(gamepad1.right_stick_y);
+        } else {
             rDrive1.setPower(0);
             rDrive2.setPower(0);
             lDrive1.setPower(0);
             lDrive2.setPower(0);
         }
-        if (slidePower() > 0.2) {
-            slide.setPower(slidePower());
-        } else if (slidePower() < -0.2) {
-            slide.setPower(slidePower());
+        //slide
+        if (gamepad1.right_bumper) {
+            slide.setPower(1);
+        } else if (gamepad1.left_bumper) {
+            slide.setPower(-1);
         } else {
             slide.setPower(0);
         }
     }
 
-    public void timer(long miliseconds) {
-        long x = (long) elapsedTime.milliseconds();
-        while (x < miliseconds + (long) elapsedTime.milliseconds()) {}
-    }
 
     public void elevator() {
-        if (gamepad2.right_trigger > 0) {
-            elevator.setPower(1);
-        }
-        else if (gamepad2.left_trigger > 0){
-            elevator.setPower(-1);
-        }
-        else{
+        if (gamepad2.right_stick_y > 0.2) {
+            elevator.setPower(gamepad1.right_stick_y);
+        } else if (gamepad2.right_stick_y < 0.2) {
+            elevator.setPower(gamepad1.right_stick_y);
+        } else {
             elevator.setPower(0);
         }
     }
 
     public void collect() {
+        //collection
         if (gamepad2.right_trigger > 0) {
             collectRight.setPosition(0.7);
             collectLeft.setPosition(0.2);
         } else if (gamepad2.left_trigger > 0) {
             collectLeft.setPosition(0.7);
             collectRight.setPosition(0.2);
+
         } else {
             collectRight.setPosition(0);
             collectLeft.setPosition(0);
         }
+        //collection fold
+        if (gamepad2.right_bumper) {
+            foldcollect.setPower(1);
+        } else if (gamepad2.left_bumper) {
+            foldcollect.setPower(-1);
+        } else {
+            foldcollect.setPower(0);
+        }
     }
+
+    public void grabber() {
+        boolean grabbervar = true;
+        if (gamepad2.x) {
+            if (grabbervar) {
+                grabber.setPosition(180);
+                grabbervar = false;
+            } else {
+                grabber.setPosition(0);
+                grabbervar = true;
+            }
+        }
+    }
+
+
+
+
+
 //Functions for Autonomous
 
 
