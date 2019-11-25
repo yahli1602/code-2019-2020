@@ -54,9 +54,10 @@ public class gecko_autonomus extends LinearOpMode {
     private double currentPosition;
     private double lastPosition;
     private double perimeter = 4 * Math.PI;
-    private double ticksPerRevolution = 1120 * 40;
-    private double ticksPerSpin = ticksPerRevolution*perimeter;
-    private double ticksPerInch = ticksPerSpin/perimeter;
+    private double ticksPerRevolution = 1120;
+    private double inchesPerTick = (perimeter/ticksPerRevolution)*40;
+    private double ticksPerSpin = ticksPerRevolution * 40;
+    private double ticksPerInch = 1/inchesPerTick;
     private boolean count = true;
 
     public void timer(long miliseconds){
@@ -69,7 +70,7 @@ public class gecko_autonomus extends LinearOpMode {
             errorT = inches;
             lastPosition = 0;
             while(errorT > 0 && opModeIsActive()){
-                uT = kp * (errorT/ticksPerInch);
+                uT = kp * errorT;
 
                 ldrive1.setPower(uT);
                 ldrive2.setPower(uT);
@@ -120,22 +121,24 @@ public class gecko_autonomus extends LinearOpMode {
         ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
 
         waitForStart();
-        rdrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-        rdrive2.setDirection(DcMotorSimple.Direction.REVERSE);
-        ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-        ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
+        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
+        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         telemetry.addData("Drive Power", ldrive1.getPower());
+        telemetry.addData("ticks", ldrive1.getCurrentPosition());
+        telemetry.addData("Output", uT);
+        telemetry.addData("", errorT);
         telemetry.update();
-
-
         while (opModeIsActive()) {
             driveInches(10);
 
-            telemetry.addData("ticks", ldrive1.getCurrentPosition());
-            telemetry.addData("power", ldrive1.getPower());
-            telemetry.addData("Output", uT);
-            telemetry.addData("", errorT);
-            telemetry.update();
         }
     }
 }

@@ -58,7 +58,7 @@ public class Funcs_11229 extends LinearOpMode {
     }
 
     public void drive() {
-//forward
+//Drive
         if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
             rDrive1.setPower(gamepad1.right_stick_y);
             rDrive2.setPower(gamepad1.right_stick_y);
@@ -70,7 +70,28 @@ public class Funcs_11229 extends LinearOpMode {
             lDrive1.setPower(0);
             lDrive2.setPower(0);
         }
-        //slide
+        //turn
+        if (gamepad1.left_trigger > 0.2){
+            rDrive1.setPower(gamepad1.left_trigger);
+            rDrive2.setPower(gamepad1.left_trigger);
+            lDrive1.setPower(-gamepad1.left_trigger);
+            lDrive2.setPower(-gamepad1.left_trigger);
+
+        }
+        else if (gamepad1.right_trigger > 0.2){
+            rDrive1.setPower(-gamepad1.right_trigger);
+            rDrive2.setPower(-gamepad1.right_trigger);
+            lDrive1.setPower(gamepad1.right_trigger);
+            lDrive2.setPower(gamepad1.right_trigger);
+
+        }
+        else {
+            rDrive1.setPower(0);
+            rDrive2.setPower(0);
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+
+        }        //slide
         if (gamepad1.right_bumper) {
             slide.setPower(1);
         } else if (gamepad1.left_bumper) {
