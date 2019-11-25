@@ -15,19 +15,23 @@ public class Funcs_11229 extends LinearOpMode {
     private ElapsedTime elapsedTime = new ElapsedTime();
     private vuforiaSkystone11229 vuforia = new vuforiaSkystone11229();
     private PID pid = new PID();
-
+    //driving motors
     private DcMotor rDrive1 = null;
     private DcMotor rDrive2 = null;
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
+    //elevator
     private DcMotor elevator = null;
+    //fold collection
     private DcMotor foldcollect = null;
+    //collection
     private Servo collectRight = null;
     private Servo collectLeft = null;
+    //grabbing the build plate
     private Servo grabber = null;
 
-
+    //hardware map
     public void init(HardwareMap HM) {
         foldcollect = HM.get(DcMotor.class, "foldCollect");
         rDrive1 = HM.get(DcMotor.class, "rDrive1");
@@ -39,7 +43,7 @@ public class Funcs_11229 extends LinearOpMode {
         collectRight = HM.get(Servo.class, "collectRight");
         collectLeft = HM.get(Servo.class, "collectLeft");
         grabber = HM.get(Servo.class, "grabber");
-
+//set Direction
         foldcollect.setDirection(DcMotor.Direction.FORWARD);
         rDrive1.setDirection(DcMotor.Direction.FORWARD);
         rDrive2.setDirection(DcMotor.Direction.FORWARD);
@@ -57,8 +61,9 @@ public class Funcs_11229 extends LinearOpMode {
         }
     }
 
+    //Drive
     public void drive() {
-//Drive
+        //Drive
         if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
             rDrive1.setPower(gamepad1.right_stick_y);
             rDrive2.setPower(gamepad1.right_stick_y);
@@ -71,27 +76,26 @@ public class Funcs_11229 extends LinearOpMode {
             lDrive2.setPower(0);
         }
         //turn
-        if (gamepad1.left_trigger > 0.2){
+        if (gamepad1.left_trigger > 0.2) {
             rDrive1.setPower(gamepad1.left_trigger);
             rDrive2.setPower(gamepad1.left_trigger);
             lDrive1.setPower(-gamepad1.left_trigger);
             lDrive2.setPower(-gamepad1.left_trigger);
 
-        }
-        else if (gamepad1.right_trigger > 0.2){
+        } else if (gamepad1.right_trigger > 0.2) {
             rDrive1.setPower(-gamepad1.right_trigger);
             rDrive2.setPower(-gamepad1.right_trigger);
             lDrive1.setPower(gamepad1.right_trigger);
             lDrive2.setPower(gamepad1.right_trigger);
 
-        }
-        else {
+        } else {
             rDrive1.setPower(0);
             rDrive2.setPower(0);
             lDrive1.setPower(0);
             lDrive2.setPower(0);
 
-        }        //slide
+        }
+        //slide
         if (gamepad1.right_bumper) {
             slide.setPower(1);
         } else if (gamepad1.left_bumper) {
@@ -101,7 +105,7 @@ public class Funcs_11229 extends LinearOpMode {
         }
     }
 
-
+    //elevator
     public void elevator() {
         if (gamepad2.right_stick_y > 0.2) {
             elevator.setPower(gamepad1.right_stick_y);
@@ -135,6 +139,7 @@ public class Funcs_11229 extends LinearOpMode {
         }
     }
 
+    //grabbing the build plate
     public void grabber() {
         boolean grabbervar = true;
         if (gamepad2.x) {
@@ -149,11 +154,7 @@ public class Funcs_11229 extends LinearOpMode {
     }
 
 
-
-
-
 //Functions for Autonomous
-
 
 
     public void rotateByDirction(String direction, float rotationPower) { //rotation by direction call it again to turn off
