@@ -79,7 +79,7 @@ public class Funcs_11229 extends LinearOpMode {
             slide.setPower(0);
         }
     }
-
+//
 
     public void elevator() {
         if (gamepad2.right_stick_y > 0.2) {
