@@ -8,10 +8,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+
 
 @TeleOp(name = "Funcs 11226", group = "Linear Opmode")
-@Disabled
 public class Funcs_11226 extends LinearOpMode {
 
     vuforiaFuncs11226 vuforia = new vuforiaFuncs11226();
@@ -58,7 +57,7 @@ public class Funcs_11226 extends LinearOpMode {
 
     }
 
-// Functions for Teleop
+// Functions for Teleop 11226
 
     public void drive() {
         if (leftPower > 0.2 || leftPower < -0.2) {

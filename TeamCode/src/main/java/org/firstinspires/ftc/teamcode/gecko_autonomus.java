@@ -48,68 +48,46 @@ public class gecko_autonomus extends LinearOpMode {
 
     ElapsedTime elapsedTime = new ElapsedTime();
 
-    private double kp = 0.3;
-    private double ki = 0.1;
-    private double kd = 0.2;
-    private double Ti;
+    private double kp = 0.2;
     public double uT;
-    private double errorL;
     private double errorT;
-    private double errorN;
-    private int count;
+    private double currentPosition;
+    private double lastPosition;
+    private double perimeter = 4 * Math.PI;
+    private double ticksPerRevolution = 1120 * 40;
+    private double ticksPerSpin = ticksPerRevolution*perimeter;
+    private double ticksPerInch = ticksPerSpin/perimeter;
+    private boolean count = true;
 
+    public void timer(long miliseconds){
+        long x = (long)elapsedTime.milliseconds();
+        while(x < miliseconds + (long)elapsedTime.milliseconds()){}
+    }
 
     public void driveInches(double inches){
         if(inches > 0 && opModeIsActive()){
             errorT = inches;
-            errorL = 0;
+            lastPosition = 0;
             while(errorT > 0 && opModeIsActive()){
-                errorN = errorT;
-                Ti  = ki/(elapsedTime.milliseconds()/100) * (errorN + errorL);
-
-                errorL += (ki/Ti) * errorT;
-                uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
+                uT = kp * (errorT/ticksPerInch);
 
                 ldrive1.setPower(uT);
                 ldrive2.setPower(uT);
                 rdrive1.setPower(uT);
                 rdrive2.setPower(uT);
 
-                errorT -= errorL;
-            }
+                currentPosition = ldrive1.getCurrentPosition()/ticksPerInch;
+                errorT -= (currentPosition - lastPosition);
+                lastPosition = currentPosition;
 
+            }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
+
         }
-        /*else if (inches < 0 && opModeIsActive()){
-            while(errorT > 0 && opModeIsActive()){
-                if(count == 1 && opModeIsActive()){
-                    errorT = -inches;
-                    errorL = 0;
-                    count++;
-                }
-                else{ }
-                errorN = errorT;
-                Ti  = ki/elapsedTime.milliseconds() * (errorN + errorL);
-
-                errorL += (ki/Ti) * errorT;
-                uT = kp * errorT + errorL + (kd/Ti) * (errorN - errorL);
-
-                ldrive1.setPower(-uT);
-                ldrive2.setPower(-uT);
-                rdrive1.setPower(-uT);
-                rdrive2.setPower(-uT);
-
-                errorT -= errorL;
-            }
-            ldrive1.setPower(0);
-            ldrive2.setPower(0);
-            rdrive1.setPower(0);
-            rdrive2.setPower(0);
-        }*/
-
+        else{}
     }
 
 
@@ -153,8 +131,10 @@ public class gecko_autonomus extends LinearOpMode {
         while (opModeIsActive()) {
             driveInches(10);
 
-            telemetry.addData("Drive Power", ldrive1.getPower());
+            telemetry.addData("ticks", ldrive1.getCurrentPosition());
+            telemetry.addData("power", ldrive1.getPower());
             telemetry.addData("Output", uT);
+            telemetry.addData("", errorT);
             telemetry.update();
         }
     }

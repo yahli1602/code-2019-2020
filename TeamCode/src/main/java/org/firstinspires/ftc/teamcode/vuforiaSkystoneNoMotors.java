@@ -29,9 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -44,7 +42,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.Funcs_11229;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,13 +83,10 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name="Vuforia 112299", group ="Concept")
+@TeleOp(name="VuforiaNoMotors", group ="Concept")
 
-public class vuforiaSkystone11229 extends LinearOpMode {
-    public DcMotor rdrive1 = null;
-    public DcMotor rdrive2 = null;
-    public DcMotor ldrive1 = null;
-    public DcMotor ldrive2 = null;
+public class vuforiaSkystoneNoMotors extends LinearOpMode {
+
 
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
@@ -166,16 +160,10 @@ public class vuforiaSkystone11229 extends LinearOpMode {
          */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        rdrive1 = hardwareMap.get(DcMotor.class, "right_drive1");
-        rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
-        ldrive1 = hardwareMap.get(DcMotor.class, "left_drive1");
-        ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
 
 
-        rdrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-        rdrive2.setDirection(DcMotorSimple.Direction.REVERSE);
-        ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-        ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
 
         // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
@@ -396,62 +384,32 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                 Orientation rotation2 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 if (rotation2.thirdAngle > 0 && opModeIsActive()) {
                     telemetry.addData("turn:", "left");
-                    rdrive1.setPower(0.2);
-                    rdrive2.setPower(0.2);
-                    ldrive1.setPower(-0.2);
-                    ldrive2.setPower(-0.2);
+
                 } else if (rotation2.thirdAngle < 0 && opModeIsActive()) {
                     telemetry.addData("turn:", "right");
-                    rdrive1.setPower(-0.2);
-                    rdrive2.setPower(-0.2);
-                    ldrive1.setPower(0.2);
-                    ldrive2.setPower(0.2);
-                } else if (targetVisible == false || skyStoneVisible == false && opModeIsActive()) {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
-                } else if (rotation2.thirdAngle <= 1 && rotation2.thirdAngle >= -1 && opModeIsActive()) {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
+
+                } else if (targetVisible == false && opModeIsActive()) {
+                    telemetry.addData("cant see target","stoping");
+                } else if (rotation2.thirdAngle == 0) {
+                    telemetry.addData("on taregt", "dont need to turn");
                 } else {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
+                    telemetry.addData("don't see target: ","stoping");
                 }
             }
             if (BP1Visible && opModeIsActive()) {
                 Orientation rotation3 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 if (rotation3.thirdAngle > 0 && opModeIsActive()) {
                     telemetry.addData("turn:", "left");
-                    rdrive1.setPower(0.2);
-                    rdrive2.setPower(0.2);
-                    ldrive1.setPower(-0.2);
-                    ldrive2.setPower(-0.2);
+
                 } else if (rotation3.thirdAngle < 0 && opModeIsActive()) {
                     telemetry.addData("turn:", "right");
-                    rdrive1.setPower(-0.2);
-                    rdrive2.setPower(-0.2);
-                    ldrive1.setPower(0.2);
-                    ldrive2.setPower(0.2);
+
                 } else if (targetVisible == false && opModeIsActive()) {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
-                } else if (rotation3.thirdAngle == 0 && opModeIsActive()) {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
+                    telemetry.addData("cant see target","stoping");
+                } else if (rotation3.thirdAngle == 0) {
+                    telemetry.addData("on taregt", "dont need to turn");
                 } else {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
+                    telemetry.addData("don't see target: ","stoping");
                 }
             }
 
