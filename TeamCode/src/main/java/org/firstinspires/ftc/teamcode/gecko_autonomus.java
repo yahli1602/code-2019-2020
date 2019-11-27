@@ -58,7 +58,7 @@ public class gecko_autonomus extends LinearOpMode {
     private double inchesPerTick = (perimeter/ticksPerRevolution)*40;
     private double ticksPerSpin = ticksPerRevolution * 40;
     private double ticksPerInch = 1/inchesPerTick;
-    private boolean count = true;
+    private int count;
 
     public void timer(long miliseconds){
         long x = (long)elapsedTime.milliseconds();
@@ -66,20 +66,28 @@ public class gecko_autonomus extends LinearOpMode {
     }
 
     public void driveInches(double inches){
-        if(inches > 0 && opModeIsActive()){
             errorT = inches;
             lastPosition = 0;
+            count = 1;
             while(errorT > 0 && opModeIsActive()){
-                uT = kp * errorT;
 
+                currentPosition = ldrive1.getCurrentPosition()/ticksPerInch;
+                errorT -= (currentPosition - lastPosition);
+                lastPosition = currentPosition;
+
+                uT = kp * errorT;
                 ldrive1.setPower(uT);
                 ldrive2.setPower(uT);
                 rdrive1.setPower(uT);
                 rdrive2.setPower(uT);
 
-                currentPosition = ldrive1.getCurrentPosition()/ticksPerInch;
-                errorT -= (currentPosition - lastPosition);
-                lastPosition = currentPosition;
+                telemetry.addData("Drive Power", ldrive1.getPower());
+                telemetry.addData("ticks", ldrive1.getCurrentPosition());
+                telemetry.addData("Output", uT);
+                telemetry.addData("", errorT);
+                telemetry.addData("count", count);
+                telemetry.update();
+                count++;
 
             }
             ldrive1.setPower(0);
@@ -87,8 +95,6 @@ public class gecko_autonomus extends LinearOpMode {
             rdrive1.setPower(0);
             rdrive2.setPower(0);
 
-        }
-        else{}
     }
 
 
@@ -131,11 +137,6 @@ public class gecko_autonomus extends LinearOpMode {
         ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        telemetry.addData("Drive Power", ldrive1.getPower());
-        telemetry.addData("ticks", ldrive1.getCurrentPosition());
-        telemetry.addData("Output", uT);
-        telemetry.addData("", errorT);
-        telemetry.update();
         while (opModeIsActive()) {
             driveInches(10);
 

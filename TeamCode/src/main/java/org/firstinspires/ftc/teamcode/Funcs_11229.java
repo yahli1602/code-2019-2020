@@ -10,12 +10,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "Funcs 11229", group = "Linear Opmode")
-@Disabled
 public class Funcs_11229 extends LinearOpMode {
 
     private ElapsedTime elapsedTime = new ElapsedTime();
-    private vuforiaSkystone11229 vuforia = new vuforiaSkystone11229();
-    private PID pid = new PID();
     //driving motors
     private DcMotor rDrive1 = null;
     private DcMotor rDrive2 = null;
@@ -34,16 +31,16 @@ public class Funcs_11229 extends LinearOpMode {
 
     //hardware map
     public void init(HardwareMap HM) {
-        foldcollect = HM.get(DcMotor.class, "foldCollect");
+        //foldcollect = HM.get(DcMotor.class, "foldCollect");
         rDrive1 = HM.get(DcMotor.class, "rDrive1");
         rDrive2 = HM.get(DcMotor.class, "rDrive2");
         lDrive1 = HM.get(DcMotor.class, "lDrive1");
         lDrive2 = HM.get(DcMotor.class, "lDrive2");
         slide = HM.get(DcMotor.class, "slide");
         elevator = HM.get(DcMotor.class, "elevator");
-        collectRight = HM.get(Servo.class, "collectRight");
-        collectLeft = HM.get(Servo.class, "collectLeft");
-        grabber = HM.get(Servo.class, "grabber");
+        // collectRight = HM.get(Servo.class, "collectRight");
+        // collectLeft = HM.get(Servo.class, "collectLeft");
+        //grabber = HM.get(Servo.class, "grabber");
 //set Direction
         foldcollect.setDirection(DcMotor.Direction.FORWARD);
         rDrive1.setDirection(DcMotor.Direction.FORWARD);
@@ -64,31 +61,13 @@ public class Funcs_11229 extends LinearOpMode {
 
     //Drive
     public void drive() {
-        //Drive
+        //Drive/turn
         if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
             rDrive1.setPower(gamepad1.right_stick_y);
             rDrive2.setPower(gamepad1.right_stick_y);
-            lDrive1.setPower(gamepad1.right_stick_y);
-            lDrive2.setPower(gamepad1.right_stick_y);
-        } else {
-            rDrive1.setPower(0);
-            rDrive2.setPower(0);
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-        }
-        //turn
-        if (gamepad1.left_trigger > 0.2) {
-            rDrive1.setPower(gamepad1.left_trigger);
-            rDrive2.setPower(gamepad1.left_trigger);
-            lDrive1.setPower(-gamepad1.left_trigger);
-            lDrive2.setPower(-gamepad1.left_trigger);
-
-        } else if (gamepad1.right_trigger > 0.2) {
-            rDrive1.setPower(-gamepad1.right_trigger);
-            rDrive2.setPower(-gamepad1.right_trigger);
-            lDrive1.setPower(gamepad1.right_trigger);
-            lDrive2.setPower(gamepad1.right_trigger);
-
+        } else if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+            lDrive1.setPower(gamepad1.left_stick_y);
+            lDrive2.setPower(gamepad1.left_stick_y);
         } else {
             rDrive1.setPower(0);
             rDrive2.setPower(0);
@@ -97,21 +76,22 @@ public class Funcs_11229 extends LinearOpMode {
 
         }
         //slide
-        if (gamepad1.right_bumper) {
-            slide.setPower(1);
-        } else if (gamepad1.left_bumper) {
-            slide.setPower(-1);
+        if (gamepad1.right_trigger > 0) {
+            slide.setPower(gamepad1.right_trigger);
+        } else if (gamepad1.left_trigger > 0) {
+            slide.setPower(gamepad1.left_trigger);
         } else {
             slide.setPower(0);
         }
     }
 
+
     //elevator
     public void elevator() {
         if (gamepad2.right_stick_y > 0.2) {
-            elevator.setPower(gamepad1.right_stick_y);
+            elevator.setPower(gamepad2.right_stick_y);
         } else if (gamepad2.right_stick_y < 0.2) {
-            elevator.setPower(gamepad1.right_stick_y);
+            elevator.setPower(gamepad2.right_stick_y);
         } else {
             elevator.setPower(0);
         }
