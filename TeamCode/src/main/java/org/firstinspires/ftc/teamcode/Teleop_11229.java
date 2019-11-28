@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -26,7 +27,13 @@ public class Teleop_11229 extends LinearOpMode {
     private DcMotor slide = null;
     //elevator
     private DcMotor elevator = null;
-
+    //fold collection
+    private DcMotor foldcollect = null;
+    //collection
+    private Servo collectRight = null;
+    private Servo collectLeft = null;
+    //grabbing the build plate
+    private Servo grabber = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,6 +43,10 @@ public class Teleop_11229 extends LinearOpMode {
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
+       // foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
+        //collectRight = hardwareMap.get(Servo.class, "collectRight");
+        //collectLeft = hardwareMap.get(Servo.class, "collectLeft");
+        //grabber = hardwareMap.get(Servo.class, "grabber");
         waitForStart();
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
@@ -43,16 +54,16 @@ public class Teleop_11229 extends LinearOpMode {
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
+//        foldcollect.setDirection(DcMotor.Direction.FORWARD);
 
 
 
         {
 
-            //Drive/turn
 
 
             while (opModeIsActive()) {
-
+                //Drive/turn
                 if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
                     rDrive1.setPower(gamepad1.right_stick_y);
                     rDrive2.setPower(gamepad1.right_stick_y);
@@ -78,7 +89,7 @@ public class Teleop_11229 extends LinearOpMode {
                     slide.setPower(0);
                 }
 
-
+//elevator
                 if (gamepad2.right_stick_y > 0.2) {
                     elevator.setPower(gamepad2.right_stick_y);
                 } else if (gamepad2.right_stick_y < 0.2) {
@@ -95,12 +106,47 @@ public class Teleop_11229 extends LinearOpMode {
                     elevator.setPower(0);
                 }
             }
-                telemetry.addData("ticks", lDrive1.getCurrentPosition());
-                telemetry.update();
 
+            //collection
+            if (gamepad2.right_trigger > 0) {
+                collectRight.setPosition(0.7);
+                collectLeft.setPosition(0.2);
+            } else if (gamepad2.left_trigger > 0) {
+                collectLeft.setPosition(0.7);
+                collectRight.setPosition(0.2);
 
+            } else {
+                collectRight.setPosition(0);
+                collectLeft.setPosition(0);
             }
+            //collection fold
+            if (gamepad2.right_bumper) {
+                foldcollect.setPower(1);
+            } else if (gamepad2.left_bumper) {
+                foldcollect.setPower(-1);
+            } else {
+                foldcollect.setPower(0);
+            }
+//grabber
+            boolean grabbervar = true;
+            if (gamepad2.x) {
+                if (grabbervar) {
+                    grabber.setPosition(180);
+                    grabbervar = false;
+                } else {
+                    grabber.setPosition(0);
+                    grabbervar = true;
+                }
+            }
+
+
+
+            telemetry.addData("ticks", lDrive1.getCurrentPosition());
+            telemetry.update();
+
+
         }
+    }
 
 
 

@@ -377,7 +377,7 @@ public class vuforiaMap extends LinearOpMode {
                 telemetry.addData("Visible Target", "none");
             }
 
-
+/*
             if (skyStoneVisible){
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 if(rotation.thirdAngle > 0){
@@ -395,7 +395,7 @@ public class vuforiaMap extends LinearOpMode {
                     funcs.rotateByDirction("right",0);
                 }
             }
-
+*/
 
             telemetry.update();
 
@@ -628,7 +628,7 @@ public class vuforiaMap extends LinearOpMode {
                 telemetry.addData("Visible Target", "none");
             }
 
-
+/*
             if (skyStoneVisible){
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 if(rotation.thirdAngle > 0){
@@ -646,7 +646,7 @@ public class vuforiaMap extends LinearOpMode {
                     funcs.rotateByDirction("right",0);
                 }
             }
-
+*/
             if(BP1Visible){
                 VectorF translation = lastLocation.getTranslation();
                 while(translation.get(0) / mmPerInch != tarX){

@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -21,28 +20,20 @@ public class Funcs_11229 extends LinearOpMode {
     private DcMotor slide = null;
     //elevator
     private DcMotor elevator = null;
-    //fold collection
-    private DcMotor foldcollect = null;
-    //collection
-    private Servo collectRight = null;
-    private Servo collectLeft = null;
-    //grabbing the build plate
-    private Servo grabber = null;
+
 
     //hardware map
     public void init(HardwareMap HM) {
-        //foldcollect = HM.get(DcMotor.class, "foldCollect");
+
         rDrive1 = HM.get(DcMotor.class, "rDrive1");
         rDrive2 = HM.get(DcMotor.class, "rDrive2");
         lDrive1 = HM.get(DcMotor.class, "lDrive1");
         lDrive2 = HM.get(DcMotor.class, "lDrive2");
         slide = HM.get(DcMotor.class, "slide");
         elevator = HM.get(DcMotor.class, "elevator");
-        // collectRight = HM.get(Servo.class, "collectRight");
-        // collectLeft = HM.get(Servo.class, "collectLeft");
-        //grabber = HM.get(Servo.class, "grabber");
+
 //set Direction
-        foldcollect.setDirection(DcMotor.Direction.FORWARD);
+
         rDrive1.setDirection(DcMotor.Direction.FORWARD);
         rDrive2.setDirection(DcMotor.Direction.FORWARD);
         lDrive1.setDirection(DcMotor.Direction.REVERSE);
@@ -98,40 +89,12 @@ public class Funcs_11229 extends LinearOpMode {
     }
 
     public void collect() {
-        //collection
-        if (gamepad2.right_trigger > 0) {
-            collectRight.setPosition(0.7);
-            collectLeft.setPosition(0.2);
-        } else if (gamepad2.left_trigger > 0) {
-            collectLeft.setPosition(0.7);
-            collectRight.setPosition(0.2);
 
-        } else {
-            collectRight.setPosition(0);
-            collectLeft.setPosition(0);
-        }
-        //collection fold
-        if (gamepad2.right_bumper) {
-            foldcollect.setPower(1);
-        } else if (gamepad2.left_bumper) {
-            foldcollect.setPower(-1);
-        } else {
-            foldcollect.setPower(0);
-        }
     }
 
     //grabbing the build plate
     public void grabber() {
-        boolean grabbervar = true;
-        if (gamepad2.x) {
-            if (grabbervar) {
-                grabber.setPosition(180);
-                grabbervar = false;
-            } else {
-                grabber.setPosition(0);
-                grabbervar = true;
-            }
-        }
+
     }
 
 
