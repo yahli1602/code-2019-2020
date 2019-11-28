@@ -29,7 +29,7 @@ public class Teleop_11229 extends LinearOpMode {
 
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
         rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
@@ -44,10 +44,6 @@ public class Teleop_11229 extends LinearOpMode {
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
 
-        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
         {
@@ -91,11 +87,21 @@ public class Teleop_11229 extends LinearOpMode {
                     elevator.setPower(0);
                 }
 
+                if (gamepad2.right_stick_y > 0.2) {
+                    elevator.setPower(gamepad2.right_stick_y);
+                } else if (gamepad2.right_stick_y < 0.2) {
+                    elevator.setPower(gamepad2.right_stick_y);
+                } else {
+                    elevator.setPower(0);
+                }
+            }
                 telemetry.addData("ticks", lDrive1.getCurrentPosition());
                 telemetry.update();
+
+
             }
         }
 
 
-    }
+
 }
