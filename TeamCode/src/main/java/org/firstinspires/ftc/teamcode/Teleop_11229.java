@@ -43,7 +43,7 @@ public class Teleop_11229 extends LinearOpMode {
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-       // foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
+        // foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
         //collectRight = hardwareMap.get(Servo.class, "collectRight");
         //collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         //grabber = hardwareMap.get(Servo.class, "grabber");
@@ -57,9 +57,7 @@ public class Teleop_11229 extends LinearOpMode {
 //        foldcollect.setDirection(DcMotor.Direction.FORWARD);
 
 
-
         {
-
 
 
             while (opModeIsActive()) {
@@ -67,8 +65,7 @@ public class Teleop_11229 extends LinearOpMode {
                 if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
                     rDrive1.setPower(gamepad1.right_stick_y);
                     rDrive2.setPower(gamepad1.right_stick_y);
-                }
-                else{
+                } else {
                     rDrive1.setPower(0);
                     rDrive2.setPower(0);
                 }
@@ -83,10 +80,16 @@ public class Teleop_11229 extends LinearOpMode {
                 //slide
                 if (gamepad1.right_trigger > 0) {
                     slide.setPower(-gamepad1.right_trigger);
+                    telemetry.addData("Slide Power:", slide.getPower());
+                    telemetry.update();
                 } else if (gamepad1.left_trigger > 0) {
                     slide.setPower(gamepad1.left_trigger);
+                    telemetry.addData("Slide Power:", slide.getPower());
+                    telemetry.update();
                 } else {
                     slide.setPower(0);
+                    telemetry.addData("Slide Power:", slide.getPower());
+                    telemetry.update();
                 }
 
 //elevator
@@ -140,14 +143,12 @@ public class Teleop_11229 extends LinearOpMode {
             }
 
 
-
             telemetry.addData("ticks", lDrive1.getCurrentPosition());
             telemetry.update();
 
 
         }
     }
-
 
 
 }

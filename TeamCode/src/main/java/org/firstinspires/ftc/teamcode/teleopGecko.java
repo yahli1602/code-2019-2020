@@ -21,13 +21,15 @@ public DcMotor ldrive2 = null;
     ldrive1 = hardwareMap.get(DcMotor.class,"left_drive1");
     ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
     waitForStart();
-    rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-    rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
-    ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-    ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+    rdrive1.setDirection(DcMotorSimple.Direction.REVERSE);
+    rdrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+    ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
+    ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
 
-
-
+    rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         while (opModeIsActive()) {
@@ -61,7 +63,8 @@ public DcMotor ldrive2 = null;
                 ldrive2.setPower(0);
 
             }
-            telemetry.addData("", ldrive1.getCurrentPosition());
+            int position = ldrive1.getCurrentPosition();
+            telemetry.addData("", position);
             telemetry.update();
         }
     }

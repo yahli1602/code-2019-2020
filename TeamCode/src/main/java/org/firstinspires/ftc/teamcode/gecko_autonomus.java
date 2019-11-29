@@ -87,7 +87,6 @@ public class gecko_autonomus extends LinearOpMode {
                 telemetry.addData("", errorT);
                 telemetry.addData("count", count);
                 telemetry.update();
-                count++;
 
             }
             ldrive1.setPower(0);
@@ -139,6 +138,10 @@ public class gecko_autonomus extends LinearOpMode {
 
         while (opModeIsActive()) {
             driveInches(10);
+
+            int position = ldrive1.getCurrentPosition();
+            telemetry.addData("position", position);
+            telemetry.update();
 
         }
     }
