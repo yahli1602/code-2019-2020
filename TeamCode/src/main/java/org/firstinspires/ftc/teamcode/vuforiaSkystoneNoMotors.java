@@ -122,6 +122,8 @@ public class vuforiaSkystoneNoMotors extends LinearOpMode {
     private static final float mmTargetHeight = (6) * mmPerInch;          // the height of the center of the target image above the floor
     private static final float tarX = 5;
     private static final float tarY = 0;
+    private static final float RX = 4;
+    private static final float RY = 8;
 
     //TODO: add the distnces from the center of the robot to the phone
     private static final float phoneDistanceFromCenterX = 0;
@@ -371,7 +373,8 @@ public class vuforiaSkystoneNoMotors extends LinearOpMode {
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+                        translation.get(1) / mmPerInch - 8, Math.abs(translation.get(0) / mmPerInch) - 4, translation.get(2) / mmPerInch);
+                telemetry.addData("x in mm:",translation.get(0));
 
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
@@ -382,38 +385,40 @@ public class vuforiaSkystoneNoMotors extends LinearOpMode {
             }
             if (skyStoneVisible && opModeIsActive()) {
                 Orientation rotation2 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                if (rotation2.thirdAngle > 5 && opModeIsActive()) {
+                if (rotation2.thirdAngle > 4 && opModeIsActive()) {
                     telemetry.addData("turn:", "left");
 
-                } else if (rotation2.thirdAngle < -5 && opModeIsActive()) {
+                } else if (rotation2.thirdAngle < -4 && opModeIsActive()) {
                     telemetry.addData("turn:", "right");
 
                 } else if (targetVisible == false && opModeIsActive()) {
-                    telemetry.addData("cant see target","stoping");
-                } else if (rotation2.thirdAngle <= 5 && rotation2.thirdAngle >= -5 && opModeIsActive()) {
+                    telemetry.addData("cant see target", "stoping");
+                } else if (rotation2.thirdAngle <= 4 && rotation2.thirdAngle >= -4 && opModeIsActive()) {
                     telemetry.addData("on taregt", "dont need to turn");
                 } else {
-                    telemetry.addData("don't see target: ","stoping");
+                    telemetry.addData("don't see target: ", "stoping");
                 }
             }
-            if (BP1Visible && opModeIsActive()) {
-                Orientation rotation3 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                if (rotation3.thirdAngle > 0 && opModeIsActive()) {
-                    telemetry.addData("turn:", "left");
+            if (skyStoneVisible && opModeIsActive()) {
+                VectorF translation2 = lastLocation.getTranslation();
+                if (translation2.get(1) / mmPerInch - RY > 2.5 && opModeIsActive()) {
+                    telemetry.addData("slide:", "right");
+                } else if (translation2.get(1) / mmPerInch -RY< -2.5 && opModeIsActive()) {
+                    telemetry.addData("slide:", "left");
 
-                } else if (rotation3.thirdAngle < 0 && opModeIsActive()) {
-                    telemetry.addData("turn:", "right");
+                } else if (Math.abs(translation2.get(0) / mmPerInch) - RX > 4 && opModeIsActive()) {
+                    telemetry.addData("drive:", "forwrd");
 
-                } else if (targetVisible == false && opModeIsActive()) {
-                    telemetry.addData("cant see target","stoping");
-                } else if (rotation3.thirdAngle == 0) {
-                    telemetry.addData("on taregt", "dont need to turn");
+                } else if (Math.abs(translation2.get(0) / mmPerInch) - RX < 6 && opModeIsActive()) {
+                    telemetry.addData("drive:", "backwards");
+
+                } else if (targetVisible == false || BP1Visible == false && opModeIsActive()) {
+                    telemetry.addData("no need to drive:", "");
                 } else {
-                    telemetry.addData("don't see target: ","stoping");
+                    telemetry.addData("no need to drive:", "");
+
                 }
             }
-
-
             telemetry.update();
 
         }

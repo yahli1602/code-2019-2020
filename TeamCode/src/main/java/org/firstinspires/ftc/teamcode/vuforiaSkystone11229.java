@@ -93,6 +93,7 @@ public class vuforiaSkystone11229 extends LinearOpMode {
     public DcMotor rdrive2 = null;
     public DcMotor ldrive1 = null;
     public DcMotor ldrive2 = null;
+    public DcMotor slide = null;
 
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
@@ -128,6 +129,8 @@ public class vuforiaSkystone11229 extends LinearOpMode {
     private static final float mmTargetHeight = (6) * mmPerInch;          // the height of the center of the target image above the floor
     private static final float tarX = 5;
     private static final float tarY = 0;
+    private float Rx = 0;
+    private float Ry = 0;
 
     //TODO: add the distnces from the center of the robot to the phone
     private static final float phoneDistanceFromCenterX = 0;
@@ -170,12 +173,14 @@ public class vuforiaSkystone11229 extends LinearOpMode {
         rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
         ldrive1 = hardwareMap.get(DcMotor.class, "left_drive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
+        //slide = hardwareMap.get(DcMotor.class, "slide");
 
 
-        rdrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-        rdrive2.setDirection(DcMotorSimple.Direction.REVERSE);
-        ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-        ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+        rdrive1.setDirection(DcMotor.Direction.REVERSE);
+        rdrive2.setDirection(DcMotor.Direction.REVERSE);
+        ldrive1.setDirection(DcMotor.Direction.FORWARD);
+        ldrive2.setDirection(DcMotor.Direction.FORWARD);
+        //slide.setDirection(DcMotor.Direction.FORWARD);
 
         // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
@@ -383,7 +388,7 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+                        translation.get(1) / mmPerInch - 8, translation.get(0) / mmPerInch, translation.get(2) / mmPerInch);
 
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
@@ -403,13 +408,13 @@ public class vuforiaSkystone11229 extends LinearOpMode {
             if (skyStoneVisible && opModeIsActive()) {
 
                 Orientation rotation2 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                if (rotation2.thirdAngle > 5 && opModeIsActive()) {
+                if (rotation2.thirdAngle > 3 && opModeIsActive()) {
                     telemetry.addData("turn:", "left");
                     rdrive1.setPower(0.4);
                     rdrive2.setPower(0.4);
                     ldrive1.setPower(-0.4);
                     ldrive2.setPower(-0.4);
-                } else if (rotation2.thirdAngle < -5 && opModeIsActive()) {
+                } else if (rotation2.thirdAngle < -3 && opModeIsActive()) {
                     telemetry.addData("turn:", "right");
                     rdrive1.setPower(-0.4);
                     rdrive2.setPower(-0.4);
@@ -420,7 +425,7 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);
                     ldrive2.setPower(0);
-                } else if (rotation2.thirdAngle <= 5 && rotation2.thirdAngle >= -5 && opModeIsActive()) {
+                } else if (rotation2.thirdAngle <= 3 && rotation2.thirdAngle >= -3 && opModeIsActive()) {
                     rdrive1.setPower(0);
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);
@@ -434,34 +439,36 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                 }
             }
             if (BP1Visible && opModeIsActive()) {
-                Orientation rotation3 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                if (rotation3.thirdAngle > 5 && opModeIsActive()) {
-                    telemetry.addData("turn:", "left");
+                VectorF translation2 = lastLocation.getTranslation();
+                if (translation2.get(0)/mmPerInch>4 && opModeIsActive()) {
+                    slide.setPower(1);
+                } else if (translation2.get(0)/mmPerInch<-4 && opModeIsActive()) {
+                    slide.setPower(-1);
+
+                }else if(translation2.get(1)/mmPerInch > 4 && opModeIsActive()) {
                     rdrive1.setPower(0.4);
                     rdrive2.setPower(0.4);
-                    ldrive1.setPower(-0.4);
-                    ldrive2.setPower(-0.4);
-                } else if (rotation3.thirdAngle < -5 && opModeIsActive()) {
-                    telemetry.addData("turn:", "right");
-                    rdrive1.setPower(-0.4);
-                    rdrive2.setPower(-0.4);
                     ldrive1.setPower(0.4);
                     ldrive2.setPower(0.4);
-                } else if (targetVisible == false && opModeIsActive()) {
+
+                }else if (translation2.get(2)/mmPerInch< -4  && opModeIsActive()){
+                    rdrive1.setPower(-0.4);
+                    rdrive2.setPower(-0.4);
+                    ldrive1.setPower(-0.4);
+                    ldrive2.setPower(-0.4);
+
+                } else if (targetVisible == false || BP1Visible == false && opModeIsActive()) {
                     rdrive1.setPower(0);
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);
                     ldrive2.setPower(0);
-                } else if (rotation3.thirdAngle <= 5 && rotation3.thirdAngle >= -5 && opModeIsActive()) {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
+
                 } else {
                     rdrive1.setPower(0);
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);
                     ldrive2.setPower(0);
+
                 }
             }
 
