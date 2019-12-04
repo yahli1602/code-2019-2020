@@ -27,12 +27,17 @@ public class vuforiaTeleop extends LinearOpMode {
         ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
         slide = hardwareMap.get(DcMotor.class, "left_drive2");
         waitForStart();
-        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
-        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
-        slide.setDirection(DcMotorSimple.Direction.FORWARD);
+        rdrive1.setDirection(DcMotor.Direction.FORWARD);
+        rdrive2.setDirection(DcMotor.Direction.FORWARD);
+        ldrive1.setDirection(DcMotor.Direction.REVERSE);
+        ldrive2.setDirection(DcMotor.Direction.REVERSE);
+        slide.setDirection(DcMotor.Direction.FORWARD);
 
+        rdrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rdrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ldrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ldrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
 
@@ -66,7 +71,7 @@ public class vuforiaTeleop extends LinearOpMode {
             }
 
             if (gamepad1.a){
-                vuFuncs.lockedOnTareget(9);
+                vuFuncs.lockedOnTareget(0);
             }
 
             else {

@@ -129,8 +129,8 @@ public class vuforiaSkystone11229 extends LinearOpMode {
     private static final float mmTargetHeight = (6) * mmPerInch;          // the height of the center of the target image above the floor
     private static final float tarX = 5;
     private static final float tarY = 0;
-    private float Rx = 0;
-    private float Ry = 0;
+    private static final float RX = 4;
+    private static final float RY = 8;
 
     //TODO: add the distnces from the center of the robot to the phone
     private static final float phoneDistanceFromCenterX = 0;
@@ -173,14 +173,14 @@ public class vuforiaSkystone11229 extends LinearOpMode {
         rdrive2 = hardwareMap.get(DcMotor.class, "right_drive2");
         ldrive1 = hardwareMap.get(DcMotor.class, "left_drive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "left_drive2");
-        //slide = hardwareMap.get(DcMotor.class, "slide");
+        slide = hardwareMap.get(DcMotor.class, "slide");
 
 
         rdrive1.setDirection(DcMotor.Direction.REVERSE);
         rdrive2.setDirection(DcMotor.Direction.REVERSE);
         ldrive1.setDirection(DcMotor.Direction.FORWARD);
         ldrive2.setDirection(DcMotor.Direction.FORWARD);
-        //slide.setDirection(DcMotor.Direction.FORWARD);
+        slide.setDirection(DcMotor.Direction.FORWARD);
 
         // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
@@ -438,40 +438,53 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                     ldrive2.setPower(0);
                 }
             }
+            if (skyStoneVisible && opModeIsActive()) {
+                Orientation rotation2 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+                if (rotation2.thirdAngle > 2 && opModeIsActive()) {
+                    telemetry.addData("turn:", "left");
+
+                } else if (rotation2.thirdAngle < -2 && opModeIsActive()) {
+                    telemetry.addData("turn:", "right");
+
+                } else if (targetVisible == false && opModeIsActive()) {
+                    telemetry.addData("cant see target", "stoping");
+                } else if (rotation2.thirdAngle <= 2 && rotation2.thirdAngle >= -2 && opModeIsActive()) {
+                    telemetry.addData("on taregt", "dont need to turn");
+                } else {
+                    telemetry.addData("don't see target: ", "stoping");
+                }
+            }
             if (BP1Visible && opModeIsActive()) {
                 VectorF translation2 = lastLocation.getTranslation();
-                if (translation2.get(0)/mmPerInch>4 && opModeIsActive()) {
+                if (translation2.get(1) / mmPerInch - RY > 3 && opModeIsActive()) {
+                    telemetry.addData("slide:", "right");
                     slide.setPower(1);
-                } else if (translation2.get(0)/mmPerInch<-4 && opModeIsActive()) {
+                } else if (translation2.get(1) / mmPerInch -RY< -3 && opModeIsActive()) {
+                    telemetry.addData("slide:", "left");
                     slide.setPower(-1);
 
-                }else if(translation2.get(1)/mmPerInch > 4 && opModeIsActive()) {
-                    rdrive1.setPower(0.4);
-                    rdrive2.setPower(0.4);
-                    ldrive1.setPower(0.4);
-                    ldrive2.setPower(0.4);
+                } else if (Math.abs(translation2.get(0) / mmPerInch) - RX > 6 && opModeIsActive()) {
+                    telemetry.addData("drive:", "forwrd");
+                    rdrive1.setPower(0.7);
+                    rdrive2.setPower(0.7);
+                    ldrive1.setPower(0.7);
+                    ldrive2.setPower(0.7);
 
-                }else if (translation2.get(2)/mmPerInch< -4  && opModeIsActive()){
-                    rdrive1.setPower(-0.4);
-                    rdrive2.setPower(-0.4);
-                    ldrive1.setPower(-0.4);
-                    ldrive2.setPower(-0.4);
+
+                } else if (Math.abs(translation2.get(0) / mmPerInch) - RX < 4 && opModeIsActive()) {
+                    telemetry.addData("drive:", "backwards");
+                    rdrive1.setPower(-0.7);
+                    rdrive2.setPower(-0.7);
+                    ldrive1.setPower(-0.7);
+                    ldrive2.setPower(-0.7);
 
                 } else if (targetVisible == false || BP1Visible == false && opModeIsActive()) {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
-
+                    telemetry.addData("no need to drive:", "");
                 } else {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
+                    telemetry.addData("no need to drive:", "");
 
                 }
             }
-
 
             telemetry.update();
 
