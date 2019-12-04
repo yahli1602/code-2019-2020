@@ -103,53 +103,37 @@ public class Teleop_11229 extends LinearOpMode {
             }
 */
             //Drive gilad
-            if(gamepad1.left_trigger > 0.2 || gamepad1.left_stick_y > 0.2){
-                if(gamepad1.left_stick_y > 0.2){
-                    rDrive1.setPower(gamepad1.left_stick_y);
-                    rDrive2.setPower(gamepad1.left_stick_y);
-                    lDrive1.setPower(gamepad1.left_stick_y - gamepad1.right_trigger);
-                    lDrive2.setPower(gamepad1.left_stick_y - gamepad1.right_trigger);
-                }
-                else if (gamepad1.left_stick_y < -0.2){
-                    rDrive1.setPower(gamepad1.left_stick_y);
-                    rDrive2.setPower(gamepad1.left_stick_y);
-                    lDrive1.setPower(gamepad1.left_stick_y + gamepad1.right_trigger);
-                    lDrive2.setPower(gamepad1.left_stick_y + gamepad1.right_trigger);
-                }
-                else{
-                    rDrive1.setPower(-gamepad1.left_trigger);
-                    rDrive2.setPower(-gamepad1.left_trigger);
-                    lDrive1.setPower(gamepad1.left_trigger);
-                    lDrive2.setPower(gamepad1.left_trigger);
-                }
-            }
-            else if(gamepad1.right_trigger > 0.2){
-                if(gamepad1.left_stick_y > 0.2){
-                    rDrive1.setPower(gamepad1.left_stick_y - gamepad1.left_trigger);
-                    rDrive2.setPower(gamepad1.left_stick_y - gamepad1.left_trigger);
-                    lDrive1.setPower(gamepad1.left_stick_y);
-                    lDrive2.setPower(gamepad1.left_stick_y);
-                }
-                else if(gamepad1.left_stick_y < -0.2){
-                    rDrive1.setPower(gamepad1.left_stick_y + gamepad1.left_trigger);
-                    rDrive2.setPower(gamepad1.left_stick_y + gamepad1.left_trigger);
-                    lDrive1.setPower(gamepad1.left_stick_y);
-                    lDrive2.setPower(gamepad1.left_stick_y);
-                }
-                else{
-                    rDrive1.setPower(gamepad1.right_trigger);
-                    rDrive2.setPower(gamepad1.right_trigger);
-                    lDrive1.setPower(-gamepad1.right_trigger);
-                    lDrive2.setPower(-gamepad1.right_trigger);
-                }
-            }
-            else {
-                rDrive1.setPower(0);
-                rDrive2.setPower(0);
-                lDrive1.setPower(0);
-                lDrive2.setPower(0);
+         if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < 0.2){
+          rDrive1.setPower(gamepad1.left_stick_y);
+          rDrive2.setPower(gamepad1.left_stick_y);
+          lDrive1.setPower(gamepad1.left_stick_y);
+          lDrive2.setPower(gamepad1.left_stick_y);
+         }
+         else {
+             rDrive1.setPower(0);
+             rDrive2.setPower(0);
+             lDrive1.setPower(0);
+             lDrive2.setPower(0);
+         }
+         if (gamepad1.left_trigger > 0.2){
+             rDrive1.setPower(-gamepad1.left_trigger);
+             rDrive2.setPower(-gamepad1.left_trigger);
+             lDrive1.setPower(gamepad1.left_trigger);
+             lDrive2.setPower(gamepad1.left_trigger);
+         }
 
+          else if (gamepad1.right_trigger > 0.2){
+                rDrive1.setPower(gamepad1.right_trigger);
+                rDrive2.setPower(gamepad1.right_trigger);
+                lDrive1.setPower(-gamepad1.right_trigger);
+                lDrive2.setPower(-gamepad1.right_trigger);
             }
+         else {
+             rDrive1.setPower(0);
+             rDrive2.setPower(0);
+             lDrive1.setPower(0);
+             lDrive2.setPower(0);
+         }
 
             if (gamepad1.right_stick_x > 0 || gamepad1.right_stick_x < 0) {
                 slide.setPower(-gamepad1.right_stick_x);
