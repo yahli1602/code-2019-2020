@@ -38,6 +38,7 @@ public class Auto_11229_B extends LinearOpMode {
     private double inchesPerTick = perimeter / ticksPerRevolution;
     private double ticksPerSpin = ticksPerRevolution * 40;
     private double ticksPerInch = 1 / inchesPerTick;
+    private double diameter = 13.979921;
     private int count;
 
     public void timer(long miliseconds) {
@@ -47,30 +48,110 @@ public class Auto_11229_B extends LinearOpMode {
     }
 
     public void driveInches(double inches) {
+        if(inches > 0){
+            errorT = inches;
+            lastPosition = 0;
+            while (errorT > 0 && opModeIsActive()) {
+                uT = kp * errorT;
+
+                currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
+                errorT -= (currentPosition - lastPosition);
+                lastPosition = currentPosition;
+
+                ldrive1.setPower(uT);
+                ldrive2.setPower(uT);
+                rdrive1.setPower(uT);
+                rdrive2.setPower(uT);
+
+            }
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+        }
+        else{
+            errorT = -inches;
+            lastPosition = 0;
+            while (errorT > 0 && opModeIsActive()) {
+                uT = kp * errorT;
+
+                currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
+                errorT -= (currentPosition - lastPosition);
+                lastPosition = currentPosition;
+
+                ldrive1.setPower(-uT);
+                ldrive2.setPower(-uT);
+                rdrive1.setPower(-uT);
+                rdrive2.setPower(-uT);
+
+            }
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+        }
+    }
+    // Turns right by default
+    public void turDeg(double deg){
+        if(deg > 0){
+            errorT = diameter * Math.PI * (deg/360);
+            lastPosition = 0;
+            while (errorT > 0 && opModeIsActive()) {
+                uT = kp * errorT;
+
+                currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
+                errorT -= (currentPosition - lastPosition);
+                lastPosition = currentPosition;
+
+                ldrive1.setPower(-uT);
+                ldrive2.setPower(-uT);
+                rdrive1.setPower(uT);
+                rdrive2.setPower(uT);
+
+            }
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+        }
+        else{
+            errorT = diameter * Math.PI * (-deg/360);
+            lastPosition = 0;
+            while (errorT > 0 && opModeIsActive()) {
+                uT = kp * errorT;
+
+                currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
+                errorT -= (currentPosition - lastPosition);
+                lastPosition = currentPosition;
+
+                ldrive1.setPower(uT);
+                ldrive2.setPower(uT);
+                rdrive1.setPower(-uT);
+                rdrive2.setPower(-uT);
+
+            }
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+        }
+    }
+
+    public void slide(double inches){
         errorT = inches;
         lastPosition = 0;
         while (errorT > 0 && opModeIsActive()) {
-            uT = kp * errorT;
+            uT = ks * errorT;
 
             currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
             errorT -= (currentPosition - lastPosition);
             lastPosition = currentPosition;
 
-            ldrive1.setPower(uT);
-            ldrive2.setPower(uT);
-            rdrive1.setPower(uT);
-            rdrive2.setPower(uT);
-
-            telemetry.addData("right power", rdrive1.getPower());
-            telemetry.addData("left power", ldrive1.getPower());
-            telemetry.update();
+            slide.setPower(uT);
         }
-        ldrive1.setPower(0);
-        ldrive2.setPower(0);
-        rdrive1.setPower(0);
-        rdrive2.setPower(0);
-
+        slide.setPower(0);
     }
+
     @Override
     public void runOpMode() throws InterruptedException {
         rdrive1 = hardwareMap.get(DcMotor.class, "rDrive1");

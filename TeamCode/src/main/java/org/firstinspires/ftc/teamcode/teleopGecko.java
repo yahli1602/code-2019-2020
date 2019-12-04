@@ -26,10 +26,10 @@ public DcMotor ldrive2 = null;
     ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
     ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
 
-    rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    rdrive1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    rdrive2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    ldrive1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    ldrive2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         while (opModeIsActive()) {
@@ -38,34 +38,19 @@ public DcMotor ldrive2 = null;
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2){
                 rdrive1.setPower(gamepad1.right_stick_y);
                 rdrive2.setPower(gamepad1.right_stick_y);
-                ldrive1.setPower(gamepad1.right_stick_y);
-                ldrive2.setPower(gamepad1.right_stick_y);
             }
-
-            if (gamepad1.left_trigger > 0.2){
-                rdrive1.setPower(gamepad1.left_trigger);
-                rdrive2.setPower(gamepad1.left_trigger);
-                ldrive1.setPower(-gamepad1.left_trigger);
-                ldrive2.setPower(-gamepad1.left_trigger);
-
-            }
-            else if (gamepad1.right_trigger > 0.2){
-                rdrive1.setPower(-gamepad1.right_trigger);
-                rdrive2.setPower(-gamepad1.right_trigger);
-                ldrive1.setPower(gamepad1.right_trigger);
-                ldrive2.setPower(gamepad1.right_trigger);
-
-            }
-            else {
+            else{
                 rdrive1.setPower(0);
                 rdrive2.setPower(0);
+            }
+            if(gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2){
+                ldrive1.setPower(gamepad1.left_stick_y);
+                ldrive2.setPower(gamepad1.left_stick_y);
+            }
+            else {
                 ldrive1.setPower(0);
                 ldrive2.setPower(0);
-
             }
-            int position = ldrive1.getCurrentPosition();
-            telemetry.addData("", position);
-            telemetry.update();
         }
     }
 }
