@@ -86,7 +86,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name="Vuforia 112299", group ="Concept")
+@Autonomous(name="Vuforia 112299", group ="Concept")
 
 public class vuforiaSkystone11229 extends LinearOpMode {
     public DcMotor rdrive1 = null;
@@ -129,8 +129,8 @@ public class vuforiaSkystone11229 extends LinearOpMode {
     private static final float mmTargetHeight = (6) * mmPerInch;          // the height of the center of the target image above the floor
     private static final float tarX = 5;
     private static final float tarY = 0;
-    private static final float RX = 4;
-    private static final float RY = 8;
+    private static final float RY = 0;
+    private static final float RX = 8;
 
     //TODO: add the distnces from the center of the robot to the phone
     private static final float phoneDistanceFromCenterX = 0;
@@ -156,6 +156,7 @@ public class vuforiaSkystone11229 extends LinearOpMode {
     private boolean targetVisible = false;
     private boolean skyStoneVisible = false;
     private boolean BP1Visible = false;
+    private boolean lockSSS = false;
     private float phoneXRotate = 0;
     private float phoneYRotate = 0;
     private float phoneZRotate = 0;
@@ -329,9 +330,10 @@ public class vuforiaSkystone11229 extends LinearOpMode {
 
         // Next, translate the camera lens to where it is on the robot.
         // In this example, it is centered (left to right), but forward of the middle of the robot, and above ground level.
-        final float CAMERA_FORWARD_DISPLACEMENT = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
-        final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
-        final float CAMERA_LEFT_DISPLACEMENT = 0;     // eg: Camera is ON the robot's center line
+        //TODO: change it for the actual robot parameters
+        final float CAMERA_FORWARD_DISPLACEMENT = 0 * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
+        final float CAMERA_VERTICAL_DISPLACEMENT = 0 * mmPerInch;   // eg: Camera is 8 Inches above ground
+        final float CAMERA_LEFT_DISPLACEMENT = 190;     // eg: Camera is ON the robot's center line
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
@@ -361,21 +363,22 @@ public class vuforiaSkystone11229 extends LinearOpMode {
             targetVisible = false;
             skyStoneVisible = false;
             BP1Visible = false;
+            lockSSS = false;
             for (VuforiaTrackable trackable : allTrackables) {
-                if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible() && opModeIsActive()) {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
-                    if (trackable == targetsSkyStone.get(0)) {
+                    if (trackable == targetsSkyStone.get(0) && opModeIsActive()) {
                         skyStoneVisible = true;
                     }
-                    if (trackable == targetsSkyStone.get(9)) {
+                    if (trackable == targetsSkyStone.get(9) && opModeIsActive()) {
                         BP1Visible = true;
                     }
 
                     // getUpdatedRobotLocation() will return null if no new information is available since
                     // the last time that call was made, or if the trackable is not currently visible.
                     OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
-                    if (robotLocationTransform != null) {
+                    if (robotLocationTransform != null && opModeIsActive()) {
                         lastLocation = robotLocationTransform;
                     }
                     break;
@@ -397,49 +400,62 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                 targetVisible = false;
                 skyStoneVisible = false;
                 telemetry.addData("Visible Target", "none");
-                if (rdrive1.isBusy()){
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
-                }
 
-            }
-            if (BP1Visible && opModeIsActive()) {
 
-                Orientation rotation2 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                if (rotation2.thirdAngle > 3 && opModeIsActive()) {
-                    telemetry.addData("turn:", "left");
-                    rdrive1.setPower(0.4);
-                    rdrive2.setPower(0.4);
-                    ldrive1.setPower(-0.4);
-                    ldrive2.setPower(-0.4);
-                } else if (rotation2.thirdAngle < -3 && opModeIsActive()) {
-                    telemetry.addData("turn:", "right");
-                    rdrive1.setPower(-0.4);
-                    rdrive2.setPower(-0.4);
-                    ldrive1.setPower(0.4);
-                    ldrive2.setPower(0.4);
-                } else if (targetVisible == false || skyStoneVisible == false && opModeIsActive()) {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
-                } else if (rotation2.thirdAngle <= 3 && rotation2.thirdAngle >= -3 && opModeIsActive()) {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
-                    telemetry.addData("on target","no need to turn");
-                } else {
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
-                }
             }
             if (skyStoneVisible && opModeIsActive()) {
-                VectorF translation2 = lastLocation.getTranslation();
+
+
+                Orientation rotation2 = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+
+                if (rotation2.thirdAngle > 2 && opModeIsActive()) {
+                    telemetry.addData("turn:", "right");
+                    ldrive1.setPower(-0.3);
+                    ldrive2.setPower(-0.3);
+                    rdrive1.setPower(0.3);
+                    rdrive2.setPower(0.3);
+
+                } else if (rotation2.thirdAngle < -2 && opModeIsActive()) {
+                    telemetry.addData("turn:", "left");
+                    ldrive1.setPower(0.3);
+                    ldrive2.setPower(0.3);
+                    rdrive1.setPower(-0.3);
+                    rdrive2.setPower(-0.3);
+
+                } else if (targetVisible == false && opModeIsActive()) {
+                    telemetry.addData("cant see target", "stoping");
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+
+                } else if (rotation2.thirdAngle <= 2 && rotation2.thirdAngle >= -2 && opModeIsActive()) {
+                    telemetry.addData("on taregt", "dont need to turn");
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+
+                } else {
+                    telemetry.addData("don't see target: ", "stoping");
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+
+
+                    if (targetVisible == false || skyStoneVisible == false && opModeIsActive()) {
+                        rdrive1.setPower(0);
+                        rdrive2.setPower(0);
+                        ldrive1.setPower(0);
+                        ldrive2.setPower(0);
+                        lockSSS = true;
+                    }
+                }
+
+
+                if (BP1Visible && opModeIsActive()) {
+                    VectorF translation2 = lastLocation.getTranslation();
                 /*if (translation2.get(1) / mmPerInch - RY > 0.5 && !rdrive1.isBusy() && opModeIsActive()) {
                     slide.setPower(1);
                     telemetry.addData("slide:", "right");
@@ -450,75 +466,74 @@ public class vuforiaSkystone11229 extends LinearOpMode {
                     telemetry.addData("slide:", "left");
                 }*/
 
+                    while (Math.abs(translation2.get(0) / mmPerInch) - RX > 8 && Math.abs(translation2.get(0) / mmPerInch) - RX < 10 && opModeIsActive()) {
+                        telemetry.addData("trans2 Y:", Math.abs(translation2.get(0)) - RY);
+                        if (Math.abs(translation2.get(0) / mmPerInch) - RX > 7 && opModeIsActive()) {
+                            rdrive1.setPower(-0.5);
+                            rdrive2.setPower(-0.5);
+                            ldrive1.setPower(-0.5);
+                            ldrive2.setPower(-0.5);
+                            telemetry.addData("drive:", "backwards");
 
-                if (Math.abs(translation2.get(0) / mmPerInch) - RX > 5 && opModeIsActive()) {
-                    rdrive1.setPower(0.5);
-                    rdrive2.setPower(0.5);
-                    ldrive1.setPower(0.5);
-                    ldrive2.setPower(0.5);
-                    telemetry.addData("drive:", "forwrd");
+                        } else if (Math.abs(translation2.get(0) / mmPerInch) - RX < 11 && opModeIsActive()) {
+                            rdrive1.setPower(0.5);
+                            rdrive2.setPower(0.5);
+                            ldrive1.setPower(0.5);
+                            ldrive2.setPower(0.5);
+                            telemetry.addData("drive:", "forward");
 
-                } else if (Math.abs(translation2.get(0) / mmPerInch) - RX < 8 && opModeIsActive()) {
-                    rdrive1.setPower(-0.5);
-                    rdrive2.setPower(-0.5);
-                    ldrive1.setPower(-0.5);
-                    ldrive2.setPower(-0.5);
-                    telemetry.addData("drive:", "backwards");
-                }else{
+                        }
+                        telemetry.update();
+
+                    }
+
                     rdrive1.setPower(0);
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);
                     ldrive2.setPower(0);
-                    telemetry.addData("on target","*stopping*");
+                    telemetry.addData("on need to drive", "*stopping*");
+
+
+                }
+                if (BP1Visible && opModeIsActive()) {
+                    VectorF translation2 = lastLocation.getTranslation();
+                    if (translation2.get(1) / mmPerInch - RY > 3 && opModeIsActive()) {
+                        telemetry.addData("slide:", "right");
+                        slide.setPower(1);
+                    } else if (translation2.get(1) / mmPerInch - RY < -3 && opModeIsActive()) {
+                        telemetry.addData("slide:", "left");
+                        slide.setPower(-1);
+
+                    } else if (Math.abs(translation2.get(0) / mmPerInch) - RX > 10 && opModeIsActive()) {
+                        telemetry.addData("drive:", "forwrd");
+                        rdrive1.setPower(0.7);
+                        rdrive2.setPower(0.7);
+                        ldrive1.setPower(0.7);
+                        ldrive2.setPower(0.7);
+
+
+                    } else if (Math.abs(translation2.get(0) / mmPerInch) - RX < 8 && opModeIsActive()) {
+                        telemetry.addData("drive:", "backwards");
+                        rdrive1.setPower(-0.7);
+                        rdrive2.setPower(-0.7);
+                        ldrive1.setPower(-0.7);
+                        ldrive2.setPower(-0.7);
+
+                    } else if (targetVisible == false || BP1Visible == false && opModeIsActive()) {
+                        telemetry.addData("no need to drive:", "");
+                    } else {
+                        telemetry.addData("no need to drive:", "");
+
+                    }
                 }
 
-                if (targetVisible == false || BP1Visible == false && opModeIsActive()) {
-                    telemetry.addData("cant see target:", "*stopping*");
-                    rdrive1.setPower(0);
-                    rdrive2.setPower(0);
-                    ldrive1.setPower(0);
-                    ldrive2.setPower(0);
-                }
+                telemetry.update();
 
             }
-            if (BP1Visible && opModeIsActive()) {
-                VectorF translation2 = lastLocation.getTranslation();
-                if (translation2.get(1) / mmPerInch - RY > 3 && opModeIsActive()) {
-                    telemetry.addData("slide:", "right");
-                    slide.setPower(1);
-                } else if (translation2.get(1) / mmPerInch -RY< -3 && opModeIsActive()) {
-                    telemetry.addData("slide:", "left");
-                    slide.setPower(-1);
 
-                } else if (Math.abs(translation2.get(0) / mmPerInch) - RX > 6 && opModeIsActive()) {
-                    telemetry.addData("drive:", "forwrd");
-                    rdrive1.setPower(0.7);
-                    rdrive2.setPower(0.7);
-                    ldrive1.setPower(0.7);
-                    ldrive2.setPower(0.7);
-
-
-                } else if (Math.abs(translation2.get(0) / mmPerInch) - RX < 4 && opModeIsActive()) {
-                    telemetry.addData("drive:", "backwards");
-                    rdrive1.setPower(-0.7);
-                    rdrive2.setPower(-0.7);
-                    ldrive1.setPower(-0.7);
-                    ldrive2.setPower(-0.7);
-
-                } else if (targetVisible == false || BP1Visible == false && opModeIsActive()) {
-                    telemetry.addData("no need to drive:", "");
-                } else {
-                    telemetry.addData("no need to drive:", "");
-
-                }
-            }
-
-            telemetry.update();
-
+            // Disable Tracking when we are done;
+            //targetsSkyStone.deactivate();
         }
-
-        // Disable Tracking when we are done;
-        //targetsSkyStone.deactivate();
     }
 }
 

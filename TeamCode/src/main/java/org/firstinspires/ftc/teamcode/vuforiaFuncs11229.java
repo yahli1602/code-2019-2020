@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -322,12 +323,12 @@ public class vuforiaFuncs11229 extends LinearOpMode {
             if (targetVisible) {
                 VectorF translation = lastLocation.getTranslation();
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                if (rotation.thirdAngle > 4) {
+                if (rotation.thirdAngle > 2.5) {
                     rdrive1.setPower(0.4);
                     rdrive2.setPower(0.4);
                     ldrive1.setPower(-0.4);
                     ldrive2.setPower(-0.4);
-                } else if (rotation.thirdAngle < -4) {
+                } else if (rotation.thirdAngle < -2.5) {
                     rdrive1.setPower(-0.4);
                     rdrive2.setPower(-0.4);
                     ldrive1.setPower(0.4);
@@ -337,7 +338,7 @@ public class vuforiaFuncs11229 extends LinearOpMode {
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);
                     ldrive2.setPower(0);
-                } else if (rotation.thirdAngle <= 4 && rotation.thirdAngle >= -4) {
+                } else if (rotation.thirdAngle <= 2.5 && rotation.thirdAngle >= -2.5) {
                     rdrive1.setPower(0);
                     rdrive2.setPower(0);
                     ldrive1.setPower(0);

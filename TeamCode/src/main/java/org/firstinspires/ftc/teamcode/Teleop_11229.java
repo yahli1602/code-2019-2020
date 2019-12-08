@@ -44,7 +44,7 @@ public class Teleop_11229 extends LinearOpMode {
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-         foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
+
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         grabber1 = hardwareMap.get(Servo.class, "grabber1");
@@ -56,7 +56,6 @@ public class Teleop_11229 extends LinearOpMode {
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
-       foldcollect.setDirection(DcMotor.Direction.FORWARD);
         grabber1.setDirection(Servo.Direction.FORWARD);
         grabber2.setDirection(Servo.Direction.REVERSE);
 
@@ -172,13 +171,7 @@ public class Teleop_11229 extends LinearOpMode {
                     collectLeft.setPosition(0);
                 }
                 //collection fold
-                if (gamepad2.right_bumper) {
-                    foldcollect.setPower(1);
-                } else if (gamepad2.left_bumper) {
-                    foldcollect.setPower(-1);
-                } else {
-                    foldcollect.setPower(0);
-                }
+
 
 //grabber
 
