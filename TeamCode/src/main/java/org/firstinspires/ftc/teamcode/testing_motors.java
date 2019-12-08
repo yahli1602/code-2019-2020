@@ -29,9 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -41,72 +43,114 @@ import com.qualcomm.robotcore.util.Range;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all linear OpModes contain.
- *
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="testing motors", group="Linear Opmode")
+@TeleOp(name = "testing motors", group = "Linear Opmode")
 public class testing_motors extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
+    private DcMotor rDrive1 = null;
+    private DcMotor rDrive2 = null;
+    private DcMotor lDrive1 = null;
+    private DcMotor lDrive2 = null;
+    private DcMotor slide = null;
+    //elevator
+    private DcMotor elevator = null;
+    //fold collection
+    private DcMotor foldcollect = null;
+    //collection
+    private Servo collectRight = null;
+    private Servo collectLeft = null;
+    //grabbing the build plate
+    private Servo grabber1 = null;
+    private Servo grabber2 = null;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotor.class, "1");
-        rightDrive = hardwareMap.get(DcMotor.class, "2");
-
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-
-        // Wait for the game to start (driver presses PLAY)
+        rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
+        rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
+        lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
+        lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
+        slide = hardwareMap.get(DcMotor.class, "slide");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
+        collectRight = hardwareMap.get(Servo.class, "collectRight");
+        collectLeft = hardwareMap.get(Servo.class, "collectLeft");
+        grabber1 = hardwareMap.get(Servo.class, "grabber1");
+        grabber2 = hardwareMap.get(Servo.class, "grabber2");
         waitForStart();
+        rDrive1.setDirection(DcMotor.Direction.REVERSE);
+        rDrive2.setDirection(DcMotor.Direction.REVERSE);
+        lDrive1.setDirection(DcMotor.Direction.FORWARD);
+        lDrive2.setDirection(DcMotor.Direction.FORWARD);
+        slide.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.FORWARD);
+        foldcollect.setDirection(DcMotor.Direction.FORWARD);
+        grabber1.setDirection(Servo.Direction.FORWARD);
+        grabber2.setDirection(Servo.Direction.REVERSE);
+
+
+        rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         runtime.reset();
-
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-
-            // Setup a variable for each drive wheel to save power level for telemetry
-            double leftPower;
-            double rightPower;
-
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            double drive = -gamepad1.left_stick_y;
-            double turn  =  gamepad1.right_stick_x;
-            leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
-
-            // Send calculated power to wheels
-            leftDrive.setPower(leftPower);
-            rightDrive.setPower(rightPower);
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-            telemetry.update();
+int x=0;
+        while (opModeIsActive() && x==0) {
+            rDrive1.setPower(1);
+            rDrive2.setPower(1);
+            x++;
+        }
+        sleep(1000);
+        while (opModeIsActive() && x==1) {
+            rDrive1.setPower(0);
+            rDrive1.setPower(0);
+            lDrive1.setPower(1);
+            lDrive2.setPower(1);
+            x++;
+        }
+        sleep(1000);
+        while (opModeIsActive() && x==2) {
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+            slide.setPower(1);
+            x++;
+        }
+        sleep(1000);
+        while (opModeIsActive() && x==3) {
+            slide.setPower(-1);
+            x++;
+        }
+        sleep(1000);
+        while (opModeIsActive() && x==4) {
+            elevator.setPower(-1);
+            x++;
+        }
+        sleep(1000);
+        while (opModeIsActive() && x==5) {
+            elevator.setPower(0);
+            collectLeft.setPosition(0.8);
+            collectRight.setPosition(0.2);
+            x++;
+        }
+        sleep(1000);
+        while (opModeIsActive() && x==6) {
+            collectLeft.setPosition(0);
+            collectRight.setPosition(0);
+            x++;
         }
     }
 }

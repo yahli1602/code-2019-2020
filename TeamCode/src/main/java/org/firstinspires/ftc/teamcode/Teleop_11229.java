@@ -44,7 +44,7 @@ public class Teleop_11229 extends LinearOpMode {
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-
+        foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         grabber1 = hardwareMap.get(Servo.class, "grabber1");
@@ -56,6 +56,7 @@ public class Teleop_11229 extends LinearOpMode {
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
+        foldcollect.setDirection(DcMotor.Direction.FORWARD);
         grabber1.setDirection(Servo.Direction.FORWARD);
         grabber2.setDirection(Servo.Direction.REVERSE);
 
@@ -69,7 +70,7 @@ public class Teleop_11229 extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-           /* //Drive/turn
+            /* //Drive/turn
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
                 rDrive1.setPower(gamepad1.right_stick_y);
                 rDrive2.setPower(gamepad1.right_stick_y);
@@ -99,40 +100,34 @@ public class Teleop_11229 extends LinearOpMode {
                 slide.setPower(0);
                 telemetry.addData("Slide Power:", slide.getPower());
                 telemetry.update();
-            }
-*/
-            //Drive gilad
-         if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < 0.2){
-          rDrive1.setPower(gamepad1.left_stick_y);
-          rDrive2.setPower(gamepad1.left_stick_y);
-          lDrive1.setPower(gamepad1.left_stick_y);
-          lDrive2.setPower(gamepad1.left_stick_y);
-         }
-         else {
-             rDrive1.setPower(0);
-             rDrive2.setPower(0);
-             lDrive1.setPower(0);
-             lDrive2.setPower(0);
-         }
-         if (gamepad1.left_trigger > 0.2){
-             rDrive1.setPower(-gamepad1.left_trigger);
-             rDrive2.setPower(-gamepad1.left_trigger);
-             lDrive1.setPower(gamepad1.left_trigger);
-             lDrive2.setPower(gamepad1.left_trigger);
-         }
+            }*/
 
-          else if (gamepad1.right_trigger > 0.2){
+             //Drive gilad
+            if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+                rDrive1.setPower(gamepad1.left_stick_y);
+                rDrive2.setPower(gamepad1.left_stick_y);
+                lDrive1.setPower(gamepad1.left_stick_y);
+                lDrive2.setPower(gamepad1.left_stick_y);
+            } else if (gamepad1.left_trigger > 0.2) {
+                rDrive1.setPower(-gamepad1.left_trigger);
+                rDrive2.setPower(-gamepad1.left_trigger);
+                lDrive1.setPower(gamepad1.left_trigger);
+                lDrive2.setPower(gamepad1.left_trigger);
+
+            } else if (gamepad1.right_trigger > 0.2) {
                 rDrive1.setPower(gamepad1.right_trigger);
                 rDrive2.setPower(gamepad1.right_trigger);
                 lDrive1.setPower(-gamepad1.right_trigger);
                 lDrive2.setPower(-gamepad1.right_trigger);
+
             }
-         else {
-             rDrive1.setPower(0);
-             rDrive2.setPower(0);
-             lDrive1.setPower(0);
-             lDrive2.setPower(0);
-         }
+
+            else {
+                rDrive1.setPower(0);
+                rDrive2.setPower(0);
+                lDrive1.setPower(0);
+                lDrive2.setPower(0);
+            }
 
             if (gamepad1.right_stick_x > 0 || gamepad1.right_stick_x < 0) {
                 slide.setPower(-gamepad1.right_stick_x);
@@ -140,6 +135,9 @@ public class Teleop_11229 extends LinearOpMode {
                 slide.setPower(0);
             }
             telemetry.addData("rtrigger:", gamepad1.right_trigger);
+            telemetry.addData("ltrigger:", gamepad1.left_trigger);
+            telemetry.addData("drive:", rDrive1.getPower());
+            telemetry.update();
 //elevator
             if (gamepad2.right_stick_y > 0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
@@ -158,20 +156,26 @@ public class Teleop_11229 extends LinearOpMode {
             }
 
 
-                //collection
-                if (gamepad2.right_trigger > 0) {
-                    collectRight.setPosition(0.7);
-                    collectLeft.setPosition(0.2);
-                } else if (gamepad2.left_trigger > 0) {
-                    collectLeft.setPosition(0.7);
-                    collectRight.setPosition(0.2);
+            //collection
+            if (gamepad2.right_trigger > 0) {
+                collectRight.setPosition(0.7);
+                collectLeft.setPosition(0.2);
+            } else if (gamepad2.left_trigger > 0) {
+                collectLeft.setPosition(0.7);
+                collectRight.setPosition(0.2);
 
-                } else {
-                    collectRight.setPosition(0);
-                    collectLeft.setPosition(0);
-                }
-                //collection fold
-
+            } else {
+                collectRight.setPosition(0);
+                collectLeft.setPosition(0);
+            }
+            //collection fold
+            if (gamepad2.right_bumper) {
+                foldcollect.setPower(1);
+            } else if (gamepad2.left_bumper) {
+                foldcollect.setPower(-1);
+            } else {
+                foldcollect.setPower(0);
+            }
 
 //grabber
 
@@ -183,8 +187,18 @@ public class Teleop_11229 extends LinearOpMode {
                 grabber2.setPosition(0);
             }
 
-            telemetry.addData("ticks", lDrive1.getCurrentPosition());
-            telemetry.update();
+
+            //Drop cube on plate
+            if(gamepad1.a){
+                rDrive1.setPower(0.7);
+                rDrive2.setPower(0.7);
+                lDrive1.setPower(0.7);
+                lDrive2.setPower(0.7);
+
+                collectRight.setPosition(0.3);
+                collectLeft.setPosition(0.7);
+            }
+
 
 
         }
