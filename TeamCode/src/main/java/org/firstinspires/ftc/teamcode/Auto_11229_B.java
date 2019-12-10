@@ -195,16 +195,22 @@ public class Auto_11229_B extends LinearOpMode {
         }
     }
 
-    private void holdElevator(){
-        while(elevator.getCurrentPosition() < ticksPerRevolution * 12 && opModeIsActive()){
-            elevator.setPower(-1);
+    private void Elevator(double spins){
+        setPoint = elevator.getCurrentPosition();
+        if(spins > 0){
+            while(elevator.getCurrentPosition() < ticksPerRevolution * spins && opModeIsActive()){
+                elevator.setPower(-1);
+            }
+            elevator.setPower(0);
+            sleep(500);
         }
-        elevator.setPower(0);
+        else{
+            while(elevator.getCurrentPosition() > ticksPerRevolution * spins && opModeIsActive()){
+                elevator.setPower(1);
+            }
+            elevator.setPower(0);
+        }
         sleep(500);
-        while(elevator.getCurrentPosition() > 0 && opModeIsActive()){
-            elevator.setPower(1);
-        }
-        elevator.setPower(0);
     }
 
     public void AutoSideRight(){
@@ -264,29 +270,19 @@ public class Auto_11229_B extends LinearOpMode {
         elevator.setDirection(DcMotorSimple.Direction.FORWARD);
 
         while (opModeIsActive()) {
-            turnDeg(-90);
-            //while(ldrive1.isBusy()){}
-            holdElevator();
-            sleep(500);
-            driveInches(72);
-            /*while(ldrive1.isBusy()){}
-            turnDeg(90);
-            while(ldrive1.isBusy()){}
-            driveInches(24);*/
-            /*target = diameter * (90/360) * ticksPerInch;
-            ldrive1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ldrive2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rdrive1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rdrive2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rdrive1.setTargetPosition((int)target);
-            rdrive2.setTargetPosition((int)target);
-            ldrive1.setTargetPosition(-(int)target);
-            ldrive2.setTargetPosition(-(int)target);
-            ldrive1.setPower(-0.7);
-            ldrive2.setPower(-0.7);
-            rdrive1.setPower(0.7);
-            rdrive1.setPower(0.7);*/
 
+            //while(ldrive1.isBusy()){}
+            Elevator(10);
+
+            driveInches(56.5);
+            //Elevator(-4);
+            //sleep(150);
+            turnDeg(-90);
+            sleep(500);
+            slideInches(32.5);
+            sleep(1250);
+            driveInches(-48);
+            sleep(2000);
         }
     }
 }
