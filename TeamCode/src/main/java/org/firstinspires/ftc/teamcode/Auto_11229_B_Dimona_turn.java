@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "Auto 11229 B Dimona straight drive", group = "Autonomous")
-public class Auto_11229_B_Dimona extends LinearOpMode {
+@Autonomous(name = "Auto 11229 B Dimona left turn", group = "Autonomous")
+public class Auto_11229_B_Dimona_turn extends LinearOpMode {
 
     ElapsedTime elapsedTime = new ElapsedTime();
     public DcMotor rdrive1 = null;
@@ -55,14 +55,34 @@ public class Auto_11229_B_Dimona extends LinearOpMode {
         ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-int x = 0;
+        int x = 0;
         while (opModeIsActive() && x==0) {
 
             rdrive1.setPower(0.7);
             rdrive2.setPower(0.7);
             ldrive1.setPower(1);
             ldrive2.setPower(1);
-            sleep(500);
+            sleep(600);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            sleep(100);
+            rdrive1.setPower(1);
+            rdrive2.setPower(1);
+            ldrive1.setPower(-1);
+            ldrive2.setPower(-1);
+            sleep(320);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            sleep(100);
+            rdrive1.setPower(0.7);
+            rdrive2.setPower(0.7);
+            ldrive1.setPower(1);
+            ldrive2.setPower(1);
+            sleep(450);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
             ldrive1.setPower(0);
