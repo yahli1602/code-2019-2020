@@ -23,20 +23,11 @@ public class Funcs_11226 extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
-    private DcMotor arm = null;
+    private DcMotor elevator = null;
+    private Servo collect1 = null;
+    private Servo collect2 = null;
     private Servo grabLeft = null;
     private Servo grabRight = null;
-
-    public double rightPower = gamepad1.right_stick_y;
-    public double leftPower = gamepad1.left_stick_y;
-
-    public double slidePower(){
-        if(gamepad1.right_trigger > gamepad1.left_trigger){
-            return gamepad1.right_trigger;
-        }
-        return -gamepad1.left_trigger;
-    }
-    private double armPower = gamepad2.left_stick_y;
 
     public void init(HardwareMap HM) {
 
@@ -45,7 +36,6 @@ public class Funcs_11226 extends LinearOpMode {
         lDrive1 = HM.get(DcMotor.class, "lDrive1");
         lDrive2 = HM.get(DcMotor.class, "lDrive2");
         slide = HM.get(DcMotor.class, "slide");
-        arm = HM.get(DcMotor.class, "arm");
         grabLeft = HM.get(Servo.class, "grabLeft");
         grabRight = HM.get(Servo.class, "grabRight");
 
@@ -54,42 +44,43 @@ public class Funcs_11226 extends LinearOpMode {
         lDrive1.setDirection(DcMotor.Direction.REVERSE);
         lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        arm.setDirection(DcMotor.Direction.FORWARD);
 
     }
 
 // Functions for Teleop 11226
 
     public void drive() {
-        if (leftPower > 0.2 || leftPower < -0.2) {
-            lDrive1.setPower(leftPower);
-            lDrive2.setPower(leftPower);
-        } else {
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-        }
-        if (rightPower > 0.2 || rightPower < -0.2) {
-            rDrive1.setPower(rightPower);
-            rDrive2.setPower(rightPower);
+        //Drive/turn
+        if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
+            rDrive1.setPower(gamepad1.right_stick_y);
+            rDrive2.setPower(gamepad1.right_stick_y);
+        } else if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+            lDrive1.setPower(gamepad1.left_stick_y);
+            lDrive2.setPower(gamepad1.left_stick_y);
         } else {
             rDrive1.setPower(0);
             rDrive2.setPower(0);
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+
         }
-        if (slidePower() > 0.2) {
-            slide.setPower(slidePower());
-        } else if (slidePower() < -0.2) {
-            slide.setPower(slidePower());
+        //slide
+        if (gamepad1.right_trigger > 0) {
+            slide.setPower(gamepad1.right_trigger);
+        } else if (gamepad1.left_trigger > 0) {
+            slide.setPower(gamepad1.left_trigger);
         } else {
             slide.setPower(0);
         }
     }
 
-    public void arm(){
-        if(armPower > 0.2 || armPower < -0.2){
-            arm.setPower(armPower);
-        }
-        else{
-            arm.setPower(0);
+    public void elevator() {
+        if (gamepad2.right_stick_y > 0.2) {
+            elevator.setPower(gamepad2.right_stick_y);
+        } else if (gamepad2.right_stick_y < 0.2) {
+            elevator.setPower(gamepad2.right_stick_y);
+        } else {
+            elevator.setPower(0);
         }
     }
 

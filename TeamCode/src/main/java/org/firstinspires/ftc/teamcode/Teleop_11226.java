@@ -21,8 +21,6 @@ public class Teleop_11226 extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            funcs.drive();
-            funcs.arm();
             funcs.grab();
         }
     }

@@ -52,7 +52,7 @@ public class Auto_11229_B extends LinearOpMode {
 
     public void driveInches(double inches) {
 
-        setPoint = ldrive1.getCurrentPosition();
+        setPoint = ldrive1.getCurrentPosition()/ticksPerInch;
         /*ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -75,6 +75,7 @@ public class Auto_11229_B extends LinearOpMode {
                 ldrive2.setPower(uT);
                 rdrive1.setPower(1.55 * uT);
                 rdrive2.setPower(1.55 * uT);
+                sleep(1);
             }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
@@ -95,6 +96,7 @@ public class Auto_11229_B extends LinearOpMode {
                 ldrive2.setPower(-uT);
                 rdrive1.setPower(-uT * 1.55);
                 rdrive2.setPower(-uT * 1.55);
+                sleep(1);
             }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
@@ -106,14 +108,6 @@ public class Auto_11229_B extends LinearOpMode {
     public void turnDeg(double deg){
 
         setPoint = ldrive1.getCurrentPosition();
-        /*ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
 
         if(deg > 0){
             errorT = diameter * Math.PI * (deg/360);
@@ -129,6 +123,7 @@ public class Auto_11229_B extends LinearOpMode {
                 ldrive2.setPower(uT);
                 rdrive1.setPower(-uT);
                 rdrive2.setPower(-uT);
+                sleep(1);
             }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
@@ -149,8 +144,7 @@ public class Auto_11229_B extends LinearOpMode {
                 ldrive2.setPower(-uT);
                 rdrive1.setPower(uT);
                 rdrive2.setPower(uT);
-
-                while(ldrive1.isBusy()){}
+                sleep(1);
             }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
@@ -176,6 +170,7 @@ public class Auto_11229_B extends LinearOpMode {
                 lastPosition = currentPosition;
 
                 slide.setPower(-uT);
+                sleep(1);
             }
             slide.setPower(0);
         }
@@ -190,6 +185,7 @@ public class Auto_11229_B extends LinearOpMode {
                 lastPosition = currentPosition;
 
                 slide.setPower(uT);
+                sleep(1);
             }
             slide.setPower(0);
         }

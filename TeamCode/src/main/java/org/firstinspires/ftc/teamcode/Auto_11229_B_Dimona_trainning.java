@@ -63,10 +63,10 @@ public class Auto_11229_B_Dimona_trainning extends LinearOpMode {
 int x = 0;
         while (opModeIsActive() && x==0) {
 
-            rdrive1.setPower(1);
-            rdrive2.setPower(1);
-            ldrive1.setPower(1);
-            ldrive2.setPower(1);
+            rdrive1.setPower(0.7);
+            rdrive2.setPower(0.7);
+            ldrive1.setPower(0.7);
+            ldrive2.setPower(0.7);
             sleep(480);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
@@ -77,11 +77,11 @@ int x = 0;
             sleep(1000);
             elevator.setPower(0);
 
-            rdrive1.setPower(1);
-            rdrive2.setPower(1);
-            ldrive1.setPower(1);
-            ldrive2.setPower(1);
-            sleep(500);
+            rdrive1.setPower(0.7);
+            rdrive2.setPower(0.7);
+            ldrive1.setPower(0.7);
+            ldrive2.setPower(0.7);
+            sleep(515);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
             ldrive1.setPower(0);
@@ -97,10 +97,10 @@ int x = 0;
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             sleep(100);
-            rdrive1.setPower(1);
-            rdrive2.setPower(1);
-            ldrive1.setPower(1);
-            ldrive2.setPower(1);
+            rdrive1.setPower(0.7);
+            rdrive2.setPower(0.7);
+            ldrive1.setPower(0.7);
+            ldrive2.setPower(0.7);
             sleep(560);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
