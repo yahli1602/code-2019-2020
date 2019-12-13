@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "Auto 11229 B Dimona Trainning", group = "Autonomous")
+@Autonomous(name = "Auto 11229 B Dimona Training", group = "Autonomous")
 public class Auto_11229_B_Dimona_trainning extends LinearOpMode {
 
     ElapsedTime elapsedTime = new ElapsedTime();
@@ -63,8 +63,22 @@ public class Auto_11229_B_Dimona_trainning extends LinearOpMode {
 int x = 0;
         while (opModeIsActive() && x==0) {
 
-            rdrive1.setPower(0.7);
-            rdrive2.setPower(0.7);
+            rdrive1.setPower(1);
+            rdrive2.setPower(1);
+            ldrive1.setPower(1);
+            ldrive2.setPower(1);
+            sleep(480);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            sleep(100);
+            elevator.setPower(-1);
+            sleep(1000);
+            elevator.setPower(0);
+
+            rdrive1.setPower(1);
+            rdrive2.setPower(1);
             ldrive1.setPower(1);
             ldrive2.setPower(1);
             sleep(500);
@@ -72,11 +86,28 @@ int x = 0;
             rdrive2.setPower(0);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
-            elevator.setPower(-1);
-            sleep(1000);
-            elevator.setPower(1);
-            sleep(1000);
-            elevator.setPower(0);
+            sleep(100);
+            rdrive1.setPower(-0.5);
+            rdrive2.setPower(-0.5);
+            ldrive1.setPower(5);
+            ldrive2.setPower(5);
+            sleep(800);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            sleep(100);
+            rdrive1.setPower(1);
+            rdrive2.setPower(1);
+            ldrive1.setPower(1);
+            ldrive2.setPower(1);
+            sleep(560);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            sleep(100);
+
             x++;
         }
     }
