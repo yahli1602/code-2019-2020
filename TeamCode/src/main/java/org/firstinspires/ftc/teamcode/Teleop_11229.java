@@ -139,22 +139,16 @@ public class Teleop_11229 extends LinearOpMode {
             telemetry.addData("drive:", rDrive1.getPower());
             telemetry.update();
 //elevator
-            if (gamepad2.right_stick_y > 0.2) {
+            if (gamepad2.right_stick_y > 0.2 && elevator.getCurrentPosition() < 2000) {
                 elevator.setPower(gamepad2.right_stick_y);
-            } else if (gamepad2.right_stick_y < 0.2) {
-                elevator.setPower(gamepad2.right_stick_y);
-            } else {
-                elevator.setPower(0);
-            }
-
-            if (gamepad2.right_stick_y > 0.2) {
-                elevator.setPower(gamepad2.right_stick_y);
-            } else if (gamepad2.right_stick_y < 0.2) {
+            } else if (gamepad2.right_stick_y < -0.2 && elevator.getCurrentPosition() < -1000) {
                 elevator.setPower(gamepad2.right_stick_y);
             } else {
                 elevator.setPower(0);
             }
 
+            telemetry.addData("elevator", elevator.getCurrentPosition());
+            telemetry.update();
 
             //collection
             if (gamepad2.right_trigger > 0) {

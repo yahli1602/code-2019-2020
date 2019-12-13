@@ -28,11 +28,10 @@ public class Auto_11229_B extends LinearOpMode {
     public DcMotor slide = null;
     public DcMotor elevator = null;
 
-    private double kp = 0.05;
+    private double kp = 0.02;
     private double ks = 0.1;
     private double uT = 1;
-    private double errorT;
-    private double currentPosition;
+    private double errorT;    private double currentPosition;
     private double lastPosition;
     private double perimeter = 4 * Math.PI;
     private double ticksPerRevolution = 1120;
@@ -52,16 +51,10 @@ public class Auto_11229_B extends LinearOpMode {
 
     public void driveInches(double inches) {
 
-        setPoint = ldrive1.getCurrentPosition()/ticksPerInch;
-        /*ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
+        setPoint = ldrive1.getCurrentPosition() / ticksPerInch;
 
-        if(inches > 0){
+
+        if (inches > 0) {
             errorT = inches;
             lastPosition = 0;
             while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
@@ -73,16 +66,18 @@ public class Auto_11229_B extends LinearOpMode {
 
                 ldrive1.setPower(uT);
                 ldrive2.setPower(uT);
-                rdrive1.setPower(1.55 * uT);
-                rdrive2.setPower(1.55 * uT);
+                rdrive1.setPower(uT);
+                rdrive2.setPower(uT);
+                telemetry.addData("rdrive:", rdrive1.getPower());
+                telemetry.addData("ldrive:", ldrive1.getPower());
+                telemetry.update();
                 sleep(1);
             }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-        }
-        else{
+        } else {
             errorT = -inches;
             lastPosition = 0;
             while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
@@ -94,8 +89,11 @@ public class Auto_11229_B extends LinearOpMode {
 
                 ldrive1.setPower(-uT);
                 ldrive2.setPower(-uT);
-                rdrive1.setPower(-uT * 1.55);
-                rdrive2.setPower(-uT * 1.55);
+                rdrive1.setPower(-uT);
+                rdrive2.setPower(-uT);
+                telemetry.addData("rdrive:", rdrive1.getPower());
+                telemetry.addData("ldrive:", ldrive1.getPower());
+                telemetry.update();
                 sleep(1);
             }
             ldrive1.setPower(0);
@@ -104,15 +102,16 @@ public class Auto_11229_B extends LinearOpMode {
             rdrive2.setPower(0);
         }
     }
+
     // Turns right by default
-    public void turnDeg(double deg){
+    public void turnDeg(double deg) {
 
         setPoint = ldrive1.getCurrentPosition();
 
-        if(deg > 0){
-            errorT = diameter * Math.PI * (deg/360);
+        if (deg > 0) {
+            errorT = diameter * Math.PI * (deg / 360);
             lastPosition = 0;
-            while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+            while (errorT > setPoint && opModeIsActive() && uT > 0.5) {
                 uT = kp * errorT;
 
                 currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
@@ -123,15 +122,17 @@ public class Auto_11229_B extends LinearOpMode {
                 ldrive2.setPower(uT);
                 rdrive1.setPower(-uT);
                 rdrive2.setPower(-uT);
-                sleep(1);
+                telemetry.addData("rdrive:", rdrive1.getPower());
+                telemetry.addData("ldrive:", ldrive1.getPower());
+                telemetry.update();
+                sleep(100);
             }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-        }
-        else{
-            errorT = diameter * Math.PI * (-deg/360);
+        } else {
+            errorT = diameter * Math.PI * (-deg / 360);
             lastPosition = 0;
             while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
                 uT = kp * errorT;
@@ -144,6 +145,9 @@ public class Auto_11229_B extends LinearOpMode {
                 ldrive2.setPower(-uT);
                 rdrive1.setPower(uT);
                 rdrive2.setPower(uT);
+                telemetry.addData("rdrive:", rdrive1.getPower());
+                telemetry.addData("ldrive:", ldrive1.getPower());
+                telemetry.update();
                 sleep(1);
             }
             ldrive1.setPower(0);
@@ -153,13 +157,13 @@ public class Auto_11229_B extends LinearOpMode {
         }
     }
 
-    public void slideInches(double inches){
+    public void slideInches(double inches) {
 
         setPoint = slide.getCurrentPosition();
         /*slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
 
-        if(inches > 0){
+        if (inches > 0) {
             errorT = inches;
             lastPosition = 0;
             while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
@@ -173,8 +177,7 @@ public class Auto_11229_B extends LinearOpMode {
                 sleep(1);
             }
             slide.setPower(0);
-        }
-        else{
+        } else {
             errorT = -inches;
             lastPosition = 0;
             while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
@@ -191,17 +194,16 @@ public class Auto_11229_B extends LinearOpMode {
         }
     }
 
-    private void Elevator(double spins){
+    private void Elevator(double spins) {
         setPoint = elevator.getCurrentPosition();
-        if(spins > 0){
-            while(elevator.getCurrentPosition() < ticksPerRevolution * spins && opModeIsActive()){
+        if (spins > 0) {
+            while (elevator.getCurrentPosition() < ticksPerRevolution * spins && opModeIsActive()) {
                 elevator.setPower(-1);
             }
             elevator.setPower(0);
             sleep(500);
-        }
-        else{
-            while(elevator.getCurrentPosition() > ticksPerRevolution * spins && opModeIsActive()){
+        } else {
+            while (elevator.getCurrentPosition() > ticksPerRevolution * spins && opModeIsActive()) {
                 elevator.setPower(1);
             }
             elevator.setPower(0);
@@ -209,7 +211,7 @@ public class Auto_11229_B extends LinearOpMode {
         sleep(500);
     }
 
-    public void AutoSideRight(){
+    public void AutoSideRight() {
         //holdElevator();
         driveInches(4);
         turnDeg(-90);
@@ -243,6 +245,13 @@ public class Auto_11229_B extends LinearOpMode {
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
 
+        rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -265,20 +274,29 @@ public class Auto_11229_B extends LinearOpMode {
         slide.setDirection(DcMotorSimple.Direction.FORWARD);
         elevator.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        while (opModeIsActive()) {
+        int h = 0;
+        while (opModeIsActive() && h == 0) {
 
             //while(ldrive1.isBusy()){}
-            Elevator(10);
+            //Elevator(10);
 
-            driveInches(56.5);
+            driveInches(24);
+            sleep(500);
             //Elevator(-4);
             //sleep(150);
-            turnDeg(-90);
-            sleep(500);
+            //turnDeg(-90);
+            telemetry.addData("rdrive:", rdrive1.getPower());
+            telemetry.addData("ldrive:", ldrive1.getPower());
+            telemetry.update();
+            /*sleep(500);
             slideInches(32.5);
             sleep(1250);
             driveInches(-48);
-            sleep(2000);
+            sleep(2000);*/
+            telemetry.addData("rdrive:", rdrive1.getPower());
+            telemetry.addData("ldrive:", ldrive1.getPower());
+            telemetry.update();
+            h++;
         }
     }
 }
