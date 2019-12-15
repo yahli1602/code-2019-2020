@@ -32,6 +32,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -53,9 +55,22 @@ import java.util.List;
  */
 @TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
 public class TensorFlow extends LinearOpMode {
+
+    public DcMotor rdrive1 = null;
+    public DcMotor rdrive2 = null;
+    public DcMotor ldrive1 = null;
+    public DcMotor ldrive2 = null;
+    public DcMotor slide = null;
+    public DcMotor elevator = null;
+
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
+
+    private float skyStoneX = 0;
+    private float Stone1X = 0;
+    private float Stone2X = 0;
+    int skystonePostion;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -86,6 +101,23 @@ public class TensorFlow extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+
+        rdrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
+        rdrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
+        ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
+        ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
+        slide = hardwareMap.get(DcMotor.class, "slide");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
+
+
+        rdrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rdrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ldrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ldrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
@@ -109,6 +141,14 @@ public class TensorFlow extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
+        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
+        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
+        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
+        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+        slide.setDirection(DcMotorSimple.Direction.FORWARD);
+        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
         if (opModeIsActive()) {
             while (opModeIsActive()) {
                 if (tfod != null) {
@@ -120,13 +160,93 @@ public class TensorFlow extends LinearOpMode {
 
                       // step through the list of recognitions and display boundary info.
                       int i = 0;
+
                       for (Recognition recognition : updatedRecognitions) {
                         telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
                         telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
                                           recognition.getLeft(), recognition.getTop());
                         telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
                                 recognition.getRight(), recognition.getBottom());
+
                       }
+                      if (updatedRecognitions.size() == 3){
+                          skyStoneX = -1;
+                          Stone1X = -1;
+                          Stone2X = -1;
+                          if (skyStoneX == -1 && Stone1X == -1 && Stone2X == -1){
+                              for (Recognition object : updatedRecognitions){
+                                  if (object.getLabel().equals(LABEL_SECOND_ELEMENT)){
+                                      skyStoneX = object.getLeft();
+                                  }else if (object.getLabel().equals(LABEL_FIRST_ELEMENT)){
+                                      Stone1X = object.getLeft();
+                                  }else if (object.getLabel().equals(LABEL_FIRST_ELEMENT)){
+                                      Stone2X = object.getLeft();
+                                  }
+                              }
+                              if (skyStoneX < Stone1X && skyStoneX < Stone2X){
+                                  skystonePostion = -1;
+                              }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+                                  skystonePostion = 1;
+                              }else {
+                                  skystonePostion = 0;
+                              }
+                              telemetry.addData("skyStoneX",skyStoneX);
+                              telemetry.addData("Stone1X",Stone1X);
+                              telemetry.addData("Stone2X",Stone2X);
+                          }
+
+
+                      }
+                      if (updatedRecognitions.size() == 2){
+                          skyStoneX = -1;
+                          Stone1X = -1;
+
+                          if (skyStoneX == -1 && Stone1X == -1){
+                              for (Recognition object : updatedRecognitions){
+                                  if (object.getLabel().equals(LABEL_SECOND_ELEMENT)){
+                                      skyStoneX = object.getLeft();
+                                  }else if (object.getLabel().equals(LABEL_FIRST_ELEMENT)){
+                                      Stone1X = object.getLeft();
+                                  }
+
+                              }
+                              if (skyStoneX < Stone1X){
+                                  skystonePostion = -1;
+                                  Stone1X = 1;
+
+                              }else{
+                                  skystonePostion = 1;
+                                  Stone1X = -1;
+                                  //TODO: add a driving function to the sky ston that actualy is a skystone and a stone
+                                  if (updatedRecognitions.size() == 2) {
+                                      skyStoneX = -1;
+                                      Stone2X = -1;
+
+                                      if (skyStoneX == -1 && Stone2X == -1) {
+                                          for (Recognition object2 : updatedRecognitions) {
+                                              if (object2.getLabel().equals(LABEL_SECOND_ELEMENT)) {
+                                                  skyStoneX = object2.getLeft();
+                                              } else if (object2.getLabel().equals(LABEL_FIRST_ELEMENT)) {
+                                                  Stone2X = object2.getLeft();
+                                              }
+
+                                          }
+                                          if (skyStoneX < Stone2X) {
+                                              skystonePostion = 0;
+
+                                          } else {
+                                              skystonePostion = 1;
+                                          }
+                                          telemetry.addData("skyStoneX",skyStoneX);
+                                          telemetry.addData("Stone1X",Stone1X);
+                                          telemetry.addData("Stone2X",Stone2X);
+                                      }
+                                  }
+                              }
+                          }
+
+                      }
+
                       telemetry.update();
                     }
                 }
@@ -163,8 +283,21 @@ public class TensorFlow extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.8;
+        tfodParameters.minimumConfidence = 0.60;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
+
+    private void goToStoneX(int stonePlace){
+        if (stonePlace == 0){
+
+        }else if(stonePlace == 1){
+
+        }
+    }
+
+    private void goToStoneY(){
+
+    }
+
 }
