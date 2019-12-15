@@ -17,7 +17,6 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.dex.file.ValueEncoder
 @TeleOp(name = "Teleop_11229", group = "Linear Opmode")
 
 public class Teleop_11229 extends LinearOpMode {
-//private Funcs_11229 funcs = new Funcs_11229();
 
     //driving motors
     private DcMotor rDrive1 = null;
@@ -60,6 +59,19 @@ public class Teleop_11229 extends LinearOpMode {
         grabber1.setDirection(Servo.Direction.FORWARD);
         grabber2.setDirection(Servo.Direction.REVERSE);
 
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -102,7 +114,7 @@ public class Teleop_11229 extends LinearOpMode {
                 telemetry.update();
             }*/
 
-             //Drive gilad
+            //Drive gilad
             if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                 rDrive1.setPower(gamepad1.left_stick_y);
                 rDrive2.setPower(gamepad1.left_stick_y);
@@ -120,9 +132,7 @@ public class Teleop_11229 extends LinearOpMode {
                 lDrive1.setPower(-gamepad1.right_trigger);
                 lDrive2.setPower(-gamepad1.right_trigger);
 
-            }
-
-            else {
+            } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
                 lDrive1.setPower(0);
@@ -139,9 +149,7 @@ public class Teleop_11229 extends LinearOpMode {
             telemetry.addData("drive:", rDrive1.getPower());
             telemetry.update();
 //elevator
-            if (gamepad2.right_stick_y > 0.2 && elevator.getCurrentPosition() < 2000) {
-                elevator.setPower(gamepad2.right_stick_y);
-            } else if (gamepad2.right_stick_y < -0.2 && elevator.getCurrentPosition() < -1000) {
+            if (gamepad2.right_stick_y > 0.2 && elevator.getCurrentPosition() < -600|| gamepad2.right_stick_y < -0.2 && elevator.getCurrentPosition() > -3000) {
                 elevator.setPower(gamepad2.right_stick_y);
             } else {
                 elevator.setPower(0);
@@ -183,7 +191,7 @@ public class Teleop_11229 extends LinearOpMode {
 
 
             //Drop cube on plate
-            if(gamepad1.a){
+            if (gamepad1.a) {
                 rDrive1.setPower(0.7);
                 rDrive2.setPower(0.7);
                 lDrive1.setPower(0.7);
@@ -192,7 +200,6 @@ public class Teleop_11229 extends LinearOpMode {
                 collectRight.setPosition(0.3);
                 collectLeft.setPosition(0.7);
             }
-
 
 
         }

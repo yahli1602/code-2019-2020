@@ -7,10 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-@TeleOp(name = "Teleop_11229", group = "Linear Opmode")
+@TeleOp(name = "Teleop_11229 sensitive", group = "Linear Opmode")
 
 public class Teleop_11229_sensitive extends LinearOpMode {
-//private Funcs_11229 funcs = new Funcs_11229();
 
     //driving motors
     private DcMotor rDrive1 = null;

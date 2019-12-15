@@ -31,7 +31,8 @@ public class Auto_11229_B extends LinearOpMode {
     private double kp = 0.02;
     private double ks = 0.1;
     private double uT = 1;
-    private double errorT;    private double currentPosition;
+    private double errorT;
+    private double currentPosition;
     private double lastPosition;
     private double perimeter = 4 * Math.PI;
     private double ticksPerRevolution = 1120;
@@ -39,117 +40,139 @@ public class Auto_11229_B extends LinearOpMode {
     private double ticksPerSpin = ticksPerRevolution * 40;
     private double ticksPerInch = 1 / inchesPerTick;
     private double diameter = 13.979921;
-    private double VerticalLength = 15.5;
     private double setPoint;
-    private double target;
 
     public void timer(long miliseconds) {
         long x = (long) elapsedTime.milliseconds();
-        while (x < miliseconds + (long) elapsedTime.milliseconds() && opModeIsActive()) {
-        }
+        while (x < miliseconds + (long) elapsedTime.milliseconds() && opModeIsActive()) {}
     }
 
     public void driveInches(double inches) {
 
         setPoint = ldrive1.getCurrentPosition() / ticksPerInch;
 
-
         if (inches > 0) {
-            errorT = inches;
+            errorT = inches + setPoint;
             lastPosition = 0;
-            while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
-                uT = kp * errorT;
+            int x = 0;
+            while(x == 0) {
+                while(errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                    telemetry.addData("", 1);
+                    telemetry.update();
+                    uT = kp * errorT;
 
-                currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
-                errorT -= currentPosition - lastPosition;
-                lastPosition = currentPosition;
+                    currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
+                    errorT -= currentPosition - lastPosition;
+                    lastPosition = currentPosition;
 
-                ldrive1.setPower(uT);
-                ldrive2.setPower(uT);
-                rdrive1.setPower(uT);
-                rdrive2.setPower(uT);
-                telemetry.addData("rdrive:", rdrive1.getPower());
-                telemetry.addData("ldrive:", ldrive1.getPower());
+                    ldrive1.setPower(uT);
+                    ldrive2.setPower(uT);
+                    rdrive1.setPower(uT);
+                    rdrive2.setPower(uT);
+                }
+                telemetry.addData("", 2);
                 telemetry.update();
-                sleep(1);
+                x++;
             }
+            telemetry.addData("", 3);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
+            telemetry.update();
         } else {
-            errorT = -inches;
+            errorT = -inches + setPoint;
             lastPosition = 0;
-            while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
-                uT = kp * errorT;
+            int x = 0;
+            while(x == 0) {
+                if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                    telemetry.addData("", kp);
+                    telemetry.update();
+                    uT = kp * errorT;
 
-                currentPosition = -ldrive1.getCurrentPosition() / ticksPerInch;
-                errorT -= (currentPosition - lastPosition);
-                lastPosition = currentPosition;
+                    currentPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch;
+                    errorT -= Math.abs(currentPosition - lastPosition);
+                    lastPosition = currentPosition;
 
-                ldrive1.setPower(-uT);
-                ldrive2.setPower(-uT);
-                rdrive1.setPower(-uT);
-                rdrive2.setPower(-uT);
-                telemetry.addData("rdrive:", rdrive1.getPower());
-                telemetry.addData("ldrive:", ldrive1.getPower());
-                telemetry.update();
-                sleep(1);
+                    ldrive1.setPower(-uT);
+                    ldrive2.setPower(-uT);
+                    rdrive1.setPower(-uT);
+                    rdrive2.setPower(-uT);
+                }
+                else{
+                    x++;
+                }
             }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
         }
+        telemetry.addData("", 3);
+        telemetry.update();
     }
 
     // Turns right by default
     public void turnDeg(double deg) {
-
-        setPoint = ldrive1.getCurrentPosition();
+        telemetry.addData("", 3);
+        telemetry.update();
+        setPoint = ldrive1.getCurrentPosition() / ticksPerInch;
 
         if (deg > 0) {
-            errorT = diameter * Math.PI * (deg / 360);
+            errorT = diameter * Math.PI * (deg / 360) + setPoint;
             lastPosition = 0;
-            while (errorT > setPoint && opModeIsActive() && uT > 0.5) {
-                uT = kp * errorT;
+            int x = 0;
+            while(x == 0) {
+                if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                    uT = kp * errorT;
 
-                currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
-                errorT -= (currentPosition - lastPosition);
-                lastPosition = currentPosition;
+                    currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
+                    errorT -= (currentPosition - lastPosition);
+                    lastPosition = currentPosition;
 
-                ldrive1.setPower(uT);
-                ldrive2.setPower(uT);
-                rdrive1.setPower(-uT);
-                rdrive2.setPower(-uT);
-                telemetry.addData("rdrive:", rdrive1.getPower());
-                telemetry.addData("ldrive:", ldrive1.getPower());
-                telemetry.update();
-                sleep(100);
+                    ldrive1.setPower(uT);
+                    ldrive2.setPower(uT);
+                    rdrive1.setPower(-uT);
+                    rdrive2.setPower(-uT);
+                    telemetry.addData("rdrive:", rdrive1.getPower());
+                    telemetry.addData("ldrive:", ldrive1.getPower());
+                    telemetry.update();
+                }
+                else{
+                    x++;
+                }
             }
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
         } else {
-            errorT = diameter * Math.PI * (-deg / 360);
+            errorT = diameter * Math.PI * (-deg / 360) + setPoint;
             lastPosition = 0;
-            while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
-                uT = kp * errorT;
+            int x = 0;
+            while(x == 0) {
+                if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                    telemetry.addData("", 5);
+                    telemetry.update();
+                    uT = kp * errorT;
 
-                currentPosition = -ldrive1.getCurrentPosition() / ticksPerInch;
-                errorT -= (currentPosition - lastPosition);
-                lastPosition = currentPosition;
+                    currentPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch;
+                    errorT -= Math.abs(currentPosition - lastPosition);
+                    lastPosition = currentPosition;
 
-                ldrive1.setPower(-uT);
-                ldrive2.setPower(-uT);
-                rdrive1.setPower(uT);
-                rdrive2.setPower(uT);
-                telemetry.addData("rdrive:", rdrive1.getPower());
-                telemetry.addData("ldrive:", ldrive1.getPower());
-                telemetry.update();
-                sleep(1);
+                    ldrive1.setPower(-uT);
+                    ldrive2.setPower(-uT);
+                    rdrive1.setPower(uT);
+                    rdrive2.setPower(uT);
+                    telemetry.addData("rdrive:", rdrive1.getPower());
+                    telemetry.addData("ldrive:", ldrive1.getPower());
+                    telemetry.update();
+                }
+                else{
+                    x++;
+                }
             }
+            telemetry.addData("", 6);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
@@ -159,42 +182,52 @@ public class Auto_11229_B extends LinearOpMode {
 
     public void slideInches(double inches) {
 
-        setPoint = slide.getCurrentPosition();
-        /*slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
+        setPoint = slide.getCurrentPosition() / ticksPerInch;
 
         if (inches > 0) {
-            errorT = inches;
+            errorT = inches + setPoint;
             lastPosition = 0;
-            while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
-                uT = ks * errorT;
+            int x = 0;
+            while (x == 0) {
+                if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                    uT = ks * errorT;
 
-                currentPosition = slide.getCurrentPosition() / ticksPerInch;
-                errorT -= (currentPosition - lastPosition);
-                lastPosition = currentPosition;
+                    currentPosition = slide.getCurrentPosition() / ticksPerInch;
+                    errorT -= (currentPosition - lastPosition);
+                    lastPosition = currentPosition;
 
-                slide.setPower(-uT);
-                sleep(1);
+                    slide.setPower(-uT);
+                }
+                else{
+                    x++;
+                }
             }
             slide.setPower(0);
         } else {
-            errorT = -inches;
+            errorT = -inches + setPoint;
             lastPosition = 0;
-            while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
-                uT = ks * errorT;
+            int x = 0;
+            while(x == 0) {
+                if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                    uT = ks * errorT;
 
-                currentPosition = -slide.getCurrentPosition() / ticksPerInch;
-                errorT -= (currentPosition - lastPosition);
-                lastPosition = currentPosition;
+                    currentPosition = Math.abs(slide.getCurrentPosition()) / ticksPerInch;
+                    errorT -= Math.abs(currentPosition - lastPosition);
+                    lastPosition = currentPosition;
 
-                slide.setPower(uT);
-                sleep(1);
+                    slide.setPower(uT);
+                }
+                else{
+                    x++;
+                }
             }
             slide.setPower(0);
         }
     }
 
     private void Elevator(double spins) {
+        telemetry.addData("", ks);
+        telemetry.update();
         setPoint = elevator.getCurrentPosition();
         if (spins > 0) {
             while (elevator.getCurrentPosition() < ticksPerRevolution * spins && opModeIsActive()) {
@@ -211,30 +244,6 @@ public class Auto_11229_B extends LinearOpMode {
         sleep(500);
     }
 
-    public void AutoSideRight() {
-        //holdElevator();
-        driveInches(4);
-        turnDeg(-90);
-        driveInches(72);
-        turnDeg(90);
-        driveInches(24);
-        //Vuforia stuff
-        /*driveInches(12.5);
-        // case 1
-        turnDeg(130.5);
-        driveInches(36.88);
-        turnDeg(-40.5);
-        // case 2
-        turnDeg(126.7);
-        driveInches(43.27);
-        turnDeg(-36.7);
-        // case 3
-        turnDeg(118.61);
-        driveInches(50.12);
-        turnDeg(-28.61);
-        driveInches(24);
-        driveInches(-24);*/
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -281,21 +290,20 @@ public class Auto_11229_B extends LinearOpMode {
             //Elevator(10);
 
             driveInches(24);
-            sleep(500);
+            telemetry.addData("", 4);
+            telemetry.update();
             //Elevator(-4);
+            //telemetry.addData("", 4);
+            //telemetry.update();
             //sleep(150);
-            //turnDeg(-90);
-            telemetry.addData("rdrive:", rdrive1.getPower());
-            telemetry.addData("ldrive:", ldrive1.getPower());
+            turnDeg(-90);
+            telemetry.addData("", 7);
             telemetry.update();
             /*sleep(500);
             slideInches(32.5);
             sleep(1250);
             driveInches(-48);
             sleep(2000);*/
-            telemetry.addData("rdrive:", rdrive1.getPower());
-            telemetry.addData("ldrive:", ldrive1.getPower());
-            telemetry.update();
             h++;
         }
     }

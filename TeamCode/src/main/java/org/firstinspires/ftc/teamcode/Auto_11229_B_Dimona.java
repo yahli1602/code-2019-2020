@@ -70,7 +70,7 @@ int x = 0;
             elevator.setPower(-1);
             sleep(1000);
             elevator.setPower(1);
-            sleep(1000);
+            sleep(500);
             elevator.setPower(0);
             x++;
         }
