@@ -41,6 +41,7 @@ public class Auto_11229_B extends LinearOpMode {
     private double ticksPerInch = 1 / inchesPerTick;
     private double diameter = 13.979921;
     private double setPoint;
+    private String check = "";
 
     public void timer(long miliseconds) {
         long x = (long) elapsedTime.milliseconds();
@@ -57,10 +58,10 @@ public class Auto_11229_B extends LinearOpMode {
             int x = 0;
             while(x == 0) {
                 while(errorT > setPoint && opModeIsActive() && uT > 0.3) {
-                    telemetry.addData("", 1);
-                    telemetry.update();
+                    if(check == ""){
+                        check += "a";
+                    }
                     uT = kp * errorT;
-
                     currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
                     errorT -= currentPosition - lastPosition;
                     lastPosition = currentPosition;
@@ -70,24 +71,22 @@ public class Auto_11229_B extends LinearOpMode {
                     rdrive1.setPower(uT);
                     rdrive2.setPower(uT);
                 }
-                telemetry.addData("", 2);
-                telemetry.update();
+                if(check == "a"){
+                    check += "b";
+                }
                 x++;
             }
-            telemetry.addData("", 3);
+            check += "c";
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            telemetry.update();
         } else {
             errorT = -inches + setPoint;
             lastPosition = 0;
             int x = 0;
             while(x == 0) {
                 if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
-                    telemetry.addData("", kp);
-                    telemetry.update();
                     uT = kp * errorT;
 
                     currentPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch;
@@ -108,17 +107,15 @@ public class Auto_11229_B extends LinearOpMode {
             rdrive1.setPower(0);
             rdrive2.setPower(0);
         }
-        telemetry.addData("", 3);
-        telemetry.update();
+        check += "d";
     }
 
     // Turns right by default
     public void turnDeg(double deg) {
-        telemetry.addData("", 3);
-        telemetry.update();
+        check += "e";
         setPoint = ldrive1.getCurrentPosition() / ticksPerInch;
-
         if (deg > 0) {
+            check += "f";
             errorT = diameter * Math.PI * (deg / 360) + setPoint;
             lastPosition = 0;
             int x = 0;
@@ -142,6 +139,7 @@ public class Auto_11229_B extends LinearOpMode {
                     x++;
                 }
             }
+            check += "g";
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
@@ -172,7 +170,6 @@ public class Auto_11229_B extends LinearOpMode {
                     x++;
                 }
             }
-            telemetry.addData("", 6);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
@@ -290,14 +287,12 @@ public class Auto_11229_B extends LinearOpMode {
             //Elevator(10);
 
             driveInches(24);
-            telemetry.addData("", 4);
-            telemetry.update();
+            check += "h";
             //Elevator(-4);
             //telemetry.addData("", 4);
             //telemetry.update();
             //sleep(150);
-            turnDeg(-90);
-            telemetry.addData("", 7);
+            turnDeg(90);
             telemetry.update();
             /*sleep(500);
             slideInches(32.5);
