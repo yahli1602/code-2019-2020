@@ -83,7 +83,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name="Vuforia 11229", group ="Concept")
+@TeleOp(name="Vuforia Funcs 11229", group ="Concept")
 
 public class vuforiaFuncs11229 extends LinearOpMode {
     public DcMotor rdrive1 = null;

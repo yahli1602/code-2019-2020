@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -42,15 +43,15 @@ import com.qualcomm.robotcore.util.Range;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all linear OpModes contain.
- *
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
+@TeleOp(name = "case for tensor flow", group = "Linear Opmode")
 public class case_for_tensorFlow extends LinearOpMode {
 
     //driving motors
@@ -84,10 +85,10 @@ public class case_for_tensorFlow extends LinearOpMode {
         grabber1 = hardwareMap.get(Servo.class, "grabber1");
         grabber2 = hardwareMap.get(Servo.class, "grabber2");
         waitForStart();
-        rDrive1.setDirection(DcMotor.Direction.REVERSE);
-        rDrive2.setDirection(DcMotor.Direction.REVERSE);
-        lDrive1.setDirection(DcMotor.Direction.FORWARD);
-        lDrive2.setDirection(DcMotor.Direction.FORWARD);
+        rDrive1.setDirection(DcMotor.Direction.FORWARD);
+        rDrive2.setDirection(DcMotor.Direction.FORWARD);
+        lDrive1.setDirection(DcMotor.Direction.REVERSE);
+        lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
         foldcollect.setDirection(DcMotor.Direction.FORWARD);
@@ -103,13 +104,66 @@ public class case_for_tensorFlow extends LinearOpMode {
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        while (opModeIsActive()) {
-int x = 0;
-if (x==-1){
-    slide.setPower(1);
-    sleep(1000);
-    slide.setPower(0);
-}
+        int x = 0;
+        int y = 0;
+        if (opModeIsActive() && x == -1 && y == 0) {
+            slide.setPower(1);
+            sleep(350);
+            slide.setPower(0);
+            rDrive1.setPower(0.7);
+            rDrive2.setPower(0.7);
+            lDrive1.setPower(1);
+            lDrive2.setPower(1);
+            sleep(700);
+            rDrive1.setPower(0);
+            rDrive2.setPower(0);
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+            collectRight.setPosition(0.7);
+            collectLeft.setPosition(0.2);
+            sleep(1500);
+            collectLeft.setPosition(0);
+            collectRight.setPosition(0);
+            y++;
+        } else if (opModeIsActive()&& x== 0 && y == 0) {
+            slide.setPower(-1);
+            sleep(200);
+            slide.setPower(0);
+            rDrive1.setPower(0.7);
+            rDrive2.setPower(0.7);
+            lDrive1.setPower(1);
+            lDrive2.setPower(1);
+            sleep(700);
+            rDrive1.setPower(0);
+            rDrive2.setPower(0);
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+            collectRight.setPosition(0.7);
+            collectLeft.setPosition(0.2);
+            sleep(1500);
+            collectLeft.setPosition(0);
+            collectRight.setPosition(0);
+            y++;
+        }
+        else if (opModeIsActive() && x==1 && y==0){
+            slide.setPower(-1);
+            sleep(350);
+            slide.setPower(0);
+            rDrive1.setPower(0.7);
+            rDrive2.setPower(0.7);
+            lDrive1.setPower(1);
+            lDrive2.setPower(1);
+            sleep(700);
+            rDrive1.setPower(0);
+            rDrive2.setPower(0);
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+            collectRight.setPosition(0.7);
+            collectLeft.setPosition(0.2);
+            sleep(1500);
+            collectLeft.setPosition(0);
+            collectRight.setPosition(0);
+            y++;
         }
     }
 }
