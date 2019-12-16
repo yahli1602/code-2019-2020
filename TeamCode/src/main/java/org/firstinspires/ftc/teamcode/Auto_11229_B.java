@@ -120,7 +120,8 @@ public class Auto_11229_B extends LinearOpMode {
             lastPosition = 0;
             int x = 0;
             while(x == 0) {
-                if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                if (errorT > setPoint && opModeIsActive()) {
+                    check += "111111";
                     uT = kp * errorT;
 
                     currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
@@ -154,8 +155,8 @@ public class Auto_11229_B extends LinearOpMode {
                     telemetry.update();
                     uT = kp * errorT;
 
-                    currentPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch;
-                    errorT -= Math.abs(currentPosition - lastPosition);
+                    currentPosition = rdrive1.getCurrentPosition() / ticksPerInch;
+                    errorT -= currentPosition - lastPosition;
                     lastPosition = currentPosition;
 
                     ldrive1.setPower(-uT);
@@ -241,6 +242,61 @@ public class Auto_11229_B extends LinearOpMode {
         sleep(500);
     }
 
+    public void drivaBySpin(double spins){
+        setPoint = ldrive1.getCurrentPosition() / ticksPerSpin;
+
+        if (spins > 0) {
+            errorT = spins + setPoint;
+            lastPosition = 0;
+            int x = 0;
+            while(x == 0) {
+                while(errorT > setPoint && opModeIsActive() && uT > 0.3) {
+
+                    uT = kp * errorT;
+                    currentPosition = ldrive1.getCurrentPosition() / ticksPerSpin;
+                    errorT -= currentPosition - lastPosition;
+                    lastPosition = currentPosition;
+
+                    ldrive1.setPower(uT);
+                    ldrive2.setPower(uT);
+                    rdrive1.setPower(uT);
+                    rdrive2.setPower(uT);
+                }
+                x++;
+            }
+            check += "c";
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+        } else {
+            errorT = -spins + setPoint;
+            lastPosition = 0;
+            int x = 0;
+            while(x == 0) {
+                if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                    uT = kp * errorT;
+
+                    currentPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch;
+                    errorT -= Math.abs(currentPosition - lastPosition);
+                    lastPosition = currentPosition;
+
+                    ldrive1.setPower(-uT);
+                    ldrive2.setPower(-uT);
+                    rdrive1.setPower(-uT);
+                    rdrive2.setPower(-uT);
+                }
+                else{
+                    x++;
+                }
+            }
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+        }
+    }
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -292,7 +348,9 @@ public class Auto_11229_B extends LinearOpMode {
             //telemetry.addData("", 4);
             //telemetry.update();
             //sleep(150);
-            turnDeg(90);
+            turnDeg(360);
+            check += "i";
+            telemetry.addData("", check);
             telemetry.update();
             /*sleep(500);
             slideInches(32.5);
