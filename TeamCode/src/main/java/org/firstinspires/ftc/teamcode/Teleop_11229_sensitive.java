@@ -1,6 +1,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 @TeleOp(name = "Teleop_11229 sensitive", group = "Linear Opmode")
-
+@Disabled
 public class Teleop_11229_sensitive extends LinearOpMode {
 
     //driving motors

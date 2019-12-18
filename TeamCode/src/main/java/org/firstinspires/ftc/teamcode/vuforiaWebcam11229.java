@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -36,6 +37,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -83,10 +85,10 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * is explained below.
  */
 
+@TeleOp(name="vuforiaWebcam", group ="Concept")
 
-@TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
+public class vuforiaWebcam11229 extends LinearOpMode {
 
-public class vuforiaTeleop extends LinearOpMode {
 
 
     private DcMotor rDrive1 = null;
@@ -108,12 +110,7 @@ public class vuforiaTeleop extends LinearOpMode {
 
 
 
-    // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
-    // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
-    // 2) Phone Orientation. Choices are: PHONE_IS_PORTRAIT = true (portrait) or PHONE_IS_PORTRAIT = false (landscape)
-    //
-    // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
-    //
+    // IMPORTANT: If you are using a USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     private static final boolean PHONE_IS_PORTRAIT = false  ;
 
@@ -155,16 +152,21 @@ public class vuforiaTeleop extends LinearOpMode {
     // Class Members
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
+
+    /**
+     * This is the webcam we are to use. As with other hardware devices such as motors and
+     * servos, this device is identified using the robot configuration tool in the FTC application.
+     */
+    WebcamName webcamName = null;
+
     private boolean targetVisible = false;
     private boolean skystoneVisible = false;
+
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
-    private int skystoneLocation = 0;
-    private int robotLocation = 0;
 
     @Override public void runOpMode() {
-
 
         rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
         rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
@@ -189,14 +191,11 @@ public class vuforiaTeleop extends LinearOpMode {
         grabber1.setDirection(Servo.Direction.FORWARD);
         grabber2.setDirection(Servo.Direction.REVERSE);
 
-        rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
+        /*
+         * Retrieve the camera we are to use.
+         */
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
@@ -209,7 +208,11 @@ public class vuforiaTeleop extends LinearOpMode {
         // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection   = CAMERA_CHOICE;
+
+        /**
+         * We also indicate which camera on the RC we wish to use.
+         */
+        parameters.cameraName = webcamName;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -352,13 +355,13 @@ public class vuforiaTeleop extends LinearOpMode {
 
         // Next, translate the camera lens to where it is on the robot.
         // In this example, it is centered (left to right), but forward of the middle of the robot, and above ground level.
-        final float CAMERA_FORWARD_DISPLACEMENT  = 0 * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
+        final float CAMERA_FORWARD_DISPLACEMENT  = 0 * mmPerInch;   // eg: Camera is 4 Inches in front of robot-center
         final float CAMERA_VERTICAL_DISPLACEMENT = 0 * mmPerInch;   // eg: Camera is 8 Inches above ground
         final float CAMERA_LEFT_DISPLACEMENT     = 190;     // eg: Camera is ON the robot's center line
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
-                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
+                    .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
         /**  Let all the trackable listeners know where the phone is.  */
         for (VuforiaTrackable trackable : allTrackables) {
@@ -378,7 +381,7 @@ public class vuforiaTeleop extends LinearOpMode {
         // Tap the preview window to receive a fresh image.
 
         targetsSkyStone.activate();
-        while (!isStopRequested() && opModeIsActive()) {
+        while (opModeIsActive()) {
 
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
@@ -387,7 +390,7 @@ public class vuforiaTeleop extends LinearOpMode {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
-                    if (trackable.getName().equals("skystone")){
+                    if (trackable.equals(targetsSkyStone.get(0))){
                         skystoneVisible = true;
                     }
 
@@ -412,38 +415,130 @@ public class vuforiaTeleop extends LinearOpMode {
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
             }
-
             else {
                 telemetry.addData("Visible Target", "none");
             }
 
             if (skystoneVisible){
-                telemetry.addData("skystone location",robotLocation);
-                skystoneLocation = robotLocation;
+                VectorF translation = lastLocation.getTranslation();
+
+                telemetry.addData("can see skystone","");
+
+                telemetry.addData("skystone Y:",translation.get(1));
             }
-            if (robotLocation == 1){
-                if (skystoneVisible){
-                    telemetry.addData("can see skystone","");
-                }else{
 
-                }
-
-
-
+            if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+                lDrive1.setPower(gamepad1.left_stick_y);
+                lDrive2.setPower(gamepad1.left_stick_y);
+            }else{
+                lDrive1.setPower(0);
+                lDrive2.setPower(0);
             }
+
+
+            if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
+                rDrive1.setPower(gamepad1.right_stick_y);
+                rDrive2.setPower(gamepad1.right_stick_y);
+            }else {
+                rDrive1.setPower(0);
+                rDrive2.setPower(0);
+            }
+
+
+
+            //Drop cube on plate
+            if (gamepad1.a) {
+                rDrive1.setPower(0.4);
+                rDrive2.setPower(0.4);
+                lDrive1.setPower(0.3);
+                lDrive2.setPower(0.3);
+                collectRight.setPosition(0.2);
+                collectLeft.setPosition(0.7);
+            } else if(gamepad1.left_stick_y == 0 && gamepad1.right_stick_y == 0) {
+                rDrive1.setPower(0);
+                rDrive2.setPower(0);
+                lDrive1.setPower(0);
+                lDrive2.setPower(0);
+            }
+
+            if (gamepad1.x) {
+                rDrive1.setPower(-0.8);
+                rDrive2.setPower(-0.8);
+                lDrive1.setPower(0.8);
+                lDrive2.setPower(0.8);
+
+            } else if(gamepad1.left_stick_y == 0 && gamepad1.right_stick_y == 0) {
+                rDrive1.setPower(0);
+                rDrive2.setPower(0);
+                lDrive1.setPower(0);
+                lDrive2.setPower(0);
+            }
+
+            if (gamepad1.left_trigger > 0.2) {
+                slide.setPower(1);
+            }else if (gamepad1.right_trigger > 0.2){
+                slide.setPower(-1);
+            }else{
+                slide.setPower(0);
+            }
+
+
+            telemetry.addData("drive:", rDrive1.getPower());
+            telemetry.update();
+//elevator
+            if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
+                elevator.setPower(gamepad2.right_stick_y);
+            } else {
+                elevator.setPower(0);
+            }
+
+
+            if (stoneIn.isPressed()){
+                telemetry.addData("Touch sensor is pressed", "the stone is inside");
+                telemetry.update();
+            }
+
+            telemetry.addData("elevator", elevator.getCurrentPosition());
+            telemetry.update();
+
+            //collection
+            if (gamepad2.right_trigger > 0) {
+                collectRight.setPosition(0.7);
+                collectLeft.setPosition(0.2);
+            } else if (gamepad2.left_trigger > 0) {
+                collectLeft.setPosition(0.7);
+                collectRight.setPosition(0.2);
+
+            } else {
+                collectRight.setPosition(0);
+                collectLeft.setPosition(0);
+            }
+            //collection fold
+            if (gamepad2.right_bumper) {
+                foldcollect.setPower(1);
+            } else if (gamepad2.left_bumper) {
+                foldcollect.setPower(-1);
+            } else {
+                foldcollect.setPower(0);
+            }
+
+//grabber
+
+            if (gamepad2.x) {
+                grabber1.setPosition(50);
+                grabber2.setPosition(50);
+            } else {
+                grabber1.setPosition(0);
+                grabber2.setPosition(0);
+            }
+
+
 
 
             telemetry.update();
         }
 
-
-
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
-    }
-    private void slideRobotLoca(String diraction){
-        if (diraction.equals("left")){
-
-        }
     }
 }

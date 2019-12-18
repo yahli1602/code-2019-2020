@@ -71,6 +71,13 @@ public class TensorFlow extends LinearOpMode {
     private float Stone1X = 0;
     private float Stone2X = 0;
     int skystonePostion;
+    int Stone1Postion;
+    int Stone2Postion;
+    int seeSkystone = 0;
+    int seeStone1 = 0;
+    int seeStone2 = 0;
+    boolean canSeeSkystone = false;
+
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -132,9 +139,7 @@ public class TensorFlow extends LinearOpMode {
          * Activate TensorFlow Object Detection before we wait for the start command.
          * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
          **/
-        if (tfod != null) {
-            tfod.activate();
-        }
+
 
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start op mode");
@@ -150,7 +155,39 @@ public class TensorFlow extends LinearOpMode {
 
 
         if (opModeIsActive()) {
+        int z = 0;
+        int x = 0;
+
+            while (opModeIsActive() && x==0) {
+
+                rdrive1.setPower(0.65);
+                rdrive2.setPower(0.65);
+                ldrive1.setPower(0.95);
+                ldrive2.setPower(0.95);
+                sleep(600);
+                rdrive1.setPower(0);
+                rdrive2.setPower(0);
+                ldrive1.setPower(0);
+                ldrive2.setPower(0);
+                sleep(100);
+                ldrive1.setPower(-0.25);
+                ldrive2.setPower(-0.25);
+                sleep(60);
+                ldrive1.setPower(0);
+                ldrive2.setPower(0);
+
+
+                x++;
+            }
+            if (tfod != null) {
+                tfod.activate();
+            }
+
+
             while (opModeIsActive()) {
+
+
+
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -167,13 +204,17 @@ public class TensorFlow extends LinearOpMode {
                                           recognition.getLeft(), recognition.getTop());
                         telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
                                 recognition.getRight(), recognition.getBottom());
+                        if(recognition.getLabel() == "skystone" || recognition.getLabel() == LABEL_SECOND_ELEMENT){
+                            canSeeSkystone = true;
+                        }
 
                       }
                       if (updatedRecognitions.size() == 3){
-                          skyStoneX = -1;
-                          Stone1X = -1;
-                          Stone2X = -1;
-                          if (skyStoneX == -1 && Stone1X == -1 && Stone2X == -1){
+                          seeSkystone = -1;
+                          seeStone1 = -1;
+                          seeStone2 = -1;
+
+                          if (seeSkystone == -1 && seeStone1 == -1 && seeStone2 == -1){
                               for (Recognition object : updatedRecognitions){
                                   if (object.getLabel().equals(LABEL_SECOND_ELEMENT)){
                                       skyStoneX = object.getLeft();
@@ -187,10 +228,10 @@ public class TensorFlow extends LinearOpMode {
                                   skystonePostion = -1;
                               }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
                                   skystonePostion = 1;
-                              }else {
+                              }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
                                   skystonePostion = 0;
                               }
-                              telemetry.addData("skyStoneX",skyStoneX);
+                              telemetry.addData("skyStone position",skystonePostion);
                               telemetry.addData("Stone1X",Stone1X);
                               telemetry.addData("Stone2X",Stone2X);
                           }
@@ -198,10 +239,10 @@ public class TensorFlow extends LinearOpMode {
 
                       }
                       if (updatedRecognitions.size() == 2){
-                          skyStoneX = -1;
-                          Stone1X = -1;
+                          seeSkystone = -1;
+                          seeStone1 = -1;
 
-                          if (skyStoneX == -1 && Stone1X == -1){
+                          if (seeSkystone == -1 && seeStone1 == -1){
                               for (Recognition object : updatedRecognitions){
                                   if (object.getLabel().equals(LABEL_SECOND_ELEMENT)){
                                       skyStoneX = object.getLeft();
@@ -212,42 +253,58 @@ public class TensorFlow extends LinearOpMode {
                               }
                               if (skyStoneX < Stone1X){
                                   skystonePostion = -1;
-                                  Stone1X = 1;
+                                  Stone1Postion = 1;
 
                               }else{
                                   skystonePostion = 1;
-                                  Stone1X = -1;
+                                  Stone1Postion = -1;
                                   //TODO: add a driving function to the sky ston that actualy is a skystone and a stone
-                                  if (updatedRecognitions.size() == 2) {
-                                      skyStoneX = -1;
-                                      Stone2X = -1;
 
-                                      if (skyStoneX == -1 && Stone2X == -1) {
-                                          for (Recognition object2 : updatedRecognitions) {
-                                              if (object2.getLabel().equals(LABEL_SECOND_ELEMENT)) {
-                                                  skyStoneX = object2.getLeft();
-                                              } else if (object2.getLabel().equals(LABEL_FIRST_ELEMENT)) {
-                                                  Stone2X = object2.getLeft();
-                                              }
-
-                                          }
-                                          if (skyStoneX < Stone2X) {
-                                              skystonePostion = 0;
-
-                                          } else {
-                                              skystonePostion = 1;
-                                          }
-                                          telemetry.addData("skyStoneX",skyStoneX);
-                                          telemetry.addData("Stone1X",Stone1X);
-                                          telemetry.addData("Stone2X",Stone2X);
-                                      }
-                                  }
                               }
+
+                              telemetry.addData("skyStone position",skystonePostion);
+                              telemetry.addData("Stone1X",Stone1X);
+                              telemetry.addData("Stone2X",Stone2X);
+
+
                           }
 
+                          telemetry.addData("skyStone position",skystonePostion);
+                          telemetry.addData("Stone1X",Stone1X);
+                          telemetry.addData("Stone2X",Stone2X);
+
+                      }
+                      if (updatedRecognitions.equals(LABEL_SECOND_ELEMENT)){
+                          telemetry.addData("can see skyStone","start laasof");
                       }
 
+
+
+
                       telemetry.update();
+                    }
+
+                    if (canSeeSkystone && z==0){
+                        telemetry.addData("can see skystone","start osef");
+
+                        ldrive1.setPower(0.25);
+                        ldrive2.setPower(0.25);
+                        sleep(100);
+                        ldrive1.setPower(0);
+                        ldrive2.setPower(0);
+                        sleep(100);
+                        rdrive1.setPower(0.7);
+                        rdrive2.setPower(0.7);
+                        ldrive1.setPower(0.7);
+                        ldrive2.setPower(0.7);
+                        sleep(170);
+                        ldrive1.setPower(0);
+                        ldrive2.setPower(0);
+                        rdrive1.setPower(0);
+                        rdrive2.setPower(0);
+                        sleep(70);
+
+                        z++;
                     }
                 }
             }

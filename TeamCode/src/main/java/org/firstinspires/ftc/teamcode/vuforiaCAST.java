@@ -31,9 +31,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -86,27 +83,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 @TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
 
-public class vuforiaTeleop extends LinearOpMode {
-
-
-    private DcMotor rDrive1 = null;
-    private DcMotor rDrive2 = null;
-    private DcMotor lDrive1 = null;
-    private DcMotor lDrive2 = null;
-    private DcMotor slide = null;
-    //elevator
-    private DcMotor elevator = null;
-    //fold collection
-    private DcMotor foldcollect = null;
-    //collection
-    private Servo collectRight = null;
-    private Servo collectLeft = null;
-    //grabbing the build plate
-    private Servo grabber1 = null;
-    private Servo grabber2 = null;
-    private TouchSensor stoneIn = null;
-
-
+public class vuforiaCAST extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -164,40 +141,6 @@ public class vuforiaTeleop extends LinearOpMode {
     private int robotLocation = 0;
 
     @Override public void runOpMode() {
-
-
-        rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
-        rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
-        lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
-        lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
-        slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
-        foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
-        collectRight = hardwareMap.get(Servo.class, "collectRight");
-        collectLeft = hardwareMap.get(Servo.class, "collectLeft");
-        grabber1 = hardwareMap.get(Servo.class, "grabber1");
-        grabber2 = hardwareMap.get(Servo.class, "grabber2");
-        stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
-
-        rDrive1.setDirection(DcMotor.Direction.REVERSE);
-        rDrive2.setDirection(DcMotor.Direction.REVERSE);
-        lDrive1.setDirection(DcMotor.Direction.FORWARD);
-        lDrive2.setDirection(DcMotor.Direction.FORWARD);
-        slide.setDirection(DcMotor.Direction.FORWARD);
-        elevator.setDirection(DcMotor.Direction.FORWARD);
-        foldcollect.setDirection(DcMotor.Direction.FORWARD);
-        grabber1.setDirection(Servo.Direction.FORWARD);
-        grabber2.setDirection(Servo.Direction.REVERSE);
-
-        rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-
-
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -357,8 +300,8 @@ public class vuforiaTeleop extends LinearOpMode {
         final float CAMERA_LEFT_DISPLACEMENT     = 190;     // eg: Camera is ON the robot's center line
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
-                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
+                    .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                    .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
         /**  Let all the trackable listeners know where the phone is.  */
         for (VuforiaTrackable trackable : allTrackables) {
@@ -387,7 +330,7 @@ public class vuforiaTeleop extends LinearOpMode {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
-                    if (trackable.getName().equals("skystone")){
+                    if (trackable.equals(targetsSkyStone.get(0))){
                         skystoneVisible = true;
                     }
 
@@ -418,32 +361,22 @@ public class vuforiaTeleop extends LinearOpMode {
             }
 
             if (skystoneVisible){
+                VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("skystone location",robotLocation);
-                skystoneLocation = robotLocation;
-            }
-            if (robotLocation == 1){
-                if (skystoneVisible){
-                    telemetry.addData("can see skystone","");
+                if (translation.get(0) > 25){
+                    skystoneLocation = 1;
+                }else if(25 < translation.get(0) && 45 > translation.get(0)){
+                    skystoneLocation = 2;
                 }else{
-
+                    skystoneLocation = 3;
                 }
-
-
-
             }
 
 
             telemetry.update();
         }
 
-
-
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
-    }
-    private void slideRobotLoca(String diraction){
-        if (diraction.equals("left")){
-
-        }
     }
 }

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -34,6 +35,7 @@ public class Teleop_11229 extends LinearOpMode {
     //grabbing the build plate
     private Servo grabber1 = null;
     private Servo grabber2 = null;
+    private TouchSensor stoneIn = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -48,6 +50,8 @@ public class Teleop_11229 extends LinearOpMode {
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         grabber1 = hardwareMap.get(Servo.class, "grabber1");
         grabber2 = hardwareMap.get(Servo.class, "grabber2");
+        stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
+
         waitForStart();
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
@@ -82,7 +86,7 @@ public class Teleop_11229 extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-            /* //Drive/turn
+            //Drive/turn tank
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
                 rDrive1.setPower(gamepad1.right_stick_y);
                 rDrive2.setPower(gamepad1.right_stick_y);
@@ -94,6 +98,21 @@ public class Teleop_11229 extends LinearOpMode {
                 lDrive1.setPower(gamepad1.left_stick_y);
                 lDrive2.setPower(gamepad1.left_stick_y);
             } else {
+                lDrive1.setPower(0);
+                lDrive2.setPower(0);
+            }
+
+            //Drop cube on plate
+            if (gamepad2.a) {
+                rDrive1.setPower(0.4);
+                rDrive2.setPower(0.4);
+                lDrive1.setPower(0.3);
+                lDrive2.setPower(0.3);
+                collectRight.setPosition(0.2);
+                collectLeft.setPosition(0.7);
+            } else {
+                rDrive1.setPower(0);
+                rDrive2.setPower(0);
                 lDrive1.setPower(0);
                 lDrive2.setPower(0);
             }
@@ -112,9 +131,9 @@ public class Teleop_11229 extends LinearOpMode {
                 slide.setPower(0);
                 telemetry.addData("Slide Power:", slide.getPower());
                 telemetry.update();
-            }*/
+            }
 
-            //Drive gilad
+            /*//Drive gilad
             if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                 rDrive1.setPower(gamepad1.left_stick_y);
                 rDrive2.setPower(gamepad1.left_stick_y);
@@ -132,6 +151,15 @@ public class Teleop_11229 extends LinearOpMode {
                 lDrive1.setPower(-gamepad1.right_trigger);
                 lDrive2.setPower(-gamepad1.right_trigger);
 
+            }
+            //Drop cube on plate
+            else if (gamepad1.a) {
+                rDrive1.setPower(0.4);
+                rDrive2.setPower(0.4);
+                lDrive1.setPower(0.3);
+                lDrive2.setPower(0.3);
+                collectRight.setPosition(0.2);
+                collectLeft.setPosition(0.7);
             } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
@@ -143,16 +171,21 @@ public class Teleop_11229 extends LinearOpMode {
                 slide.setPower(-gamepad1.right_stick_x);
             } else {
                 slide.setPower(0);
-            }
+            }*/
             telemetry.addData("rtrigger:", gamepad1.right_trigger);
             telemetry.addData("ltrigger:", gamepad1.left_trigger);
             telemetry.addData("drive:", rDrive1.getPower());
             telemetry.update();
 //elevator
-            if (gamepad2.right_stick_y > 0.2 && elevator.getCurrentPosition() < -300|| gamepad2.right_stick_y < -0.2 && elevator.getCurrentPosition() > -3000) {
+            if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
             } else {
                 elevator.setPower(0);
+            }
+
+
+            if (stoneIn.isPressed()) {
+                telemetry.addData("Touch sensor is pressed", "the stone is inside");
             }
 
             telemetry.addData("elevator", elevator.getCurrentPosition());
@@ -190,20 +223,6 @@ public class Teleop_11229 extends LinearOpMode {
             }
 
 
-            //Drop cube on plate
-            if (gamepad1.a) {
-                rDrive1.setPower(0.7);
-                rDrive2.setPower(0.7);
-                lDrive1.setPower(0.7);
-                lDrive2.setPower(0.7);
-
-                collectRight.setPosition(0.3);
-                collectLeft.setPosition(0.7);
-            }
-
-
         }
-
-
     }
 }

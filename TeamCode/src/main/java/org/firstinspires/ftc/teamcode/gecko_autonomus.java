@@ -44,6 +44,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.internal.android.dex.EncodedValueReader;
 
 @Autonomous(name = "Auto Gecko", group = "Autonomous")
+@Disabled
 public class gecko_autonomus extends LinearOpMode {
 
     ElapsedTime elapsedTime = new ElapsedTime();
