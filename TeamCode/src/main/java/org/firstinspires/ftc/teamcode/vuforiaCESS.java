@@ -162,7 +162,7 @@ public class vuforiaCESS extends LinearOpMode {
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
     private int skystoneLocation = 0;
-    private int robotLocation = 0;
+    private int robotLocation = 1;
 
     @Override public void runOpMode() {
 
@@ -372,14 +372,14 @@ public class vuforiaCESS extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-        // waitForStart();
+        waitForStart();
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
 
         targetsSkyStone.activate();
-        while (!isStopRequested() && opModeIsActive()) {
+        while (opModeIsActive()) {
 
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
@@ -388,7 +388,7 @@ public class vuforiaCESS extends LinearOpMode {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
-                    if (trackable.getName().equals("skystone")){
+                    if (trackable.equals(targetsSkyStone.get(0))){
                         skystoneVisible = true;
                     }else{
                         canSlide = true;
@@ -414,6 +414,11 @@ public class vuforiaCESS extends LinearOpMode {
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+                if (gamepad1.y){
+                    robotLocation++;
+                    sleep(1000);
+                }
+
             }
 
             else {
@@ -421,8 +426,59 @@ public class vuforiaCESS extends LinearOpMode {
             }
 
             if (skystoneVisible){
-                telemetry.addData("skystone location",robotLocation);
                 skystoneLocation = robotLocation;
+                telemetry.addData("skystone location",skystoneLocation);
+                canSlide = false;
+                telemetry.addData("can slide",canSlide);
+                if (gamepad1.y){
+                    robotLocation++;
+                    sleep(1000);
+                }
+
+
+
+
+                if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+                    rDrive1.setPower(gamepad1.left_stick_y);
+                    rDrive2.setPower(gamepad1.left_stick_y);
+                    lDrive1.setPower(gamepad1.left_stick_y);
+                    lDrive2.setPower(gamepad1.left_stick_y);
+                } else if (gamepad1.left_trigger > 0.2) {
+                    rDrive1.setPower(-gamepad1.left_trigger);
+                    rDrive2.setPower(-gamepad1.left_trigger);
+                    lDrive1.setPower(gamepad1.left_trigger);
+                    lDrive2.setPower(gamepad1.left_trigger);
+
+                } else if (gamepad1.right_trigger > 0.2) {
+                    rDrive1.setPower(gamepad1.right_trigger);
+                    rDrive2.setPower(gamepad1.right_trigger);
+                    lDrive1.setPower(-gamepad1.right_trigger);
+                    lDrive2.setPower(-gamepad1.right_trigger);
+
+                }
+                //Drop cube on plate
+                else if (gamepad1.a) {
+                    rDrive1.setPower(0.4);
+                    rDrive2.setPower(0.4);
+                    lDrive1.setPower(0.3);
+                    lDrive2.setPower(0.3);
+                    collectRight.setPosition(0.2);
+                    collectLeft.setPosition(0.7);
+                } else {
+                    rDrive1.setPower(0);
+                    rDrive2.setPower(0);
+                    lDrive1.setPower(0);
+                    lDrive2.setPower(0);
+                }
+
+                if (gamepad1.right_stick_x > 0 && canSlide || gamepad1.right_stick_x < 0 && canSlide) {
+                    //slide.setPower(-gamepad1.right_stick_x);
+                } else {
+                    //slide.setPower(0);
+                }
+                if (canSlide){
+                    telemetry.addData("can slide",canSlide);
+                }
             }
 
             if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
@@ -457,6 +513,10 @@ public class vuforiaCESS extends LinearOpMode {
                 lDrive1.setPower(0);
                 lDrive2.setPower(0);
             }
+            if (gamepad1.y){
+                robotLocation++;
+                sleep(1000);
+            }
 
             if (gamepad1.right_stick_x > 0 && canSlide || gamepad1.right_stick_x < 0 && canSlide) {
                 //slide.setPower(-gamepad1.right_stick_x);
@@ -476,9 +536,9 @@ public class vuforiaCESS extends LinearOpMode {
     }
     private void slideRobotLoca(String diraction){
         if (diraction.equals("left")){
-            //TODO: add slide left and right when we will have slide
-        }else if (diraction.equals("left")){
-
+            //TODO: add slide left
+        }else if (diraction.equals("right")){
+            //TODO: add slide right
         }
     }
 }

@@ -3,21 +3,14 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.internal.android.dx.dex.file.ValueEncoder;
 
 
-@TeleOp(name = "Teleop_11229", group = "Linear Opmode")
+@TeleOp(name = "Teleop_11229_Gilad", group = "Linear Opmode")
 
-public class Teleop_11229 extends LinearOpMode {
+public class Teleop_11229_Gilad extends LinearOpMode {
 
     //driving motors
     private DcMotor rDrive1 = null;
@@ -87,66 +80,8 @@ public class Teleop_11229 extends LinearOpMode {
 
         while (opModeIsActive()) {
             //Drive/turn tank
-            if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
-                rDrive1.setPower(gamepad1.right_stick_y);
-                rDrive2.setPower(gamepad1.right_stick_y);
-            } else {
-                rDrive1.setPower(0);
-                rDrive2.setPower(0);
-            }
-            if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
-                lDrive1.setPower(gamepad1.left_stick_y);
-                lDrive2.setPower(gamepad1.left_stick_y);
-            } else {
-                lDrive1.setPower(0);
-                lDrive2.setPower(0);
-            }
 
-            //Drop cube on plate
-            if (gamepad2.a) {
-                rDrive1.setPower(0.4);
-                rDrive2.setPower(0.4);
-                lDrive1.setPower(0.3);
-                lDrive2.setPower(0.3);
-                collectRight.setPosition(0.2);
-                collectLeft.setPosition(0.7);
-            } else if(gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
-                rDrive1.setPower(0);
-                rDrive2.setPower(0);
-                lDrive1.setPower(0);
-                lDrive2.setPower(0);
-            }
-            if (gamepad1.x) {
-                rDrive1.setPower(-0.7);
-                rDrive2.setPower(-0.7);
-                lDrive1.setPower(0.7);
-                lDrive2.setPower(0.7);
-                sleep(3000);
-
-            } else if(gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
-                rDrive1.setPower(0);
-                rDrive2.setPower(0);
-                lDrive1.setPower(0);
-                lDrive2.setPower(0);
-            }
-
-
-            //slide
-            if (gamepad1.right_trigger > 0) {
-                slide.setPower(-gamepad1.right_trigger);
-                telemetry.addData("Slide Power:", slide.getPower());
-                telemetry.update();
-            } else if (gamepad1.left_trigger > 0) {
-                slide.setPower(gamepad1.left_trigger);
-                telemetry.addData("Slide Power:", slide.getPower());
-                telemetry.update();
-            } else {
-                slide.setPower(0);
-                telemetry.addData("Slide Power:", slide.getPower());
-                telemetry.update();
-            }
-
-            /*//Drive gilad
+            //Drive gilad
             if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                 rDrive1.setPower(gamepad1.left_stick_y);
                 rDrive2.setPower(gamepad1.left_stick_y);
@@ -184,7 +119,7 @@ public class Teleop_11229 extends LinearOpMode {
                 slide.setPower(-gamepad1.right_stick_x);
             } else {
                 slide.setPower(0);
-            }*/
+            }
             telemetry.addData("rtrigger:", gamepad1.right_trigger);
             telemetry.addData("ltrigger:", gamepad1.left_trigger);
             telemetry.addData("drive:", rDrive1.getPower());
@@ -235,6 +170,7 @@ public class Teleop_11229 extends LinearOpMode {
                 grabber2.setPosition(0);
             }
 
+            telemetry.update();
 
         }
     }
