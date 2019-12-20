@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -56,13 +57,14 @@ public class testing_motors extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor rDrive1 = null;
+    /*private DcMotor rDrive1 = null;
     private DcMotor rDrive2 = null;
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
-    private DcMotor slide = null;
+    private DcMotor slide = null;*/
+    private DcMotor motor1 = null;
     //elevator
-    private DcMotor elevator = null;
+    /*private DcMotor elevator = null;
     //fold collection
     private DcMotor foldcollect = null;
     //collection
@@ -70,14 +72,14 @@ public class testing_motors extends LinearOpMode {
     private Servo collectLeft = null;
     //grabbing the build plate
     private Servo grabber1 = null;
-    private Servo grabber2 = null;
+    private Servo grabber2 = null;*/
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
+        /*rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
         rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
@@ -87,9 +89,10 @@ public class testing_motors extends LinearOpMode {
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         grabber1 = hardwareMap.get(Servo.class, "grabber1");
-        grabber2 = hardwareMap.get(Servo.class, "grabber2");
+        grabber2 = hardwareMap.get(Servo.class, "grabber2");*/
+        motor1 = hardwareMap.get(DcMotor.class, "motor1");
         waitForStart();
-        rDrive1.setDirection(DcMotor.Direction.REVERSE);
+        /*rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
         lDrive1.setDirection(DcMotor.Direction.FORWARD);
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
@@ -97,19 +100,21 @@ public class testing_motors extends LinearOpMode {
         elevator.setDirection(DcMotor.Direction.FORWARD);
         foldcollect.setDirection(DcMotor.Direction.FORWARD);
         grabber1.setDirection(Servo.Direction.FORWARD);
-        grabber2.setDirection(Servo.Direction.REVERSE);
+        grabber2.setDirection(Servo.Direction.REVERSE);*/
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
-        rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        /*rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         runtime.reset();
 int x=0;
-        while (opModeIsActive() && x==0) {
+        /*while (opModeIsActive() && x==0) {
             rDrive1.setPower(1);
             rDrive2.setPower(1);
             x++;
@@ -151,6 +156,11 @@ int x=0;
             collectLeft.setPosition(0);
             collectRight.setPosition(0);
             x++;
-        }
+
+
+        }*/
+        motor1.setPower(1);
+        sleep(1000);
+        motor1.setPower(0);
     }
 }

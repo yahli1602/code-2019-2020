@@ -135,9 +135,12 @@ public class vuforiaWebcamNoMotors extends LinearOpMode {
     WebcamName webcamName = null;
 
     private boolean targetVisible = false;
+    private boolean skystoneVisible = false;
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
+    private int skystoneLocation = 0;
+    private int robotLocation = 0;
 
     @Override public void runOpMode() {
         /*
@@ -303,8 +306,8 @@ public class vuforiaWebcamNoMotors extends LinearOpMode {
 
         // Next, translate the camera lens to where it is on the robot.
         // In this example, it is centered (left to right), but forward of the middle of the robot, and above ground level.
-        final float CAMERA_FORWARD_DISPLACEMENT  = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot-center
-        final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
+        final float CAMERA_FORWARD_DISPLACEMENT  = 0 * mmPerInch;   // eg: Camera is 4 Inches in front of robot-center
+        final float CAMERA_VERTICAL_DISPLACEMENT = 0 * mmPerInch;   // eg: Camera is 8 Inches above ground
         final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
@@ -329,7 +332,7 @@ public class vuforiaWebcamNoMotors extends LinearOpMode {
         // Tap the preview window to receive a fresh image.
 
         targetsSkyStone.activate();
-        while (!isStopRequested()) {
+        while (opModeIsActive()) {
 
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
@@ -337,6 +340,9 @@ public class vuforiaWebcamNoMotors extends LinearOpMode {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
+                    if (trackable.equals(targetsSkyStone.get(0))){
+                        skystoneVisible = true;
+                    }
 
                     // getUpdatedRobotLocation() will return null if no new information is available since
                     // the last time that call was made, or if the trackable is not currently visible.
@@ -362,6 +368,20 @@ public class vuforiaWebcamNoMotors extends LinearOpMode {
             else {
                 telemetry.addData("Visible Target", "none");
             }
+
+            if (skystoneVisible){
+                VectorF translation = lastLocation.getTranslation();
+                telemetry.addData("skystone location",robotLocation);
+                if (translation.get(0) > 25){
+                    skystoneLocation = 1;
+                }else if(25 < translation.get(0) && 45 > translation.get(0)){
+                    skystoneLocation = 2;
+                }else{
+                    skystoneLocation = 3;
+                }
+            }
+
+
             telemetry.update();
         }
 

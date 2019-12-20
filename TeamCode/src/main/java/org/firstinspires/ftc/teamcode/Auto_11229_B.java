@@ -53,10 +53,10 @@ public class Auto_11229_B extends LinearOpMode {
     public void driveInches(double inches) {
 
         setPoint = ldrive1.getCurrentPosition() / ticksPerInch;
+        lastPosition = setPoint;
 
         if (inches > 0) {
             errorT = inches + setPoint;
-            lastPosition = 0;
             lim = Math.sqrt(0.005967 * inches - 0.053208);
             magnif = -2.94117647059 * lim + 2.38235294118;
             int x = 0;
@@ -87,10 +87,9 @@ public class Auto_11229_B extends LinearOpMode {
             telemetry.update();
         } else {
             errorT = -inches + setPoint;
-            lastPosition = 0;
             int x = 0;
             while(x == 0) {
-                if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
+                if (errorT > setPoint && opModeIsActive() && uT > lim) {
                     uT = kp * errorT;
 
                     currentPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch;
@@ -99,8 +98,8 @@ public class Auto_11229_B extends LinearOpMode {
 
                     ldrive1.setPower(-uT);
                     ldrive2.setPower(-uT);
-                    rdrive1.setPower(-1.5 * uT);
-                    rdrive2.setPower(-1.5 * uT);
+                    rdrive1.setPower(-magnif * uT);
+                    rdrive2.setPower(-magnif * uT);
                 }
                 else{
                     x++;
@@ -116,23 +115,31 @@ public class Auto_11229_B extends LinearOpMode {
     // Turns right by default
     public void turnDeg(double deg) {
         setPoint = ldrive1.getCurrentPosition() / ticksPerInch;
+        lastPosition = 0;
+        lim = Math.sqrt(0.005967 * (diameter * Math.PI * (deg / 360)) - 0.05147424212);
         if (deg > 0) {
-            errorT = diameter * Math.PI * (deg / 360) + setPoint;
-            lastPosition = 0;
+            errorT = diameter * Math.PI * (deg / 360);
             int x = 0;
             while(x == 0) {
-                if (errorT > setPoint && opModeIsActive()) {
+                if (errorT > 0 && opModeIsActive() && uT > 0.1995) {
 
-                    currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
+                    currentPosition = ldrive1.getCurrentPosition() / ticksPerInch - setPoint;
                     errorT -= (currentPosition - lastPosition);
                     lastPosition = currentPosition;
+
+                    uT = kp * errorT;
 
                     ldrive1.setPower(uT);
                     ldrive2.setPower(uT);
                     rdrive1.setPower(-uT);
                     rdrive2.setPower(-uT);
-                    telemetry.addData("rdrive:", rdrive1.getPower());
-                    telemetry.addData("ldrive:", ldrive1.getPower());
+                    telemetry.addData("", setPoint);
+                    telemetry.addData("", errorT);
+                    telemetry.addData("", ldrive1.getCurrentPosition());
+                    telemetry.addData("", ldrive1.getPower());
+                    telemetry.addData("", uT);
+                    telemetry.addData("", currentPosition);
+                    telemetry.addData("", lastPosition);
                     telemetry.update();
                 }
                 else{
@@ -145,7 +152,6 @@ public class Auto_11229_B extends LinearOpMode {
             rdrive2.setPower(0);
         } else {
             errorT = diameter * Math.PI * (-deg / 360) + setPoint;
-            lastPosition = 0;
             int x = 0;
             while(x == 0) {
                 if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
@@ -177,10 +183,10 @@ public class Auto_11229_B extends LinearOpMode {
     public void slideInches(double inches) {
 
         setPoint = slide.getCurrentPosition() / ticksPerInch;
+        lastPosition = setPoint;
 
         if (inches > 0) {
             errorT = inches + setPoint;
-            lastPosition = 0;
             int x = 0;
             while (x == 0) {
                 if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
@@ -199,7 +205,6 @@ public class Auto_11229_B extends LinearOpMode {
             slide.setPower(0);
         } else {
             errorT = -inches + setPoint;
-            lastPosition = 0;
             int x = 0;
             while(x == 0) {
                 if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
@@ -242,7 +247,7 @@ public class Auto_11229_B extends LinearOpMode {
         setPoint = ldrive1.getCurrentPosition() / ticksPerSpin;
 
         if (spins > 0) {
-            errorT = spins + setPoint;
+            errorT = (spins + setPoint) / 2;
             lastPosition = 0;
             int x = 0;
             while(x == 0) {
@@ -338,6 +343,8 @@ public class Auto_11229_B extends LinearOpMode {
             //Elevator(10);
             while(h == 0) {
                 driveInches(24);
+                sleep(500);
+                turnDeg(180);
                 h++;
             }
             //Elevator(-4);
