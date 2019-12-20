@@ -57,7 +57,7 @@ public class MotorTest extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor drive1 = null;
-    private DcMotor drive2 = null;
+
 
     @Override
     public void runOpMode() {
@@ -68,10 +68,10 @@ public class MotorTest extends LinearOpMode {
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
         drive1  = hardwareMap.get(DcMotor.class, "drive1");
-        drive2  = hardwareMap.get(DcMotor.class, "drive2");
+
 
         drive1.setDirection(DcMotor.Direction.FORWARD);
-        drive2.setDirection(DcMotor.Direction.FORWARD);
+
 
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -104,10 +104,10 @@ public class MotorTest extends LinearOpMode {
 
             if (gamepad1.a){
                 drive1.setPower(0.7);
-                drive2.setPower(0.7);
+
             }else{
                 drive1.setPower(0);
-                drive2.setPower(0);
+
             }
 
 

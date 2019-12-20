@@ -57,6 +57,11 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
 
+
+    float skysotneX = 0;
+    float sotne1X = 0;
+    float sotne2X = 0;
+
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
      * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
@@ -118,17 +123,26 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
                     if (updatedRecognitions != null) {
                       telemetry.addData("# Object Detected", updatedRecognitions.size());
                       // step through the list of recognitions and display boundary info.
-                      int i = 0;
-                      for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
-                        telemetry.addData("hight:",recognition.getTop() - recognition.getBottom());
-                        float hight = recognition.getTop() - recognition.getBottom();
+                        int i = 0;
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                    recognition.getLeft(), recognition.getTop());
+                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                    recognition.getRight(), recognition.getBottom());
+                            telemetry.addData("hight:",recognition.getTop() - recognition.getBottom());
+                            float hight = recognition.getTop() - recognition.getBottom();
 
-                      }
+                            if (updatedRecognitions.size() == 3){
+                                if (recognition.equals(LABEL_SECOND_ELEMENT)){
+                                    skysotneX = recognition.getLeft();
+                                }else if (recognition.equals(LABEL_FIRST_ELEMENT)){
+
+                                }
+                            }
+                        }
+
+
                       telemetry.update();
                     }
                 }
@@ -165,7 +179,7 @@ public class TensorFlowObjectDetectionWebcam extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-       tfodParameters.minimumConfidence = 0.4;
+       tfodParameters.minimumConfidence = 0.6;
        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
