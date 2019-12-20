@@ -166,7 +166,7 @@ public class Teleop_11229 extends LinearOpMode {
 
             }
             //Drop cube on plate
-            else if (gamepad1.a) {
+            else if (gamepad2.a) {
                 rDrive1.setPower(0.4);
                 rDrive2.setPower(0.4);
                 lDrive1.setPower(0.3);
