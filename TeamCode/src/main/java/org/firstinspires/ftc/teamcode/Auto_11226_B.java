@@ -303,7 +303,8 @@ public class Auto_11226_B extends LinearOpMode {
         }
     }
 
-    private void case1(){
+    // For the closest placement of the skystone
+    private void caseSSP(){
         driveInches(-10);
         sleep(300);
         slideInches(8.75);
