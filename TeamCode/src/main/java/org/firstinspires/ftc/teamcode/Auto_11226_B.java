@@ -304,6 +304,22 @@ public class Auto_11226_B extends LinearOpMode {
         }
     }
 
+    private void deploy(){
+        ldrive1.setPower(-0.3);
+        ldrive2.setPower(-0.3);
+        rdrive1.setPower(-0.4);
+        rdrive2.setPower(-0.4);
+        collectLeft.setPosition(0.7);
+        collectRight.setPosition(0.7);
+        sleep(500);
+        ldrive1.setPower(0);
+        ldrive2.setPower(0);
+        rdrive1.setPower(0);
+        rdrive2.setPower(0);
+        collectLeft.setPosition(0);
+        collectRight.setPosition(0);
+    }
+
     // For the closest placement of the skystone
     private void caseSSP(){
         driveInches(-10);
@@ -313,6 +329,7 @@ public class Auto_11226_B extends LinearOpMode {
         double x = ldrive1.getCurrentPosition() / ticksPerInch;
         collect();
         double y = ldrive1.getCurrentPosition() / ticksPerInch - x;
+        sleep(300);
         driveInches(-y);
         sleep(300);
         slideInches(-8.75);
