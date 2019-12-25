@@ -215,15 +215,31 @@ public class TensorFlow extends LinearOpMode {
                           seeStone2 = -1;
 
                           if (seeSkystone == -1 && seeStone1 == -1 && seeStone2 == -1){
-                              for (Recognition object : updatedRecognitions){
-                                  if (object.getLabel().equals(LABEL_SECOND_ELEMENT)){
-                                      skyStoneX = object.getLeft();
-                                  }else if (object.getLabel().equals(LABEL_FIRST_ELEMENT)){
-                                      Stone1X = object.getLeft();
-                                  }else if (object.getLabel().equals(LABEL_FIRST_ELEMENT)){
-                                      Stone2X = object.getLeft();
-                                  }
+
+                              if (updatedRecognitions.get(0).equals(LABEL_SECOND_ELEMENT)){
+                                  skyStoneX = updatedRecognitions.get(0).getLeft();
+                              }else if (updatedRecognitions.get(0).equals(LABEL_FIRST_ELEMENT)){
+                                  Stone1X = updatedRecognitions.get(0).getLeft();
                               }
+
+
+                              if (updatedRecognitions.get(1).equals(LABEL_SECOND_ELEMENT)){
+                                  skyStoneX = updatedRecognitions.get(1).getLeft();
+
+                              }else if (Stone1X != 0){
+
+                                      Stone2X = updatedRecognitions.get(1).getLeft();
+                              }else if(Stone1X == 0){
+                                      Stone1X = updatedRecognitions.get(1).getLeft();
+                              }
+
+                              if (updatedRecognitions.get(2).equals(LABEL_SECOND_ELEMENT)){
+                                  skyStoneX = updatedRecognitions.get(2).getLeft();
+                              }else if (updatedRecognitions.get(2).equals(LABEL_FIRST_ELEMENT)){
+                                  Stone2X = updatedRecognitions.get(2).getLeft();
+                              }
+
+
                               if (skyStoneX < Stone1X && skyStoneX < Stone2X){
                                   skystonePostion = -1;
                               }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
@@ -232,8 +248,6 @@ public class TensorFlow extends LinearOpMode {
                                   skystonePostion = 0;
                               }
                               telemetry.addData("skyStone position",skystonePostion);
-                              telemetry.addData("Stone1X",Stone1X);
-                              telemetry.addData("Stone2X",Stone2X);
                           }
 
 

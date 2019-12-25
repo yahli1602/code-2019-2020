@@ -47,6 +47,7 @@ public class Auto_11226_B extends LinearOpMode {
     private double ticksPerInch = 1 / inchesPerTick;
     private double diameter = 18;
     private double setPoint;
+    private double incPerTile = 24;
 
     public void timer(long miliseconds) {
         long x = (long) elapsedTime.milliseconds();
