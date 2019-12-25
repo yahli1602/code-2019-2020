@@ -311,7 +311,13 @@ public class Auto_11226_B extends LinearOpMode {
         double x = ldrive1.getCurrentPosition() / ticksPerInch;
         collect();
         double y = ldrive1.getCurrentPosition() / ticksPerInch - x;
-        driveInches(y);
+        driveInches(-y);
+        sleep(300);
+        slideInches(-8.75);
+        sleep(300);
+        turnDeg(180);
+        sleep(300);
+        driveInches(96);
     }
 
 
