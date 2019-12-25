@@ -4,11 +4,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
 
 
 @TeleOp(name = "Teleop 11226", group = "Linear Opmode")
@@ -28,10 +29,12 @@ public class Teleop_11226 extends LinearOpMode {
     private Servo collectRight = null;
     private Servo collectLeft = null;
     private Servo push = null;
-    private Servo hold = null;
-    private Servo turnHold = null;
+    private CRServo hold = null;
+    private CRServo turnHold = null;
     //moving Foundation
     private Servo grabber = null;
+    private TouchSensor cubeIn = null;
+
     @Override
     //
     public void runOpMode() {
@@ -42,12 +45,12 @@ public class Teleop_11226 extends LinearOpMode {
         slide1 = hardwareMap.get(DcMotor.class, "slide1");
         slide2 = hardwareMap.get(DcMotor.class, "slide2");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        collectRight = hardwareMap.get(Servo.class, "collectRight");
-        collectLeft = hardwareMap.get(Servo.class, "collectLeft");
+        //collectRight = hardwareMap.get(Servo.class, "collectRight");
+        //collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         push = hardwareMap.get(Servo.class, "push");
-        hold = hardwareMap.get(Servo.class, "hold");
-        turnHold = hardwareMap.get(Servo.class, "turnHold");
-        grabber = hardwareMap.get(Servo.class, "grabber");
+        hold = hardwareMap.get(CRServo.class, "hold");
+        turnHold = hardwareMap.get(CRServo.class, "turnHold");
+        //grabber = hardwareMap.get(Servo.class, "grabber");
         waitForStart();
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
@@ -83,9 +86,7 @@ public class Teleop_11226 extends LinearOpMode {
                 lDrive1.setPower(-gamepad1.right_trigger);
                 lDrive2.setPower(-gamepad1.right_trigger);
 
-            }
-
-            else {
+            } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
                 lDrive1.setPower(0);
@@ -108,7 +109,7 @@ public class Teleop_11226 extends LinearOpMode {
                 elevator.setPower(0);
             }
 
-            //collect
+         /*   //collect
             if (gamepad2.right_trigger > 0) {
                 collectRight.setPosition(0.7);
                 collectLeft.setPosition(0.2);
@@ -119,35 +120,36 @@ public class Teleop_11226 extends LinearOpMode {
             } else {
                 collectRight.setPosition(0);
                 collectLeft.setPosition(0);
-            }
+            }*/
 
             //push cube in
-            if (gamepad2.x){
+            if (gamepad2.x) {
                 push.setPosition(180);
-            }
-            else{
+            } else {
                 push.setPosition(0);
             }
 
             //pinch
-            if(gamepad2.y){
-                if(pinch){
-                    hold.setPosition(60);
-                    pinch = true;
-                }
-                else{
-                    hold.setPosition(0);
-                    pinch = false;
-                }
+            if (gamepad2.y) {
+                hold.setPower(-1);
+            }
+            else{
+                hold.setPower(1);
             }
 
             //turn collection
-            if(gamepad2.dpad_right){
-                turnHold.setPosition(180);
+            if (gamepad2.dpad_right) {
+                turnHold.setPower(1);
+                sleep(500);
+                turnHold.setPower(0);
+
+            } else if (gamepad2.dpad_left) {
+                turnHold.setPower(-1);
+                sleep(500);
+                turnHold.setPower(0);
+
             }
-            else if(gamepad2.dpad_left){
-                turnHold.setPosition(0);
-            }
+
         }
     }
 }
