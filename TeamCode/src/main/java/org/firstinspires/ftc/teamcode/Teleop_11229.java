@@ -131,6 +131,7 @@ public class Teleop_11229 extends LinearOpMode {
             }
 
 
+
             //slide
             if (gamepad1.right_trigger > 0) {
                 slide.setPower(-gamepad1.right_trigger);
