@@ -220,18 +220,22 @@ public class Auto_11226_B extends LinearOpMode {
         lastPosition = setPoint;
 
         if (inches > 0) {
-            errorT = inches + setPoint;
+            errorT = inches;
             int x = 0;
             while (x == 0) {
-                if (errorT > setPoint && opModeIsActive()) {
+                if (errorT > 0 && opModeIsActive()) {
                     uT = ks * errorT;
 
-                    currentPosition = slide1.getCurrentPosition() / ticksPerInch;
+                    currentPosition = slide1.getCurrentPosition() / ticksPerInch - setPoint;
                     errorT -= (currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
                     slide1.setPower(-uT);
                     slide2.setPower(-uT);
+
+                    telemetry.addData("errorT", errorT);
+                    telemetry.addData("uT", uT);
+                    telemetry.update();
                 }
                 else{
                     x++;
@@ -240,13 +244,13 @@ public class Auto_11226_B extends LinearOpMode {
             slide1.setPower(0);
             slide2.setPower(0);
         } else {
-            errorT = -inches + setPoint;
+            errorT = -inches;
             int x = 0;
             while(x == 0) {
-                if (errorT > setPoint && opModeIsActive()) {
+                if (errorT > 0 && opModeIsActive()) {
                     uT = ks * errorT;
 
-                    currentPosition = Math.abs(slide1.getCurrentPosition()) / ticksPerInch;
+                    currentPosition = Math.abs(slide1.getCurrentPosition()) / ticksPerInch - setPoint;
                     errorT -= Math.abs(currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
@@ -453,9 +457,7 @@ public class Auto_11226_B extends LinearOpMode {
             //while(ldrive1.isBusy()){}
             //Elevator(10);
             while(h == 0) {
-                //driveInches(24);
-                //sleep(500);
-                turnDeg(180);
+                slideInches(48);
                 h++;
             }
             //Elevator(-4);
