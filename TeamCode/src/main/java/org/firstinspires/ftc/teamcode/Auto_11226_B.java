@@ -40,11 +40,12 @@ public class Auto_11226_B extends LinearOpMode {
     public DcMotor rdrive2 = null;
     public DcMotor ldrive1 = null;
     public DcMotor ldrive2 = null;
-    public DcMotor slide = null;
-    public DcMotor elevator = null;
+    public DcMotor slide1 = null;
+    public DcMotor slide2 = null;
+    /*public DcMotor elevator = null;
     private Servo collectRight = null;
     private Servo collectLeft = null;
-    private TouchSensor cubeIn = null;
+    private TouchSensor cubeIn = null;*/
 
     private double kp = 0.019;
     private double ks = 0.1;
@@ -179,7 +180,8 @@ public class Auto_11226_B extends LinearOpMode {
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            slide.setPower(0);
+            slide1.setPower(0);
+            slide2.setPower(0);
         } else {
             errorT = diameter * Math.PI * (-deg / 360) + setPoint;
             int x = 0;
@@ -207,13 +209,14 @@ public class Auto_11226_B extends LinearOpMode {
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            slide.setPower(0);
+            slide1.setPower(0);
+            slide2.setPower(0);
         }
     }
 
     public void slideInches(double inches) {
 
-        setPoint = slide.getCurrentPosition() / ticksPerInch;
+        setPoint = slide1.getCurrentPosition() / ticksPerInch;
         lastPosition = setPoint;
 
         if (inches > 0) {
@@ -223,17 +226,19 @@ public class Auto_11226_B extends LinearOpMode {
                 if (errorT > setPoint && opModeIsActive()) {
                     uT = ks * errorT;
 
-                    currentPosition = slide.getCurrentPosition() / ticksPerInch;
+                    currentPosition = slide1.getCurrentPosition() / ticksPerInch;
                     errorT -= (currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
-                    slide.setPower(-uT);
+                    slide1.setPower(-uT);
+                    slide2.setPower(-uT);
                 }
                 else{
                     x++;
                 }
             }
-            slide.setPower(0);
+            slide1.setPower(0);
+            slide2.setPower(0);
         } else {
             errorT = -inches + setPoint;
             int x = 0;
@@ -241,21 +246,22 @@ public class Auto_11226_B extends LinearOpMode {
                 if (errorT > setPoint && opModeIsActive()) {
                     uT = ks * errorT;
 
-                    currentPosition = Math.abs(slide.getCurrentPosition()) / ticksPerInch;
+                    currentPosition = Math.abs(slide1.getCurrentPosition()) / ticksPerInch;
                     errorT -= Math.abs(currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
-                    slide.setPower(uT);
+                    slide1.setPower(uT);
                 }
                 else{
                     x++;
                 }
             }
-            slide.setPower(0);
+            slide1.setPower(0);
+            slide2.setPower(0);
         }
     }
 
-    private void Elevator(double spins) {
+    /*private void Elevator(double spins) {
         telemetry.addData("", ks);
         telemetry.update();
         setPoint = elevator.getCurrentPosition();
@@ -272,7 +278,7 @@ public class Auto_11226_B extends LinearOpMode {
             elevator.setPower(0);
         }
         sleep(500);
-    }
+    }*/
 
     public void drivaBySpin(double spins){
         setPoint = ldrive1.getCurrentPosition() / ticksPerSpin;
@@ -328,7 +334,7 @@ public class Auto_11226_B extends LinearOpMode {
         }
     }
 
-    private void collect(){
+    /*private void collect(){
         while(!cubeIn.isPressed()){
             collectLeft.setPosition(0.2);
             collectRight.setPosition(0.2);
@@ -337,9 +343,9 @@ public class Auto_11226_B extends LinearOpMode {
             rdrive1.setPower(0.3);
             rdrive2.setPower(0.3);
         }
-    }
+    }*/
 
-    private void deploy(){
+    /*private void deploy(){
         ldrive1.setPower(-0.3);
         ldrive2.setPower(-0.3);
         rdrive1.setPower(-0.4);
@@ -353,11 +359,15 @@ public class Auto_11226_B extends LinearOpMode {
         rdrive2.setPower(0);
         collectLeft.setPosition(0);
         collectRight.setPosition(0);
-    }
+    }*/
 
     // For the closest placement of the skystone
     private void caseSSP(){
-        driveInches(-10);
+        slideInches(22);
+
+
+
+        /*driveInches(-10);
         sleep(300);
         slideInches(8.75);
         sleep(300);
@@ -371,7 +381,7 @@ public class Auto_11226_B extends LinearOpMode {
         sleep(300);
         turnDeg(180);
         sleep(300);
-        driveInches(96);
+        driveInches(96);*/
     }
 
 
@@ -381,42 +391,47 @@ public class Auto_11226_B extends LinearOpMode {
         rdrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
-        slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        slide1 = hardwareMap.get(DcMotor.class, "slide1");
+        slide2 = hardwareMap.get(DcMotor.class, "slide1");
+        /*elevator = hardwareMap.get(DcMotor.class, "elevator");
         collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
-        cubeIn = hardwareMap.get(TouchSensor.class, "cube in");
+        cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
 
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rdrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rdrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
         rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
         rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
         ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
         ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
-        slide.setDirection(DcMotorSimple.Direction.FORWARD);
-        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
+        slide1.setDirection(DcMotorSimple.Direction.FORWARD);
+        slide2.setDirection(DcMotorSimple.Direction.FORWARD);
+        /*elevator.setDirection(DcMotorSimple.Direction.FORWARD);
         collectRight.setDirection(Servo.Direction.REVERSE);
-        collectLeft.setDirection(Servo.Direction.FORWARD);
+        collectLeft.setDirection(Servo.Direction.FORWARD);*/
 
         int h = 0;
         while (opModeIsActive()) {
@@ -426,7 +441,7 @@ public class Auto_11226_B extends LinearOpMode {
             while(h == 0) {
                 //driveInches(24);
                 //sleep(500);
-                turnDeg(180);
+                caseSSP();
                 h++;
             }
             //Elevator(-4);
