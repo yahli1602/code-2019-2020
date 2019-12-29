@@ -69,7 +69,6 @@ hell = hardwareMap.get(CRServo.class, "1");
             hell.setPower(1);
             sleep(10000);
             hell.setPower(0);
-            // Setup a variable for each drive wheel to save power level for telemetry
 
 
             // Choose to drive using either Tank Mode, or POV Mode
