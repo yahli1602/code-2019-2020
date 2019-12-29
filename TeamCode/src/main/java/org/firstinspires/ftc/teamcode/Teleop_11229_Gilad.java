@@ -140,10 +140,10 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             telemetry.update();
 
             //collection
-            if (gamepad2.right_trigger > 0) {
+            if (gamepad2.right_trigger > 0.2) {
                 collectRight.setPosition(0.7);
                 collectLeft.setPosition(0.2);
-            } else if (gamepad2.left_trigger > 0) {
+            } else if (gamepad2.left_trigger > 0.2) {
                 collectLeft.setPosition(0.7);
                 collectRight.setPosition(0.2);
 

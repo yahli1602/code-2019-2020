@@ -40,7 +40,8 @@ public class Auto_11226_B extends LinearOpMode {
     public DcMotor rdrive2 = null;
     public DcMotor ldrive1 = null;
     public DcMotor ldrive2 = null;
-    public DcMotor slide = null;
+    public DcMotor slide1 = null;
+    public DcMotor slide2 = null;
     public DcMotor elevator = null;
     private Servo collectRight = null;
     private Servo collectLeft = null;
@@ -179,7 +180,8 @@ public class Auto_11226_B extends LinearOpMode {
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            slide.setPower(0);
+            slide1.setPower(0);
+            slide2.setPower(0);
         } else {
             errorT = diameter * Math.PI * (-deg / 360) + setPoint;
             int x = 0;
@@ -207,13 +209,14 @@ public class Auto_11226_B extends LinearOpMode {
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            slide.setPower(0);
+            slide1.setPower(0);
+            slide2.setPower(0);
         }
     }
 
     public void slideInches(double inches) {
 
-        setPoint = slide.getCurrentPosition() / ticksPerInch;
+        setPoint = slide1.getCurrentPosition() / ticksPerInch;
         lastPosition = setPoint;
 
         if (inches > 0) {
@@ -223,17 +226,19 @@ public class Auto_11226_B extends LinearOpMode {
                 if (errorT > setPoint && opModeIsActive()) {
                     uT = ks * errorT;
 
-                    currentPosition = slide.getCurrentPosition() / ticksPerInch;
+                    currentPosition = slide1.getCurrentPosition() / ticksPerInch;
                     errorT -= (currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
-                    slide.setPower(-uT);
+                    slide1.setPower(-uT);
+                    slide2.setPower(-uT);
                 }
                 else{
                     x++;
                 }
             }
-            slide.setPower(0);
+            slide1.setPower(0);
+            slide2.setPower(0);
         } else {
             errorT = -inches + setPoint;
             int x = 0;
@@ -241,17 +246,19 @@ public class Auto_11226_B extends LinearOpMode {
                 if (errorT > setPoint && opModeIsActive()) {
                     uT = ks * errorT;
 
-                    currentPosition = Math.abs(slide.getCurrentPosition()) / ticksPerInch;
+                    currentPosition = Math.abs(slide1.getCurrentPosition()) / ticksPerInch;
                     errorT -= Math.abs(currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
-                    slide.setPower(uT);
+                    slide1.setPower(uT);
+                    slide2.setPower(uT);
                 }
                 else{
                     x++;
                 }
             }
-            slide.setPower(0);
+            slide1.setPower(0);
+            slide2.setPower(0);
         }
     }
 
@@ -357,9 +364,16 @@ public class Auto_11226_B extends LinearOpMode {
 
     // For the closest placement of the skystone
     private void caseSSP(){
-        driveInches(-10);
+        /*switch (skystonePostion) {
+            case 1:
+                driveInches(-14);
+            case 2:
+                driveInches(-22);
+            case 3:
+                driveInches(-30);
+        }*/
         sleep(300);
-        slideInches(8.75);
+        slideInches(31.75);
         sleep(300);
         double x = ldrive1.getCurrentPosition() / ticksPerInch;
         collect();
@@ -371,9 +385,19 @@ public class Auto_11226_B extends LinearOpMode {
         sleep(300);
         turnDeg(180);
         sleep(300);
-        driveInches(96);
+        switch (skystonePostion) {
+            case 1:
+                driveInches(88);
+            case 2:
+                driveInches(80);
+            case 3:
+                driveInches(72);
+        }
+        sleep(300);
+        deploy();
+        sleep(300);
+        driveInches(-48);
     }
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -381,7 +405,8 @@ public class Auto_11226_B extends LinearOpMode {
         rdrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
-        slide = hardwareMap.get(DcMotor.class, "slide");
+        slide1 = hardwareMap.get(DcMotor.class, "slide1");
+        slide2 = hardwareMap.get(DcMotor.class, "slide2");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
         collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
@@ -391,21 +416,24 @@ public class Auto_11226_B extends LinearOpMode {
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rdrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rdrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
@@ -413,7 +441,8 @@ public class Auto_11226_B extends LinearOpMode {
         rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
         ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
         ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
-        slide.setDirection(DcMotorSimple.Direction.FORWARD);
+        slide1.setDirection(DcMotorSimple.Direction.FORWARD);
+        slide2.setDirection(DcMotorSimple.Direction.FORWARD);
         elevator.setDirection(DcMotorSimple.Direction.FORWARD);
         collectRight.setDirection(Servo.Direction.REVERSE);
         collectLeft.setDirection(Servo.Direction.FORWARD);

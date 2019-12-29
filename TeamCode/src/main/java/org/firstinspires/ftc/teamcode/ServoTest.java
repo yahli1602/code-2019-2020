@@ -54,35 +54,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class ServoTest extends LinearOpMode {
 
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
-    private CRServo Servo1 = null;
-    private boolean servoWork = false;
-
+  private CRServo hell = null;
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        Servo1  = hardwareMap.get(CRServo.class, "servo1");
-
-
-
-
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-
-
+hell = hardwareMap.get(CRServo.class, "1");
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        runtime.reset();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            hell.setPower(1);
+            sleep(10000);
+            hell.setPower(0);
             // Setup a variable for each drive wheel to save power level for telemetry
 
 
@@ -100,17 +86,6 @@ public class ServoTest extends LinearOpMode {
 
             // Send calculated power to wheels
 
-            if (gamepad1.a && !servoWork) {
-                Servo1.setPower(1);
-                servoWork = true;
-
-            }
-
-
-            if (gamepad1.a && servoWork){
-                Servo1.setPower(-1);
-                servoWork = false;
-            }
 
 
 

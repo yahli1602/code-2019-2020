@@ -30,26 +30,26 @@ public class Teleop_11226 extends LinearOpMode {
     private Servo collectLeft = null;
     private Servo push = null;
     private CRServo hold = null;
-    private CRServo turnHold = null;
+    private Servo turnHold = null;
     //moving Foundation
     private Servo grabber = null;
     private TouchSensor cubeIn = null;
 
     @Override
     //
-    public void runOpMode() {
-        rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
+    public void runOpMode()  throws InterruptedException{
         rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
+        rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide1");
         slide2 = hardwareMap.get(DcMotor.class, "slide2");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        //collectRight = hardwareMap.get(Servo.class, "collectRight");
-        //collectLeft = hardwareMap.get(Servo.class, "collectLeft");
+        collectRight = hardwareMap.get(Servo.class, "collectRight");
+        collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         push = hardwareMap.get(Servo.class, "push");
         hold = hardwareMap.get(CRServo.class, "hold");
-        turnHold = hardwareMap.get(CRServo.class, "turnHold");
+        turnHold = hardwareMap.get(Servo.class, "turnHold");
         //grabber = hardwareMap.get(Servo.class, "grabber");
         waitForStart();
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
@@ -68,6 +68,7 @@ public class Teleop_11226 extends LinearOpMode {
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         while (opModeIsActive()) {
+
             //drive
             if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                 rDrive1.setPower(gamepad1.left_stick_y);
@@ -109,7 +110,7 @@ public class Teleop_11226 extends LinearOpMode {
                 elevator.setPower(0);
             }
 
-         /*   //collect
+            //collect
             if (gamepad2.right_trigger > 0) {
                 collectRight.setPosition(0.7);
                 collectLeft.setPosition(0.2);
@@ -120,36 +121,43 @@ public class Teleop_11226 extends LinearOpMode {
             } else {
                 collectRight.setPosition(0);
                 collectLeft.setPosition(0);
-            }*/
+            }
+
 
             //push cube in
             if (gamepad2.x) {
-                push.setPosition(180);
-            } else {
-                push.setPosition(0);
+                if (!pushCube) {
+                    push.setPosition(180);
+                    pushCube = true;
+                } else {
+                    push.setPosition(0);
+                    pushCube = false;
+                }
             }
 
             //pinch
             if (gamepad2.y) {
-                hold.setPower(-1);
-            }
-            else{
-                hold.setPower(1);
+                if (!pinch) {
+                    hold.setPower(-1);
+                    sleep(300);
+                    pinch = true;
+                } else {
+                    hold.setPower(1);
+                    sleep(300);
+                    pinch = false;
+                }
             }
 
             //turn collection
-            if (gamepad2.dpad_right) {
-                turnHold.setPower(1);
-                sleep(500);
-                turnHold.setPower(0);
+           if (gamepad2.dpad_right){
+               turnHold.setPosition(1000);
+           }
+           else if (gamepad2.dpad_left){
+               turnHold.setPosition(0);
+           }
 
-            } else if (gamepad2.dpad_left) {
-                turnHold.setPower(-1);
-                sleep(500);
-                turnHold.setPower(0);
-
-            }
 
         }
+
     }
 }
