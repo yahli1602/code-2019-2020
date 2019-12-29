@@ -54,7 +54,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
     //motors setup
 
     //driving motors
-    private DcMotor rDrive1 = null;
+    /*private DcMotor rDrive1 = null;
     private DcMotor rDrive2 = null;
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
@@ -69,7 +69,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
     //grabbing the build plate
     private Servo grabber1 = null;
     private Servo grabber2 = null;
-    private TouchSensor stoneIn = null;
+    private TouchSensor stoneIn = null;*/
 
 
 
@@ -98,7 +98,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
+        /*rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
         rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
@@ -109,7 +109,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         grabber1 = hardwareMap.get(Servo.class, "grabber1");
         grabber2 = hardwareMap.get(Servo.class, "grabber2");
-        stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
+        stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");*/
 
 
         initVuforia();
@@ -132,7 +132,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
 
         waitForStart();
 
-        rDrive1.setDirection(DcMotor.Direction.REVERSE);
+        /*rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
         lDrive1.setDirection(DcMotor.Direction.FORWARD);
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
@@ -161,7 +161,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
         lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
 
 
         if (opModeIsActive()) {
@@ -301,7 +301,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.5;
+        tfodParameters.minimumConfidence = 0.57;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
