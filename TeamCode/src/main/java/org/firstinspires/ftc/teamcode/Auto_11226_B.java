@@ -221,7 +221,7 @@ public class Auto_11226_B extends LinearOpMode {
         lastPosition = 0;
 
         if (inches > 0) {
-            errorT = inches + 4.5;
+            errorT = inches + 4.25;
                 while(errorT > 0 && opModeIsActive()) {
                     uT = ks * errorT;
 
@@ -240,7 +240,7 @@ public class Auto_11226_B extends LinearOpMode {
             slide1.setPower(0);
             slide2.setPower(0);
         } else {
-            errorT = -inches + 4.5;
+            errorT = -inches + 4.25;
             int x = 0;
             while(x == 0) {
                 if (errorT > 0 && opModeIsActive() && uT > 0) {
