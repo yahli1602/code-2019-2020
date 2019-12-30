@@ -43,12 +43,12 @@ public class Auto_11226_B extends LinearOpMode {
     public DcMotor slide1 = null;
     public DcMotor slide2 = null;
     public DcMotor elevator = null;
-    //private Servo collectRight = null;
-    //private Servo collectLeft = null;
-
+    /*private Servo collectRight = null;
+    private Servo collectLeft = null;
+    private TouchSensor cubeIn = null;*/
 
     private double kp = 0.019;
-    private double ks = 0.5;
+    private double ks = 0.1;
     private double uT = 1;
     private double errorT;
     private double currentPosition;
@@ -221,7 +221,7 @@ public class Auto_11226_B extends LinearOpMode {
         lastPosition = 0;
 
         if (inches > 0) {
-            errorT = inches;
+            errorT = inches + 4.5;
                 while(errorT > 0 && opModeIsActive()) {
                     uT = ks * errorT;
 
@@ -236,15 +236,14 @@ public class Auto_11226_B extends LinearOpMode {
                     telemetry.addData("uT", uT);
 
                     telemetry.update();
-
                 }
             slide1.setPower(0);
             slide2.setPower(0);
         } else {
-            errorT = -inches;
+            errorT = -inches + 4.5;
             int x = 0;
             while(x == 0) {
-                if (errorT > 0 && opModeIsActive()) {
+                if (errorT > 0 && opModeIsActive() && uT > 0) {
                     uT = ks * errorT;
 
                     currentPosition = Math.abs(slide1.getCurrentPosition()) / ticksPerInch - setPoint;
@@ -336,15 +335,15 @@ public class Auto_11226_B extends LinearOpMode {
         }
     }
 
-    private void collect(){
-        /*while(!cubeIn.isPressed()){
+    /*private void collect(){
+        while(!cubeIn.isPressed()){
             collectLeft.setPosition(0.2);
             collectRight.setPosition(0.2);
             ldrive1.setPower(0.3);
             ldrive2.setPower(0.3);
             rdrive1.setPower(0.3);
             rdrive2.setPower(0.3);
-        }*/
+        }
     }
 
     private void deploy(){
@@ -359,9 +358,9 @@ public class Auto_11226_B extends LinearOpMode {
         ldrive2.setPower(0);
         rdrive1.setPower(0);
         rdrive2.setPower(0);
-        //collectLeft.setPosition(0);
-        //collectRight.setPosition(0);
-    }
+        collectLeft.setPosition(0);
+        collectRight.setPosition(0);
+    }*/
 
     // For the closest placement of the skystone
     private void caseSSP(){
@@ -377,7 +376,7 @@ public class Auto_11226_B extends LinearOpMode {
         slideInches(31.75);
         sleep(300);
         double x = ldrive1.getCurrentPosition() / ticksPerInch;
-        collect();
+        //collect();
         double y = ldrive1.getCurrentPosition() / ticksPerInch - x;
         sleep(300);
         driveInches(-y);
@@ -395,7 +394,7 @@ public class Auto_11226_B extends LinearOpMode {
                 driveInches(72);
         }
         sleep(300);
-        deploy();
+        //deploy();
         sleep(300);
         driveInches(-48);
     }
@@ -410,7 +409,8 @@ public class Auto_11226_B extends LinearOpMode {
         slide2 = hardwareMap.get(DcMotor.class, "slide2");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");
-        collectLeft = hardwareMap.get(Servo.class, "collect left");*/
+        collectLeft = hardwareMap.get(Servo.class, "collect left");
+        cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
 
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
