@@ -48,7 +48,7 @@ public class Auto_11226_B extends LinearOpMode {
 
 
     private double kp = 0.019;
-    private double ks = 0.1;
+    private double ks = 0.5;
     private double uT = 1;
     private double errorT;
     private double currentPosition;
@@ -226,7 +226,7 @@ public class Auto_11226_B extends LinearOpMode {
                     uT = ks * errorT;
 
                     currentPosition = slide1.getCurrentPosition() / ticksPerInch - setPoint;
-                    errorT -= (inches - currentPosition);
+                    errorT -= (currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
                     slide1.setPower(uT);
@@ -234,6 +234,7 @@ public class Auto_11226_B extends LinearOpMode {
 
                     telemetry.addData("errorT", errorT);
                     telemetry.addData("uT", uT);
+
                     telemetry.update();
 
                 }
@@ -247,7 +248,7 @@ public class Auto_11226_B extends LinearOpMode {
                     uT = ks * errorT;
 
                     currentPosition = Math.abs(slide1.getCurrentPosition()) / ticksPerInch - setPoint;
-                    errorT -= Math.abs(currentPosition - lastPosition);
+                    errorT -= Math.abs(currentPosition -lastPosition);
                     lastPosition = currentPosition;
 
                     slide1.setPower(-uT);
@@ -451,7 +452,7 @@ public class Auto_11226_B extends LinearOpMode {
 
             //while(ldrive1.isBusy()){}
             //Elevator(10);
-            sleep(100);
+            sleep(300);
             slideInches(-48);
             h++;
             telemetry.addData("h:", h);

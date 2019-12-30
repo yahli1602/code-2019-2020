@@ -118,13 +118,13 @@ public class Teleop_11226 extends LinearOpMode {
                 lDrive2.setPower(0);
             }
 
-            if (gamepad1.right_stick_x > 0 || gamepad1.right_stick_x < 0  && Fast) {
+            if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2  && Fast) {
                 slide1.setPower(gamepad1.right_stick_x);
                 slide2.setPower(gamepad1.right_stick_x);
-            }else if (gamepad1.right_stick_x > 0 && !Fast) {
+            }else if (gamepad1.right_stick_x > 0.2 && !Fast) {
                 slide1.setPower(0.5);
                 slide2.setPower(0.5);
-            }else if (gamepad1.right_stick_x < 0  && !Fast) {
+            }else if (gamepad1.right_stick_x < 0.2  && !Fast) {
                 slide1.setPower(-0.5);
                 slide2.setPower(-0.5);
             } else {
