@@ -43,9 +43,9 @@ public class Auto_11226_B extends LinearOpMode {
     public DcMotor slide1 = null;
     public DcMotor slide2 = null;
     public DcMotor elevator = null;
-    private Servo collectRight = null;
-    private Servo collectLeft = null;
-    private TouchSensor cubeIn = null;
+    //private Servo collectRight = null;
+    //private Servo collectLeft = null;
+
 
     private double kp = 0.019;
     private double ks = 0.1;
@@ -66,6 +66,7 @@ public class Auto_11226_B extends LinearOpMode {
     private float skyStoneX = 0;
     private float Stone1X = 0;
     private float Stone2X = 0;
+    int h = 0;
     int skystonePostion;
     int Stone1Postion;
     int Stone2Postion;
@@ -217,30 +218,25 @@ public class Auto_11226_B extends LinearOpMode {
     public void slideInches(double inches) {
 
         setPoint = slide1.getCurrentPosition() / ticksPerInch;
-        lastPosition = setPoint;
+        lastPosition = 0;
 
         if (inches > 0) {
             errorT = inches;
-            int x = 0;
-            while (x == 0) {
-                if (errorT > 0 && opModeIsActive()) {
+                while(errorT > 0 && opModeIsActive()) {
                     uT = ks * errorT;
 
                     currentPosition = slide1.getCurrentPosition() / ticksPerInch - setPoint;
-                    errorT -= (currentPosition - lastPosition);
+                    errorT -= (inches - currentPosition);
                     lastPosition = currentPosition;
 
-                    slide1.setPower(-uT);
-                    slide2.setPower(-uT);
+                    slide1.setPower(uT);
+                    slide2.setPower(uT);
 
                     telemetry.addData("errorT", errorT);
                     telemetry.addData("uT", uT);
                     telemetry.update();
+
                 }
-                else{
-                    x++;
-                }
-            }
             slide1.setPower(0);
             slide2.setPower(0);
         } else {
@@ -254,8 +250,8 @@ public class Auto_11226_B extends LinearOpMode {
                     errorT -= Math.abs(currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
-                    slide1.setPower(uT);
-                    slide2.setPower(uT);
+                    slide1.setPower(-uT);
+                    slide2.setPower(-uT);
                 }
                 else{
                     x++;
@@ -340,14 +336,14 @@ public class Auto_11226_B extends LinearOpMode {
     }
 
     private void collect(){
-        while(!cubeIn.isPressed()){
+        /*while(!cubeIn.isPressed()){
             collectLeft.setPosition(0.2);
             collectRight.setPosition(0.2);
             ldrive1.setPower(0.3);
             ldrive2.setPower(0.3);
             rdrive1.setPower(0.3);
             rdrive2.setPower(0.3);
-        }
+        }*/
     }
 
     private void deploy(){
@@ -355,15 +351,15 @@ public class Auto_11226_B extends LinearOpMode {
         ldrive2.setPower(-0.3);
         rdrive1.setPower(-0.4);
         rdrive2.setPower(-0.4);
-        collectLeft.setPosition(0.7);
-        collectRight.setPosition(0.7);
+        //collectLeft.setPosition(0.7);
+        //collectRight.setPosition(0.7);
         sleep(500);
         ldrive1.setPower(0);
         ldrive2.setPower(0);
         rdrive1.setPower(0);
         rdrive2.setPower(0);
-        collectLeft.setPosition(0);
-        collectRight.setPosition(0);
+        //collectLeft.setPosition(0);
+        //collectRight.setPosition(0);
     }
 
     // For the closest placement of the skystone
@@ -412,9 +408,8 @@ public class Auto_11226_B extends LinearOpMode {
         slide1 = hardwareMap.get(DcMotor.class, "slide1");
         slide2 = hardwareMap.get(DcMotor.class, "slide2");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        collectRight = hardwareMap.get(Servo.class, "collect right");
-        collectLeft = hardwareMap.get(Servo.class, "collect left");
-        cubeIn = hardwareMap.get(TouchSensor.class, "cube in");
+        /*collectRight = hardwareMap.get(Servo.class, "collect right");
+        collectLeft = hardwareMap.get(Servo.class, "collect left");*/
 
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -448,18 +443,20 @@ public class Auto_11226_B extends LinearOpMode {
         slide1.setDirection(DcMotorSimple.Direction.FORWARD);
         slide2.setDirection(DcMotorSimple.Direction.FORWARD);
         elevator.setDirection(DcMotorSimple.Direction.FORWARD);
-        collectRight.setDirection(Servo.Direction.REVERSE);
-        collectLeft.setDirection(Servo.Direction.FORWARD);
+        /*collectRight.setDirection(Servo.Direction.REVERSE);
+        collectLeft.setDirection(Servo.Direction.FORWARD);*/
 
-        int h = 0;
-        while (opModeIsActive()) {
+
+        while (opModeIsActive() && h ==0) {
 
             //while(ldrive1.isBusy()){}
             //Elevator(10);
-            while(h == 0) {
-                slideInches(48);
-                h++;
-            }
+            sleep(100);
+            slideInches(-48);
+            h++;
+            telemetry.addData("h:", h);
+            telemetry.update();
+
             //Elevator(-4);
             //telemetry.addData("", 4);
             //telemetry.update();

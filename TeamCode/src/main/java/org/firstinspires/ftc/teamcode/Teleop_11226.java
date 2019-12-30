@@ -34,10 +34,11 @@ public class Teleop_11226 extends LinearOpMode {
     //moving Foundation
     private Servo grabber = null;
     private TouchSensor cubeIn = null;
+    private boolean Fast = true;
 
     @Override
     //
-    public void runOpMode()  throws InterruptedException{
+    public void runOpMode() throws InterruptedException {
         rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
         rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
@@ -45,8 +46,8 @@ public class Teleop_11226 extends LinearOpMode {
         slide1 = hardwareMap.get(DcMotor.class, "slide1");
         slide2 = hardwareMap.get(DcMotor.class, "slide2");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        collectRight = hardwareMap.get(Servo.class, "collectRight");
-        collectLeft = hardwareMap.get(Servo.class, "collectLeft");
+        //collectRight = hardwareMap.get(Servo.class, "collectRight");
+        //collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         push = hardwareMap.get(Servo.class, "push");
         hold = hardwareMap.get(CRServo.class, "hold");
         turnHold = hardwareMap.get(Servo.class, "turnHold");
@@ -70,23 +71,46 @@ public class Teleop_11226 extends LinearOpMode {
         while (opModeIsActive()) {
 
             //drive
-            if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+            if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2 && Fast) {
                 rDrive1.setPower(gamepad1.left_stick_y);
                 rDrive2.setPower(gamepad1.left_stick_y);
                 lDrive1.setPower(gamepad1.left_stick_y);
                 lDrive2.setPower(gamepad1.left_stick_y);
-            } else if (gamepad1.left_trigger > 0.2) {
-                rDrive1.setPower(-gamepad1.left_trigger);
-                rDrive2.setPower(-gamepad1.left_trigger);
-                lDrive1.setPower(gamepad1.left_trigger);
-                lDrive2.setPower(gamepad1.left_trigger);
+            } else if (gamepad1.left_trigger > 0.2 && Fast) {
+                rDrive1.setPower(gamepad1.left_trigger);
+                rDrive2.setPower(gamepad1.left_trigger);
+                lDrive1.setPower(-gamepad1.left_trigger);
+                lDrive2.setPower(-gamepad1.left_trigger);
 
-            } else if (gamepad1.right_trigger > 0.2) {
-                rDrive1.setPower(gamepad1.right_trigger);
-                rDrive2.setPower(gamepad1.right_trigger);
-                lDrive1.setPower(-gamepad1.right_trigger);
-                lDrive2.setPower(-gamepad1.right_trigger);
+            } else if (gamepad1.right_trigger > 0.2 && Fast) {
+                rDrive1.setPower(-gamepad1.right_trigger);
+                rDrive2.setPower(-gamepad1.right_trigger);
+                lDrive1.setPower(gamepad1.right_trigger);
+                lDrive2.setPower(gamepad1.right_trigger);
 
+
+            }else if (gamepad1.left_stick_y > 0.2 && !Fast) {
+                rDrive1.setPower(0.5);
+                rDrive2.setPower(0.5);
+                lDrive1.setPower(0.5);
+                lDrive2.setPower(0.5);
+            }else if(gamepad1.left_stick_y < 0.2 && !Fast){
+                rDrive1.setPower(-0.5);
+                rDrive2.setPower(-0.5);
+                lDrive1.setPower(-0.5);
+                lDrive2.setPower(-0.5);
+
+            } else if (gamepad1.left_trigger > 0.2 && !Fast) {
+                rDrive1.setPower(0.5);
+                rDrive2.setPower(0.5);
+                lDrive1.setPower(-0.5);
+                lDrive2.setPower(-0.5);
+
+            } else if (gamepad1.right_trigger > 0.2 && !Fast) {
+                rDrive1.setPower(-0.5);
+                rDrive2.setPower(-0.5);
+                lDrive1.setPower(0.5);
+                lDrive2.setPower(0.5);
             } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
@@ -94,9 +118,15 @@ public class Teleop_11226 extends LinearOpMode {
                 lDrive2.setPower(0);
             }
 
-            if (gamepad1.right_stick_x > 0 || gamepad1.right_stick_x < 0) {
-                slide1.setPower(-gamepad1.right_stick_x);
-                slide2.setPower(-gamepad1.right_stick_x);
+            if (gamepad1.right_stick_x > 0 || gamepad1.right_stick_x < 0  && Fast) {
+                slide1.setPower(gamepad1.right_stick_x);
+                slide2.setPower(gamepad1.right_stick_x);
+            }else if (gamepad1.right_stick_x > 0 && !Fast) {
+                slide1.setPower(0.5);
+                slide2.setPower(0.5);
+            }else if (gamepad1.right_stick_x < 0  && !Fast) {
+                slide1.setPower(-0.5);
+                slide2.setPower(-0.5);
             } else {
                 slide1.setPower(0);
                 slide2.setPower(0);
@@ -110,7 +140,7 @@ public class Teleop_11226 extends LinearOpMode {
                 elevator.setPower(0);
             }
 
-            //collect
+        /*    //collect
             if (gamepad2.right_trigger > 0) {
                 collectRight.setPosition(0.7);
                 collectLeft.setPosition(0.2);
@@ -121,6 +151,13 @@ public class Teleop_11226 extends LinearOpMode {
             } else {
                 collectRight.setPosition(0);
                 collectLeft.setPosition(0);
+            }*/
+
+            if (gamepad1.a)  {
+                Fast = true;
+            }
+            if (gamepad1.b){
+                Fast = false;
             }
 
 
@@ -149,12 +186,11 @@ public class Teleop_11226 extends LinearOpMode {
             }
 
             //turn collection
-           if (gamepad2.dpad_right){
-               turnHold.setPosition(1000);
-           }
-           else if (gamepad2.dpad_left){
-               turnHold.setPosition(0);
-           }
+            if (gamepad2.dpad_right) {
+                turnHold.setPosition(1000);
+            } else if (gamepad2.dpad_left) {
+                turnHold.setPosition(0);
+            }
 
 
         }
