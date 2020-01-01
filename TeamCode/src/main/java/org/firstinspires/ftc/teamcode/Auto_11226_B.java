@@ -49,7 +49,7 @@ public class Auto_11226_B extends LinearOpMode {
     public DcMotor slide1 = null;
     public DcMotor slide2 = null;
     public DcMotor elevator = null;
-    private CRServo hold = null;
+    public CRServo hold = null;
     /*private Servo collectRight = null;
     private Servo collectLeft = null;
     private TouchSensor cubeIn = null;*/
@@ -427,9 +427,8 @@ public class Auto_11226_B extends LinearOpMode {
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide1");
         slide2 = hardwareMap.get(DcMotor.class, "slide2");
-        hold = hardwareMap.get(CRServo.class,"hold");
-
         elevator = hardwareMap.get(DcMotor.class, "elevator");
+        hold = hardwareMap.get(CRServo.class, "hold");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
         cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
@@ -485,13 +484,14 @@ public class Auto_11226_B extends LinearOpMode {
         }
 
         waitForStart();
-        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
-        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+        rdrive1.setDirection(DcMotorSimple.Direction.REVERSE);
+        rdrive2.setDirection(DcMotorSimple.Direction.REVERSE);
+        ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
+        ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
         slide1.setDirection(DcMotorSimple.Direction.FORWARD);
         slide2.setDirection(DcMotorSimple.Direction.FORWARD);
         elevator.setDirection(DcMotorSimple.Direction.FORWARD);
+        hold.setDirection(DcMotorSimple.Direction.FORWARD);
         /*collectRight.setDirection(Servo.Direction.REVERSE);
         collectLeft.setDirection(Servo.Direction.FORWARD);*/
 
@@ -502,17 +502,69 @@ public class Auto_11226_B extends LinearOpMode {
         while (opModeIsActive() && h ==0) {
 
             //while(ldrive1.isBusy()){}
-            elevator.setPower(-0.7);
-            sleep(400);
-
-            driveInches(-44);
-            elevator.setPower(0.7);
-            sleep(400);
+            elevator.setPower(-1);
+            slide1.setPower(1);
+            slide2.setPower(1);
+            sleep(300);
+            slide1.setPower(0);
+            slide2.setPower(0);
+            sleep(700);
             elevator.setPower(0);
-
-
-
-
+            ldrive1.setPower(0.7);
+            ldrive2.setPower(0.7);
+            rdrive1.setPower(0.5);
+            rdrive2.setPower(0.5);
+            sleep(1000);
+            elevator.setPower(1);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            sleep(1000);
+            elevator.setPower(0);
+            sleep(500);
+            ldrive1.setPower(-0.48);
+            ldrive2.setPower(-0.48);
+            rdrive1.setPower(-0.3);
+            rdrive2.setPower(-0.3);
+            sleep(1000);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            sleep(300);
+            ldrive1.setPower(-0.7);
+            ldrive2.setPower(-0.7);
+            rdrive1.setPower(0.5);
+            rdrive2.setPower(0.5);
+            sleep(1500);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            sleep(300);
+            ldrive1.setPower(0.7);
+            ldrive2.setPower(0.7);
+            rdrive1.setPower(0.5);
+            rdrive2.setPower(0.5);
+            sleep(1000);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            elevator.setPower(-1);
+            sleep(500);
+            ldrive1.setPower(-0.7);
+            ldrive2.setPower(-0.7);
+            rdrive1.setPower(-0.5);
+            rdrive2.setPower(-0.5);
+            sleep(500);
+            hold.setPower(0);
+            sleep(1500);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
 
 
             h++;
