@@ -490,24 +490,28 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
             slide1.setPower(0);
             slide2.setPower(0);
             sleep(700);
-            ldrive1.setPower(0.3);
-            ldrive2.setPower(0.3);
+            ldrive1.setPower(0.35);
+            ldrive2.setPower(0.35);
             rdrive1.setPower(0.6);
             rdrive2.setPower(0.6);
-            sleep(1000);
+            sleep(1150);
             elevator.setPower(1);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            sleep(1250);
+            sleep(1150);
             elevator.setPower(0);
-            sleep(500);
+            sleep(200);
             ldrive1.setPower(-0.3);
             ldrive2.setPower(-0.3);
             rdrive1.setPower(-0.7);
             rdrive2.setPower(-0.7);
-            sleep(1000);
+            slide1.setPower(0.4);
+            slide2.setPower(0.4);
+            sleep(800);
+            slide1.setPower(0);
+            slide2.setPower(0);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
@@ -517,7 +521,7 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
             ldrive2.setPower(0.7);
             rdrive1.setPower(-0.9);
             rdrive2.setPower(-0.9);
-            sleep(1000);
+            sleep(800);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
@@ -547,7 +551,11 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
             rdrive1.setPower(0);
             rdrive2.setPower(0);
             elevator.setPower(0);
-
+            slide1.setPower(-1);
+            slide2.setPower(-1);
+            sleep(500);
+            slide1.setPower(0);
+            slide2.setPower(0);
 
             h++;
             telemetry.addData("h:", h);
