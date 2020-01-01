@@ -1,24 +1,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Path;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.Range;
-
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -29,16 +18,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.robotcore.internal.android.dex.EncodedValueReader;
 
 import java.util.List;
 
-@Autonomous(name = "Auto 11226", group = "Autonomous")
-public class Auto_11226_B extends LinearOpMode {
+@Autonomous(name = "Auto 11226 Blue Build Zone", group = "Autonomous")
+public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
-
 
 
     ElapsedTime elapsedTime = new ElapsedTime();
@@ -72,9 +59,9 @@ public class Auto_11226_B extends LinearOpMode {
 
     BNO055IMU imu;
     Orientation lastAngles = new Orientation();
-    double                  globalAngle, power = .30, correction, rotation;
-    boolean                 aButton, bButton, touched;
-    public PIDController           pidRotate, pidDrive;
+    double globalAngle, power = .30, correction, rotation;
+    boolean aButton, bButton, touched;
+    public PIDController pidRotate, pidDrive;
 
 
     private float skyStoneX = 0;
@@ -102,7 +89,8 @@ public class Auto_11226_B extends LinearOpMode {
 
     public void timer(long miliseconds) {
         long x = (long) elapsedTime.milliseconds();
-        while (x < miliseconds + (long) elapsedTime.milliseconds() && opModeIsActive()) {}
+        while (x < miliseconds + (long) elapsedTime.milliseconds() && opModeIsActive()) {
+        }
     }
 
     public void driveInches(double inches) {
@@ -113,11 +101,10 @@ public class Auto_11226_B extends LinearOpMode {
         if (inches > 0) {
             errorT = inches + setPoint;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
 
 
-
-                if(errorT > 0 && opModeIsActive()) {
+                if (errorT > 0 && opModeIsActive()) {
                     uT = kp * errorT;
                     currentPosition = Math.abs(ldrive2.getCurrentPosition()) / ticksPerInch;
                     errorT -= currentPosition - lastPosition;
@@ -132,7 +119,7 @@ public class Auto_11226_B extends LinearOpMode {
                     telemetry.addData("start", setPoint);
                     telemetry.addData("error", errorT);
                     telemetry.update();
-                }else {
+                } else {
                     ldrive1.setPower(0);
                     ldrive2.setPower(0);
                     rdrive1.setPower(0);
@@ -146,7 +133,7 @@ public class Auto_11226_B extends LinearOpMode {
         } else {
             errorT = -inches + setPoint;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > 0 && opModeIsActive()) {
                     uT = kp * errorT;
 
@@ -158,8 +145,7 @@ public class Auto_11226_B extends LinearOpMode {
                     ldrive2.setPower(uT);
                     rdrive1.setPower(uT);
                     rdrive2.setPower(uT);
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -177,7 +163,7 @@ public class Auto_11226_B extends LinearOpMode {
         if (deg > 0) {
             errorT = diameter * Math.PI * (deg / 360);
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > 0 && opModeIsActive()) {
 
                     currentPosition = ldrive1.getCurrentPosition() / ticksPerInch - setPoint;
@@ -192,8 +178,7 @@ public class Auto_11226_B extends LinearOpMode {
                     rdrive2.setPower(-uT);
                     telemetry.addData("", uT);
                     telemetry.update();
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -206,7 +191,7 @@ public class Auto_11226_B extends LinearOpMode {
         } else {
             errorT = diameter * Math.PI * (-deg / 360) + setPoint;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > setPoint && opModeIsActive()) {
                     uT = kp * errorT;
 
@@ -221,8 +206,7 @@ public class Auto_11226_B extends LinearOpMode {
                     telemetry.addData("rdrive:", rdrive1.getPower());
                     telemetry.addData("ldrive:", ldrive1.getPower());
                     telemetry.update();
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -242,38 +226,37 @@ public class Auto_11226_B extends LinearOpMode {
 
         if (inches > 0) {
             errorT = inches + 4.25;
-                while(errorT > 0 && opModeIsActive()) {
-                    uT = ks * errorT;
+            while (errorT > 0 && opModeIsActive()) {
+                uT = ks * errorT;
 
-                    currentPosition = slide1.getCurrentPosition() / ticksPerInch - setPoint;
-                    errorT -= (currentPosition - lastPosition);
-                    lastPosition = currentPosition;
+                currentPosition = slide1.getCurrentPosition() / ticksPerInch - setPoint;
+                errorT -= (currentPosition - lastPosition);
+                lastPosition = currentPosition;
 
-                    slide1.setPower(uT);
-                    slide2.setPower(uT);
+                slide1.setPower(uT);
+                slide2.setPower(uT);
 
-                    telemetry.addData("errorT", errorT);
-                    telemetry.addData("uT", uT);
+                telemetry.addData("errorT", errorT);
+                telemetry.addData("uT", uT);
 
-                    telemetry.update();
-                }
+                telemetry.update();
+            }
             slide1.setPower(0);
             slide2.setPower(0);
         } else {
             errorT = -inches + 4.25;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > 0 && opModeIsActive() && uT > 0) {
                     uT = ks * errorT;
 
                     currentPosition = Math.abs(slide1.getCurrentPosition()) / ticksPerInch - setPoint;
-                    errorT -= Math.abs(currentPosition -lastPosition);
+                    errorT -= Math.abs(currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
                     slide1.setPower(-uT);
                     slide2.setPower(-uT);
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -301,15 +284,15 @@ public class Auto_11226_B extends LinearOpMode {
         sleep(500);
     }
 
-    public void drivaBySpin(double spins){
+    public void drivaBySpin(double spins) {
         setPoint = ldrive1.getCurrentPosition() / ticksPerSpin;
 
         if (spins > 0) {
             errorT = (spins + setPoint) / 2;
             lastPosition = 0;
             int x = 0;
-            while(x == 0) {
-                while(errorT > setPoint && opModeIsActive() && uT > 0.3) {
+            while (x == 0) {
+                while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
 
                     uT = kp * errorT;
                     currentPosition = ldrive1.getCurrentPosition() / ticksPerSpin;
@@ -331,7 +314,7 @@ public class Auto_11226_B extends LinearOpMode {
             errorT = -spins + setPoint;
             lastPosition = 0;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
                     uT = kp * errorT;
 
@@ -343,8 +326,7 @@ public class Auto_11226_B extends LinearOpMode {
                     ldrive2.setPower(-uT);
                     rdrive1.setPower(-uT);
                     rdrive2.setPower(-uT);
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -383,7 +365,7 @@ public class Auto_11226_B extends LinearOpMode {
     }*/
 
     // For the closest placement of the skystone
-    private void caseSSP(){
+    private void caseSSP() {
         /*switch (skystonePostion) {
             case 1:
                 driveInches(-14);
@@ -464,21 +446,19 @@ public class Auto_11226_B extends LinearOpMode {
         pidDrive = new PIDController(.05, 0, 0);
 
 
-
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
-        parameters.mode                = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled      = false;
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled = false;
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         imu.initialize(parameters);
 
 
-        while (!isStopRequested() && !imu.isGyroCalibrated())
-        {
+        while (!isStopRequested() && !imu.isGyroCalibrated()) {
             sleep(50);
             idle();
         }
@@ -498,46 +478,36 @@ public class Auto_11226_B extends LinearOpMode {
         //paramaters for stright drive
 
 
-
-        while (opModeIsActive() && h ==0) {
+        while (opModeIsActive() && h == 0) {
 
             //while(ldrive1.isBusy()){}
             elevator.setPower(-1);
-            slide1.setPower(1);
-            slide2.setPower(1);
-            sleep(300);
+            sleep(500);
+            elevator.setPower(0);
+            slide1.setPower(-1);
+            slide2.setPower(-1);
+            sleep(800);
             slide1.setPower(0);
             slide2.setPower(0);
             sleep(700);
-            elevator.setPower(0);
-            ldrive1.setPower(0.7);
-            ldrive2.setPower(0.7);
-            rdrive1.setPower(0.5);
-            rdrive2.setPower(0.5);
+            ldrive1.setPower(0.3);
+            ldrive2.setPower(0.3);
+            rdrive1.setPower(0.6);
+            rdrive2.setPower(0.6);
             sleep(1000);
             elevator.setPower(1);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            sleep(1000);
+            sleep(1250);
             elevator.setPower(0);
             sleep(500);
-            ldrive1.setPower(-0.48);
-            ldrive2.setPower(-0.48);
-            rdrive1.setPower(-0.3);
-            rdrive2.setPower(-0.3);
+            ldrive1.setPower(-0.3);
+            ldrive2.setPower(-0.3);
+            rdrive1.setPower(-0.7);
+            rdrive2.setPower(-0.7);
             sleep(1000);
-            ldrive1.setPower(0);
-            ldrive2.setPower(0);
-            rdrive1.setPower(0);
-            rdrive2.setPower(0);
-            sleep(300);
-            ldrive1.setPower(-0.7);
-            ldrive2.setPower(-0.7);
-            rdrive1.setPower(0.5);
-            rdrive2.setPower(0.5);
-            sleep(1500);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
@@ -545,8 +515,18 @@ public class Auto_11226_B extends LinearOpMode {
             sleep(300);
             ldrive1.setPower(0.7);
             ldrive2.setPower(0.7);
-            rdrive1.setPower(0.5);
-            rdrive2.setPower(0.5);
+            rdrive1.setPower(-0.9);
+            rdrive2.setPower(-0.9);
+            sleep(1000);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            sleep(300);
+            ldrive1.setPower(0.5);
+            ldrive2.setPower(0.5);
+            rdrive1.setPower(0.8);
+            rdrive2.setPower(0.8);
             sleep(1000);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
@@ -554,17 +534,19 @@ public class Auto_11226_B extends LinearOpMode {
             rdrive2.setPower(0);
             elevator.setPower(-1);
             sleep(500);
-            ldrive1.setPower(-0.7);
-            ldrive2.setPower(-0.7);
-            rdrive1.setPower(-0.5);
-            rdrive2.setPower(-0.5);
-            sleep(500);
-            hold.setPower(0);
-            sleep(1500);
+            ldrive1.setPower(-0.5);
+            ldrive2.setPower(-0.5);
+
+            rdrive1.setPower(-0.7);
+            rdrive2.setPower(-0.7);
+            sleep(300);
+            elevator.setPower(1);
+            sleep(950);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
+            elevator.setPower(0);
 
 
             h++;
@@ -583,6 +565,7 @@ public class Auto_11226_B extends LinearOpMode {
             sleep(2000);*/
         }
     }
+
     private void initVuforia() {
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -608,19 +591,19 @@ public class Auto_11226_B extends LinearOpMode {
     }
 
     //if see 3 diffrent objects
-    private int seeThreeObj(List<Recognition> Recognitions){
+    private int seeThreeObj(List<Recognition> Recognitions) {
 
-        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(0).getLeft();
-        }else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+        } else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)) {
             Stone1X = Recognitions.get(0).getLeft();
         }
 
 
-        if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
+        if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(1).getLeft();
 
-        }else if (Recognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
+        } else if (Recognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
 
             if (Stone1X != 0) {
 
@@ -630,18 +613,18 @@ public class Auto_11226_B extends LinearOpMode {
             }
         }
 
-        if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+        if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(2).getLeft();
-        }else if (Recognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
+        } else if (Recognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)) {
             Stone2X = Recognitions.get(2).getLeft();
         }
 
 
-        if (skyStoneX < Stone1X && skyStoneX < Stone2X){
+        if (skyStoneX < Stone1X && skyStoneX < Stone2X) {
             skystonePostion = 1;
-        }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+        } else if (skyStoneX > Stone1X && skyStoneX > Stone2X) {
             skystonePostion = 3;
-        }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
+        } else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
             skystonePostion = 2;
         }
 
@@ -649,8 +632,7 @@ public class Auto_11226_B extends LinearOpMode {
     }
 
 
-    private void resetAngle()
-    {
+    private void resetAngle() {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         globalAngle = 0;
@@ -658,10 +640,10 @@ public class Auto_11226_B extends LinearOpMode {
 
     /**
      * Get current cumulative angle rotation from last reset.
+     *
      * @return Angle in degrees. + = left, - = right from zero point.
      */
-    private double getAngle()
-    {
+    private double getAngle() {
         // We experimentally determined the Z axis is the axis we want to use for heading angle.
         // We have to process the angle because the imu works in euler angles so the Z axis is
         // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
@@ -685,10 +667,10 @@ public class Auto_11226_B extends LinearOpMode {
 
     /**
      * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
+     *
      * @param degrees Degrees to turn, + is left - is right
      */
-    public void rotate(int degrees, double power)
-    {
+    public void rotate(int degrees, double power) {
         // restart imu angle tracking.
         resetAngle();
 
@@ -716,11 +698,9 @@ public class Auto_11226_B extends LinearOpMode {
 
         // rotate until turn is completed.
 
-        if (degrees < 0)
-        {
+        if (degrees < 0) {
             // On right turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() == 0)
-            {
+            while (opModeIsActive() && getAngle() == 0) {
                 ldrive1.setPower(power);
                 ldrive2.setPower(power);
                 rdrive1.setPower(-power);
@@ -728,18 +708,15 @@ public class Auto_11226_B extends LinearOpMode {
                 sleep(100);
             }
 
-            do
-            {
+            do {
                 power = pidRotate.performPID(getAngle()); // power will be - on right turn.
                 ldrive1.setPower(-power);
                 ldrive2.setPower(-power);
                 rdrive1.setPower(power);
                 rdrive2.setPower(power);
             } while (opModeIsActive() && !pidRotate.onTarget());
-        }
-        else    // left turn.
-            do
-            {
+        } else    // left turn.
+            do {
                 power = pidRotate.performPID(getAngle()); // power will be + on left turn.
                 ldrive1.setPower(-power);
                 ldrive2.setPower(-power);
