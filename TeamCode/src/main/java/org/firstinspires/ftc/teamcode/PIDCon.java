@@ -82,7 +82,11 @@ public class PIDCon {
 
         // Make sure the final result is within bounds. If we constrain the result, we make
         // sure the sign of the constrained result matches the original result sign.
-        if (Math.abs(mOutput) > mMaximumOutput)
+
+        if (Math.abs(mOutput) == 0){
+            mOutput = 0;
+        }
+        else if (Math.abs(mOutput) > mMaximumOutput)
             mOutput = mMaximumOutput * sign;
         else if (Math.abs(mOutput) < mMinimumOutput)
             mOutput = mMinimumOutput * sign;
