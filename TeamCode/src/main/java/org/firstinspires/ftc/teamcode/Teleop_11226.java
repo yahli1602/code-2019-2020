@@ -30,7 +30,7 @@ public class Teleop_11226 extends LinearOpMode {
     private Servo collectLeft = null;
     private Servo push = null;
     private CRServo hold = null;
-    private Servo turnHold = null;
+    private CRServo turnHold = null;
     //moving Foundation
     private Servo grabber = null;
     private TouchSensor cubeIn = null;
@@ -50,7 +50,7 @@ public class Teleop_11226 extends LinearOpMode {
         //collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         push = hardwareMap.get(Servo.class, "push");
         hold = hardwareMap.get(CRServo.class, "hold");
-        turnHold = hardwareMap.get(Servo.class, "turnHold");
+        turnHold = hardwareMap.get(CRServo.class, "turnHold");
         //grabber = hardwareMap.get(Servo.class, "grabber");
         waitForStart();
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
@@ -88,45 +88,45 @@ public class Teleop_11226 extends LinearOpMode {
                 lDrive1.setPower(gamepad1.right_trigger);
                 lDrive2.setPower(gamepad1.right_trigger);
 
-
-            }else if (gamepad1.left_stick_y > 0.2 && !Fast) {
-                rDrive1.setPower(0.5);
-                rDrive2.setPower(0.5);
-                lDrive1.setPower(0.5);
-                lDrive2.setPower(0.5);
-            }else if(gamepad1.left_stick_y < 0.2 && !Fast){
-                rDrive1.setPower(-0.5);
-                rDrive2.setPower(-0.5);
-                lDrive1.setPower(-0.5);
-                lDrive2.setPower(-0.5);
-
+            //drive
+            }else if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2 && !Fast) {
+                rDrive1.setPower(gamepad1.left_stick_y / 2);
+                rDrive2.setPower(gamepad1.left_stick_y / 2);
+                lDrive1.setPower(gamepad1.left_stick_y / 2);
+                lDrive2.setPower(gamepad1.left_stick_y / 2);
             } else if (gamepad1.left_trigger > 0.2 && !Fast) {
-                rDrive1.setPower(0.5);
-                rDrive2.setPower(0.5);
-                lDrive1.setPower(-0.5);
-                lDrive2.setPower(-0.5);
+                rDrive1.setPower(gamepad1.left_trigger  / 2);
+                rDrive2.setPower(gamepad1.left_trigger / 2);
+                lDrive1.setPower(-gamepad1.left_trigger / 2);
+                lDrive2.setPower(-gamepad1.left_trigger / 2);
 
             } else if (gamepad1.right_trigger > 0.2 && !Fast) {
-                rDrive1.setPower(-0.5);
-                rDrive2.setPower(-0.5);
-                lDrive1.setPower(0.5);
-                lDrive2.setPower(0.5);
-            } else {
+                rDrive1.setPower(-gamepad1.right_trigger / 2);
+                rDrive2.setPower(-gamepad1.right_trigger / 2);
+                lDrive1.setPower(gamepad1.right_trigger / 2);
+                lDrive2.setPower(gamepad1.right_trigger / 2);
+
+            }else{
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
                 lDrive1.setPower(0);
                 lDrive2.setPower(0);
             }
 
+
+
+
+
+
+
+
+
             if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2  && Fast) {
                 slide1.setPower(gamepad1.right_stick_x);
                 slide2.setPower(gamepad1.right_stick_x);
-            }else if (gamepad1.right_stick_x > 0.2 && !Fast) {
-                slide1.setPower(0.5);
-                slide2.setPower(0.5);
-            }else if (gamepad1.right_stick_x < 0.2  && !Fast) {
-                slide1.setPower(-0.5);
-                slide2.setPower(-0.5);
+            }else if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2  && !Fast) {
+                slide1.setPower(gamepad1.right_stick_x / 2);
+                slide2.setPower(gamepad1.right_stick_x / 2);
             } else {
                 slide1.setPower(0);
                 slide2.setPower(0);
@@ -187,9 +187,16 @@ public class Teleop_11226 extends LinearOpMode {
 
             //turn collection
             if (gamepad2.dpad_right) {
-                turnHold.setPosition(1000);
+                turnHold.setPower(1);
+                sleep(1200);
+                turnHold.setPower(0);
             } else if (gamepad2.dpad_left) {
-                turnHold.setPosition(0);
+                turnHold.setPower(-1);
+                sleep(1200);
+                turnHold.setPower(0);
+            }
+            else {
+                turnHold.setPower(0);
             }
 
 

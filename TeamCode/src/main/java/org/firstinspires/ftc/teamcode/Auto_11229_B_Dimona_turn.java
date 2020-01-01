@@ -17,7 +17,7 @@ public class Auto_11229_B_Dimona_turn extends LinearOpMode {
     public DcMotor ldrive2 = null;
     public DcMotor slide = null;
     public DcMotor elevator = null;
-    DriveAvoidPid pid = new DriveAvoidPid();
+
 
 
 
@@ -59,7 +59,7 @@ public class Auto_11229_B_Dimona_turn extends LinearOpMode {
         int x = 0;
         while (opModeIsActive() && x==0) {
 
-            pid.rotate(90,0.7);
+
 
             x++;
         }

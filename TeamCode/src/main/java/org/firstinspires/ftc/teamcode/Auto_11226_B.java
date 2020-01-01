@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Path;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,6 +22,10 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -43,6 +49,7 @@ public class Auto_11226_B extends LinearOpMode {
     public DcMotor slide1 = null;
     public DcMotor slide2 = null;
     public DcMotor elevator = null;
+    private CRServo hold = null;
     /*private Servo collectRight = null;
     private Servo collectLeft = null;
     private TouchSensor cubeIn = null;*/
@@ -61,6 +68,13 @@ public class Auto_11226_B extends LinearOpMode {
     private double diameter = 18;
     private double setPoint;
     private double incPerTile = 24;
+
+
+    BNO055IMU imu;
+    Orientation lastAngles = new Orientation();
+    double                  globalAngle, power = .30, correction, rotation;
+    boolean                 aButton, bButton, touched;
+    public PIDController           pidRotate, pidDrive;
 
 
     private float skyStoneX = 0;
@@ -93,32 +107,38 @@ public class Auto_11226_B extends LinearOpMode {
 
     public void driveInches(double inches) {
 
-        setPoint = ldrive1.getCurrentPosition() / ticksPerInch;
-        lastPosition = setPoint;
+        setPoint = Math.abs(ldrive2.getCurrentPosition()) / ticksPerInch;
+        lastPosition = 0;
 
         if (inches > 0) {
             errorT = inches + setPoint;
             int x = 0;
             while(x == 0) {
-                while(errorT > setPoint && opModeIsActive()) {
+
+
+
+                if(errorT > 0 && opModeIsActive()) {
                     uT = kp * errorT;
-                    currentPosition = ldrive1.getCurrentPosition() / ticksPerInch;
+                    currentPosition = Math.abs(ldrive2.getCurrentPosition()) / ticksPerInch;
                     errorT -= currentPosition - lastPosition;
                     lastPosition = currentPosition;
 
                     ldrive1.setPower(uT);
                     ldrive2.setPower(uT);
-                    rdrive1.setPower(uT);
-                    rdrive2.setPower(uT);
+                    rdrive1.setPower(uT + 0.1);
+                    rdrive2.setPower(uT + 0.1);
+
+
                     telemetry.addData("start", setPoint);
                     telemetry.addData("error", errorT);
                     telemetry.update();
+                }else {
+                    ldrive1.setPower(0);
+                    ldrive2.setPower(0);
+                    rdrive1.setPower(0);
+                    rdrive2.setPower(0);
+                    x++;
                 }
-                ldrive1.setPower(0);
-                ldrive2.setPower(0);
-                rdrive1.setPower(0);
-                rdrive2.setPower(0);
-                x++;
             }
             telemetry.addData("rdrive:", rdrive1.getPower());
             telemetry.addData("ldrive:", ldrive1.getPower());
@@ -127,17 +147,17 @@ public class Auto_11226_B extends LinearOpMode {
             errorT = -inches + setPoint;
             int x = 0;
             while(x == 0) {
-                if (errorT > setPoint && opModeIsActive()) {
+                if (errorT > 0 && opModeIsActive()) {
                     uT = kp * errorT;
 
-                    currentPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch;
+                    currentPosition = Math.abs(ldrive2.getCurrentPosition()) / ticksPerInch;
                     errorT -= Math.abs(currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
-                    ldrive1.setPower(-uT);
-                    ldrive2.setPower(-uT);
-                    rdrive1.setPower(-uT);
-                    rdrive2.setPower(-uT);
+                    ldrive1.setPower(uT);
+                    ldrive2.setPower(uT);
+                    rdrive1.setPower(uT);
+                    rdrive2.setPower(uT);
                 }
                 else{
                     x++;
@@ -407,6 +427,8 @@ public class Auto_11226_B extends LinearOpMode {
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide1");
         slide2 = hardwareMap.get(DcMotor.class, "slide2");
+        hold = hardwareMap.get(CRServo.class,"hold");
+
         elevator = hardwareMap.get(DcMotor.class, "elevator");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
@@ -436,6 +458,32 @@ public class Auto_11226_B extends LinearOpMode {
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
+        pidRotate = new PIDController(.003, .00003, 0);
+
+
+        pidDrive = new PIDController(.05, 0, 0);
+
+
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        parameters.mode                = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        imu.initialize(parameters);
+
+
+        while (!isStopRequested() && !imu.isGyroCalibrated())
+        {
+            sleep(50);
+            idle();
+        }
+
         waitForStart();
         rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
         rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -447,13 +495,26 @@ public class Auto_11226_B extends LinearOpMode {
         /*collectRight.setDirection(Servo.Direction.REVERSE);
         collectLeft.setDirection(Servo.Direction.FORWARD);*/
 
+        //paramaters for stright drive
+
+
 
         while (opModeIsActive() && h ==0) {
 
             //while(ldrive1.isBusy()){}
-            //Elevator(10);
-            sleep(300);
-            slideInches(-48);
+            elevator.setPower(-0.7);
+            sleep(400);
+
+            driveInches(-44);
+            elevator.setPower(0.7);
+            sleep(400);
+            elevator.setPower(0);
+
+
+
+
+
+
             h++;
             telemetry.addData("h:", h);
             telemetry.update();
@@ -534,6 +595,122 @@ public class Auto_11226_B extends LinearOpMode {
 
         return skystonePostion;
     }
+
+
+    private void resetAngle()
+    {
+        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        globalAngle = 0;
+    }
+
+    /**
+     * Get current cumulative angle rotation from last reset.
+     * @return Angle in degrees. + = left, - = right from zero point.
+     */
+    private double getAngle()
+    {
+        // We experimentally determined the Z axis is the axis we want to use for heading angle.
+        // We have to process the angle because the imu works in euler angles so the Z axis is
+        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
+        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
+
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+
+        if (deltaAngle < -180)
+            deltaAngle += 360;
+        else if (deltaAngle > 180)
+            deltaAngle -= 360;
+
+        globalAngle += deltaAngle;
+
+        lastAngles = angles;
+
+        return globalAngle;
+    }
+
+    /**
+     * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
+     * @param degrees Degrees to turn, + is left - is right
+     */
+    public void rotate(int degrees, double power)
+    {
+        // restart imu angle tracking.
+        resetAngle();
+
+        // if degrees > 359 we cap at 359 with same sign as original degrees.
+        if (Math.abs(degrees) > 359) degrees = (int) Math.copySign(359, degrees);
+
+        // start pid controller. PID controller will monitor the turn angle with respect to the
+        // target angle and reduce power as we approach the target angle. This is to prevent the
+        // robots momentum from overshooting the turn after we turn off the power. The PID controller
+        // reports onTarget() = true when the difference between turn angle and target angle is within
+        // 1% of target (tolerance) which is about 1 degree. This helps prevent overshoot. Overshoot is
+        // dependant on the motor and gearing configuration, starting power, weight of the robot and the
+        // on target tolerance. If the controller overshoots, it will reverse the sign of the output
+        // turning the robot back toward the setpoint value.
+
+        pidRotate.reset();
+        pidRotate.setSetpoint(degrees);
+        pidRotate.setInputRange(0, degrees);
+        pidRotate.setOutputRange(0, power);
+        pidRotate.setTolerance(1);
+        pidRotate.enable();
+
+        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
+        // clockwise (right).
+
+        // rotate until turn is completed.
+
+        if (degrees < 0)
+        {
+            // On right turn we have to get off zero first.
+            while (opModeIsActive() && getAngle() == 0)
+            {
+                ldrive1.setPower(power);
+                ldrive2.setPower(power);
+                rdrive1.setPower(-power);
+                rdrive2.setPower(-power);
+                sleep(100);
+            }
+
+            do
+            {
+                power = pidRotate.performPID(getAngle()); // power will be - on right turn.
+                ldrive1.setPower(-power);
+                ldrive2.setPower(-power);
+                rdrive1.setPower(power);
+                rdrive2.setPower(power);
+            } while (opModeIsActive() && !pidRotate.onTarget());
+        }
+        else    // left turn.
+            do
+            {
+                power = pidRotate.performPID(getAngle()); // power will be + on left turn.
+                ldrive1.setPower(-power);
+                ldrive2.setPower(-power);
+                rdrive1.setPower(power);
+                rdrive2.setPower(power);
+            } while (opModeIsActive() && !pidRotate.onTarget());
+
+        // turn the motors off.
+        rdrive1.setPower(0);
+        rdrive2.setPower(0);
+        ldrive1.setPower(0);
+        ldrive2.setPower(0);
+
+        rotation = getAngle();
+
+        // wait for rotation to stop.
+        sleep(500);
+
+        // reset angle tracking on new heading.
+        resetAngle();
+    }
+
+
 }
 
 

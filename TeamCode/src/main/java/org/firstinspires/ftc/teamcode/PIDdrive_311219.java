@@ -15,59 +15,85 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Autonomous(name="Drive Avoid PID", group="Exercises")
+@Autonomous(name="PID practice", group="PID")
 
-public class DriveAvoidPid extends LinearOpMode
+public class PIDdrive_311219 extends LinearOpMode
 {
-    public DcMotor rdrive1 = null;
-    public DcMotor rdrive2 = null;
-    public DcMotor ldrive1 = null;
-    public DcMotor ldrive2 = null;
-    public DcMotor slide = null;
-    public DcMotor elevator = null;
-
-    TouchSensor             touch;
+    DcMotor                 ldrive1,ldrive2,rdrive1,rdrive2,slide1,slide2,elevator;
+    CRServo                   hold;
     BNO055IMU               imu;
     Orientation             lastAngles = new Orientation();
-    double                  globalAngle, power = .30, correction, rotation;
+    double                  globalAngle, power = .07, correction, rotation;
     boolean                 aButton, bButton, touched;
-    public PIDController           pidRotate, pidDrive;
+    PIDController           pidRotate, a_pidDrive,d_pidDrive;
+    double                  d_error = 0;
+    double                  d_prevError = 0;
+    double                  d_startPoint = 0;
+    double cuurentPosition = 0;
+    double integral = 0;
+    double derivative = 0;
+
+
+    double d_kP = 0;
+    double d_kI =0;
+    double d_kD = 0;
+
+    private final double perimeter = 4 * Math.PI;
+    private final double ticksPerRevolution = 1120;
+    private final double inchesPerTick = perimeter / ticksPerRevolution;
+    private final double ticksPerSpin = ticksPerRevolution * 40;
+    private final double ticksPerInch = 1 / inchesPerTick;
 
     // called when init button is  pressed.
     @Override
     public void runOpMode() throws InterruptedException
     {
-
         rdrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
         rdrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
-        slide = hardwareMap.get(DcMotor.class, "slide");
+        slide1 = hardwareMap.get(DcMotor.class, "slide1");
+        slide2 = hardwareMap.get(DcMotor.class, "slide2");
+        hold = hardwareMap.get(CRServo.class,"hold");
+
         elevator = hardwareMap.get(DcMotor.class, "elevator");
+        /*collectRight = hardwareMap.get(Servo.class, "collect right");
+        collectLeft = hardwareMap.get(Servo.class, "collect left");
+        cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
+
+        rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rdrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rdrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        // get a reference to REV Touch sensor.
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
@@ -86,11 +112,13 @@ public class DriveAvoidPid extends LinearOpMode
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate = new PIDController(.003, .00003, 0);
+        pidRotate = new PIDController(0,0, 0);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
-        pidDrive = new PIDController(.05, 0, 0);
+        a_pidDrive = new PIDController(0, 0, 0);
+
+        d_pidDrive = new PIDController(0,0,0);
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
@@ -109,16 +137,6 @@ public class DriveAvoidPid extends LinearOpMode
         // wait for start button.
 
         waitForStart();
-        rdrive1.setDirection(DcMotorSimple.Direction.FORWARD);
-        rdrive2.setDirection(DcMotorSimple.Direction.FORWARD);
-        ldrive1.setDirection(DcMotorSimple.Direction.REVERSE);
-        ldrive2.setDirection(DcMotorSimple.Direction.REVERSE);
-        slide.setDirection(DcMotorSimple.Direction.FORWARD);
-        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
-        rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ldrive2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         telemetry.addData("Mode", "running");
         telemetry.update();
@@ -126,71 +144,23 @@ public class DriveAvoidPid extends LinearOpMode
         sleep(1000);
 
         // Set up parameters for driving in a straight line.
-        pidDrive.setSetpoint(0);
-        pidDrive.setOutputRange(0, power);
-        pidDrive.setInputRange(-90, 90);
-        pidDrive.enable();
+
+
+
+
 
         // drive until end of period.
-        int x =0;
-        while (opModeIsActive() && x == 0)
+
+        while (opModeIsActive())
         {
-            // Use PID with imu input to drive in a straight line.
-            correction = pidDrive.performPID(getAngle());
-
-            telemetry.addData("1 imu heading", lastAngles.firstAngle);
-            telemetry.addData("2 global heading", globalAngle);
-            telemetry.addData("3 correction", correction);
-            telemetry.addData("4 turn rotation", rotation);
-            telemetry.update();
-
-            // set power levels.
-            /*ldrive1.setPower(power - correction);
-            ldrive2.setPower(power - correction);
-            rdrive1.setPower(power + correction);
-            rdrive2.setPower(power + correction);
-
-            // We record the sensor values because we will test them in more than
-            // one place with time passing between those places. See the lesson on
-            // Timing Considerations to know why.
-
-            aButton = gamepad1.a;
-            bButton = gamepad1.b;
-            touched = touch.isPressed();
-
-            if (touched || aButton || bButton)
-            {
-                // backup.
-                ldrive1.setPower(-power);
-                ldrive2.setPower(-power);
-                rdrive1.setPower(-power);
-                rdrive2.setPower(-power);
-
-                sleep(500);
-
-                // stop.
-                ldrive1.setPower(0);
-                ldrive2.setPower(0);
-                rdrive1.setPower(0);
-                rdrive2.setPower(0);
-
-                // turn 90 degrees right.
-                if (touched || aButton) rotate(-90, power);
-
-                // turn 90 degrees left.
-                if (bButton) rotate(90, power);
-            }*/
-
-            rotate(90,0.7);
-            x++;
+            elevator.setPower(0.7);
+            sleep(150);
+            elevator.setPower(0);
+            driveInches(44,0.7);
 
         }
+            // Use PID with imu input to drive in a straight line.
 
-        // turn the motors off.
-        ldrive1.setPower(0);
-        ldrive2.setPower(0);
-        rdrive1.setPower(0);
-        rdrive2.setPower(0);
     }
 
     /**
@@ -234,7 +204,7 @@ public class DriveAvoidPid extends LinearOpMode
      * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
      * @param degrees Degrees to turn, + is left - is right
      */
-    public void rotate(int degrees, double power)
+    private void rotate(int degrees, double power)
     {
         // restart imu angle tracking.
         resetAngle();
@@ -248,7 +218,7 @@ public class DriveAvoidPid extends LinearOpMode
         // reports onTarget() = true when the difference between turn angle and target angle is within
         // 1% of target (tolerance) which is about 1 degree. This helps prevent overshoot. Overshoot is
         // dependant on the motor and gearing configuration, starting power, weight of the robot and the
-        // on target tolerance. If the controller overshoots, it will reverse the sign of the output 
+        // on target tolerance. If the controller overshoots, it will reverse the sign of the output
         // turning the robot back toward the setpoint value.
 
         pidRotate.reset();
@@ -282,6 +252,7 @@ public class DriveAvoidPid extends LinearOpMode
                 ldrive2.setPower(-power);
                 rdrive1.setPower(power);
                 rdrive2.setPower(power);
+
             } while (opModeIsActive() && !pidRotate.onTarget());
         }
         else    // left turn.
@@ -300,6 +271,7 @@ public class DriveAvoidPid extends LinearOpMode
         ldrive1.setPower(0);
         ldrive2.setPower(0);
 
+
         rotation = getAngle();
 
         // wait for rotation to stop.
@@ -308,4 +280,66 @@ public class DriveAvoidPid extends LinearOpMode
         // reset angle tracking on new heading.
         resetAngle();
     }
+
+
+
+    private void driveInches(double inches,double d_power)
+    {
+        a_pidDrive.setSetpoint(0);
+        a_pidDrive.setOutputRange(0, d_power);
+        a_pidDrive.setInputRange(-90, 90);
+        a_pidDrive.enable();
+
+        d_error = inches;
+
+        d_startPoint = rdrive1.getCurrentPosition() / ticksPerInch;
+
+        while (d_error > 0 && opModeIsActive()){
+
+            cuurentPosition = inches - (rdrive1.getCurrentPosition() - d_startPoint) / ticksPerInch;
+            d_error = inches - cuurentPosition;
+            derivative = d_error - d_prevError;
+            integral = integral + d_error;
+            d_prevError = d_error;
+            if (d_error == 0) integral = 0;
+            d_power = d_error   + integral  + derivative ;
+
+
+
+
+
+            correction = a_pidDrive.performPID(getAngle());
+
+            telemetry.addData("1 imu heading", lastAngles.firstAngle);
+            telemetry.addData("2 global heading", globalAngle);
+            telemetry.addData("3 correction", correction);
+            telemetry.addData("4 turn rotation", rotation);
+            telemetry.update();
+
+            // set power levels.
+            telemetry.addData("d_pwer",d_power);
+            telemetry.addData("coraction",correction);
+            ldrive1.setPower(d_power - correction);
+            ldrive2.setPower(d_power - correction);
+            rdrive1.setPower(d_power + correction);
+            rdrive2.setPower(d_power + correction);
+
+
+
+
+
+
+        }
+
+
+        ldrive1.setPower(0);
+        ldrive2.setPower(0);
+        rdrive1.setPower(0);
+        rdrive2.setPower(0);
+
+
+    }
+
+
+
 }

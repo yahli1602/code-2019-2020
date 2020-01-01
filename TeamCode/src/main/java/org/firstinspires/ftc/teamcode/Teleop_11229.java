@@ -30,8 +30,8 @@ public class Teleop_11229 extends LinearOpMode {
     //fold collection
     private DcMotor foldcollect = null;
     //collection
-    private CRServo collectRight = null;
-    private CRServo collectLeft = null;
+    private Servo collectRight = null;
+    private Servo collectLeft = null;
     //grabbing the build plate
     private Servo grabber1 = null;
     private Servo grabber2 = null;
@@ -46,8 +46,8 @@ public class Teleop_11229 extends LinearOpMode {
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
         foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
-        //collectRight = hardwareMap.get(CRServo.class, "collectRight");
-        //collectLeft = hardwareMap.get(CRServo.class, "collectLeft");
+        collectRight = hardwareMap.get(Servo.class, "collectRight");
+        collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         grabber1 = hardwareMap.get(Servo.class, "grabber1");
         grabber2 = hardwareMap.get(Servo.class, "grabber2");
         stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
@@ -108,8 +108,8 @@ public class Teleop_11229 extends LinearOpMode {
                 rDrive2.setPower(0.4);
                 lDrive1.setPower(0.3);
                 lDrive2.setPower(0.3);
-                collectRight.setPower(-1);
-                collectLeft.setPower(1);
+                collectRight.setPosition(-1);
+                collectLeft.setPosition(1);
             } else if(gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
@@ -205,20 +205,20 @@ public class Teleop_11229 extends LinearOpMode {
             telemetry.addData("elevator", elevator.getCurrentPosition());
             telemetry.update();
 
-            /*/collection
+            //collection
             if (gamepad2.right_trigger > 0) {
-                collectRight.setPower(1);
-                collectLeft.setPower(-1);
+                collectRight.setPosition(0.7);
+                collectLeft.setPosition(0.2);
             }
             else if (gamepad2.left_trigger > 0) {
-                collectLeft.setPower(-1);
-                collectRight.setPower(1);
+                collectLeft.setPosition(0.7);
+                collectRight.setPosition(0.2);
 
             }
             else {
-                collectRight.setPower(0);
-                collectLeft.setPower(0);
-            }*/
+                collectRight.setPosition(0);
+                collectLeft.setPosition(0);
+            }
             //collection fold
             if (gamepad2.right_bumper) {
                 foldcollect.setPower(1);
