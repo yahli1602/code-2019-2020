@@ -565,7 +565,12 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-
+            elevator.setPower(0);
+            slide1.setPower(1);
+            slide2.setPower(1);
+            sleep(500);
+            slide1.setPower(0);
+            slide2.setPower(0);
 
             h++;
             telemetry.addData("h:", h);
