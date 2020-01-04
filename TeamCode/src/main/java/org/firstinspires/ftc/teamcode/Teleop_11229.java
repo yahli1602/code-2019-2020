@@ -147,7 +147,7 @@ public class Teleop_11229 extends LinearOpMode {
                 telemetry.update();
             }
 
-            /*//Drive gilad
+            /*Drive gilad
             if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                 rDrive1.setPower(gamepad1.left_stick_y);
                 rDrive2.setPower(gamepad1.left_stick_y);
