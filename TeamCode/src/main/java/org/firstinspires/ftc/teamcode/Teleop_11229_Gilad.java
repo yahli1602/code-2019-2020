@@ -20,14 +20,11 @@ public class Teleop_11229_Gilad extends LinearOpMode {
     private DcMotor slide = null;
     //elevator
     private DcMotor elevator = null;
-    //fold collection
-    private DcMotor foldcollect = null;
+
     //collection
     private Servo collectRight = null;
     private Servo collectLeft = null;
-    //grabbing the build plate
-    private Servo grabber1 = null;
-    private Servo grabber2 = null;
+
     private TouchSensor stoneIn = null;
 
     @Override
@@ -38,11 +35,8 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
-        grabber1 = hardwareMap.get(Servo.class, "grabber1");
-        grabber2 = hardwareMap.get(Servo.class, "grabber2");
         stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
 
         waitForStart();
@@ -52,9 +46,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
-        foldcollect.setDirection(DcMotor.Direction.FORWARD);
-        grabber1.setDirection(Servo.Direction.FORWARD);
-        grabber2.setDirection(Servo.Direction.REVERSE);
+
 
         rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -151,27 +143,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 collectRight.setPosition(0);
                 collectLeft.setPosition(0);
             }
-            //collection fold
-            if (gamepad2.right_bumper) {
-                foldcollect.setPower(1);
-            } else if (gamepad2.left_bumper) {
-                foldcollect.setPower(-1);
-            } else {
-                foldcollect.setPower(0);
-            }
-
-//grabber
-
-            if (gamepad2.x) {
-                grabber1.setPosition(50);
-                grabber2.setPosition(50);
-            } else {
-                grabber1.setPosition(0);
-                grabber2.setPosition(0);
-            }
-
             telemetry.update();
-
         }
     }
 }

@@ -32,7 +32,7 @@ public class Auto_11229_B extends LinearOpMode {
     public DcMotor elevator = null;
     //private Servo collectRight = null;
     //private Servo collectLeft = null;
-    public TouchSensor touch = null;
+    // public TouchSensor stoneIn = null;
 
     private double kp = 0.019;
     private double ks = 0.1;
@@ -366,6 +366,7 @@ public class Auto_11229_B extends LinearOpMode {
         slide = hardwareMap.get(DcMotor.class, "slide");
         //collectLeft = hardwareMap.get(Servo.class, "collect left");
         //collectRight = hardwareMap.get(Servo.class, "collect right");
+        //stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
 
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
