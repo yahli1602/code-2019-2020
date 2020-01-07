@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -75,10 +76,10 @@ public class PIDdrive_11226 extends LinearOpMode {
         slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        rdrive1.setDirection(DcMotor.Direction.FORWARD);
-        rdrive2.setDirection(DcMotor.Direction.FORWARD);
-        ldrive1.setDirection(DcMotor.Direction.REVERSE);
-        ldrive2.setDirection(DcMotor.Direction.REVERSE);
+        rdrive1.setDirection(DcMotor.Direction.REVERSE);
+        rdrive2.setDirection(DcMotor.Direction.REVERSE);
+        ldrive1.setDirection(DcMotor.Direction.FORWARD);
+        ldrive2.setDirection(DcMotor.Direction.FORWARD);
         slide1.setDirection(DcMotor.Direction.FORWARD);
         slide2.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
@@ -98,6 +99,13 @@ public class PIDdrive_11226 extends LinearOpMode {
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        int h = 0;
+        while (opModeIsActive()) {
+            while (h == 0) {
+                driveInches(24, 1);
+            }
+        }
 
         // get a reference to REV Touch sensor.
 
@@ -285,9 +293,13 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         d_startPoint = rdrive2.getCurrentPosition() / ticksPerInch;
 
-        while (dPID.getError() != dPID.getSetpoint() && opModeIsActive()) {
+        cuurentPosition = (rdrive2.getCurrentPosition() - d_startPoint) / ticksPerInch;
+        dPID.setInput(cuurentPosition);
+        dPID.performPID();
 
-            cuurentPosition = inches - (rdrive2.getCurrentPosition() - d_startPoint) / ticksPerInch;
+        while (dPID.getError() > 0 && opModeIsActive()) {
+
+            cuurentPosition = (rdrive2.getCurrentPosition() - d_startPoint) / ticksPerInch;
             dPID.setInput(cuurentPosition);
             d_power = dPID.performPID();
 
@@ -296,8 +308,8 @@ public class PIDdrive_11226 extends LinearOpMode {
             telemetry.addData("2 global heading", globalAngle);
             telemetry.addData("3 correc;ption", correction);
             telemetry.addData("4 turn rotation", rotation);
-            telemetry.addData("cPosition",cuurentPosition);
-            telemetry.addData("dPower",d_power);
+            telemetry.addData("cPosition", cuurentPosition);
+            telemetry.addData("dPower", d_power);
 
 
             telemetry.update();

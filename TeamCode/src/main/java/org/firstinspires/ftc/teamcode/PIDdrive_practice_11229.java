@@ -325,7 +325,7 @@ public class PIDdrive_practice_11229 extends LinearOpMode
             lDrive1.setPower(d_power);
             lDrive2.setPower(d_power);
 
-            if (h == 0){
+            if (h == 0 && opModeIsActive()){
                 sleep(200);
                 h++;
             }

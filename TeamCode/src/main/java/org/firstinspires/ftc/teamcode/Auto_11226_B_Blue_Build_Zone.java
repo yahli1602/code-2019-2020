@@ -41,10 +41,10 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
     private Servo collectLeft = null;
     private TouchSensor cubeIn = null;*/
 
-    private double kp = 0.019;
+    private double kp = 0.2;
     private double ks = 0.1;
     private double ki = 0.2;
-    private double kd = 0.3;
+    private double kd = 0.1;
     private double uT = 1;
     private double pU;
     private double errorT;
@@ -61,7 +61,7 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
     private double startPosition;
     private double incPerTile = 24;
     private double integral = 0;
-    private double derivative;
+    private double derivative = 0;
 
 
     BNO055IMU imu;
@@ -102,9 +102,9 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
 
     public void driveInches(double inches) {
 
-        startPosition = Math.abs(ldrive2.getCurrentPosition()) / ticksPerInch;
+        startPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch;
         lastError = 0;
-
+        errorT = inches;
         if (inches > 0) {
             while (errorT > 0 && opModeIsActive()) {
                 currentPosition = Math.abs(ldrive1.getCurrentPosition()) / ticksPerInch - startPosition;
@@ -126,6 +126,10 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
                 ldrive2.setPower(uT);
                 rdrive1.setPower(uT);
                 rdrive2.setPower(uT);
+
+                telemetry.addData("uT", uT);
+                telemetry.addData("errorT", errorT);
+                telemetry.addData("start", startPosition);
 
                 sleep(10);
             }
@@ -492,82 +496,7 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
 
             while (opModeIsActive() && h == 0) {
 
-                //while(ldrive1.isBusy()){}
-                elevator.setPower(-1);
-                sleep(500);
-                elevator.setPower(0);
-                slide1.setPower(-1);
-                slide2.setPower(-1);
-                sleep(800);
-                slide1.setPower(0);
-                slide2.setPower(0);
-                sleep(700);
-                ldrive1.setPower(0.35);
-                ldrive2.setPower(0.35);
-                rdrive1.setPower(0.6);
-                rdrive2.setPower(0.6);
-                sleep(1150);
-                elevator.setPower(1);
-                ldrive1.setPower(0);
-                ldrive2.setPower(0);
-                rdrive1.setPower(0);
-                rdrive2.setPower(0);
-                sleep(1150);
-                elevator.setPower(0);
-                sleep(200);
-                ldrive1.setPower(-0.3);
-                ldrive2.setPower(-0.3);
-                rdrive1.setPower(-0.7);
-                rdrive2.setPower(-0.7);
-                slide1.setPower(0.4);
-                slide2.setPower(0.4);
-                sleep(800);
-                slide1.setPower(0);
-                slide2.setPower(0);
-                ldrive1.setPower(0);
-                ldrive2.setPower(0);
-                rdrive1.setPower(0);
-                rdrive2.setPower(0);
-                sleep(300);
-                ldrive1.setPower(0.7);
-                ldrive2.setPower(0.7);
-                rdrive1.setPower(-0.9);
-                rdrive2.setPower(-0.9);
-                sleep(800);
-                ldrive1.setPower(0);
-                ldrive2.setPower(0);
-                rdrive1.setPower(0);
-                rdrive2.setPower(0);
-                sleep(300);
-                ldrive1.setPower(0.5);
-                ldrive2.setPower(0.5);
-                rdrive1.setPower(0.8);
-                rdrive2.setPower(0.8);
-                sleep(1000);
-                ldrive1.setPower(0);
-                ldrive2.setPower(0);
-                rdrive1.setPower(0);
-                rdrive2.setPower(0);
-                elevator.setPower(-1);
-                sleep(500);
-                ldrive1.setPower(-0.5);
-                ldrive2.setPower(-0.5);
-
-                rdrive1.setPower(-0.7);
-                rdrive2.setPower(-0.7);
-                sleep(300);
-                elevator.setPower(1);
-                sleep(950);
-                ldrive1.setPower(0);
-                ldrive2.setPower(0);
-                rdrive1.setPower(0);
-                rdrive2.setPower(0);
-                elevator.setPower(0);
-                slide1.setPower(-1);
-                slide2.setPower(-1);
-                sleep(500);
-                slide1.setPower(0);
-                slide2.setPower(0);
+                driveInches(48);
 
                 h++;
                 telemetry.addData("h:", h);

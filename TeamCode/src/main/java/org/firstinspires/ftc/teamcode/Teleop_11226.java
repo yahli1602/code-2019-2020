@@ -227,10 +227,10 @@ public class Teleop_11226 extends LinearOpMode {
                 }
             }*/
 
-            if(gamepad2.right_trigger > 0){
+            if(gamepad2.y){
                 hold.setPower(-1);
             }
-            else if(gamepad2.left_trigger > 0){
+            else if(gamepad2.x){
                 hold.setPower(1);
             }
 
