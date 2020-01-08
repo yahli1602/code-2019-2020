@@ -38,6 +38,8 @@ public class PIDdrive_11226 extends LinearOpMode {
     double d_prevError = 0;
     double d_startPoint = 0;
     double cuurentPosition = 0;
+    double l_dPower = 0;
+    double r_dPower = 0;
     double integral = 0;
     double derivative = 0;
 
@@ -291,7 +293,7 @@ public class PIDdrive_11226 extends LinearOpMode {
         dPID.setOutputRange(-1, 1);
 
 
-        d_startPoint = rdrive2.getCurrentPosition() / ticksPerInch;
+        d_startPoint = rdrive2.getCurrentPosition();
 
         cuurentPosition = (rdrive2.getCurrentPosition() - d_startPoint) / ticksPerInch;
         dPID.setInput(cuurentPosition);
@@ -314,11 +316,25 @@ public class PIDdrive_11226 extends LinearOpMode {
 
             telemetry.update();
 
+
+            if (getAngle() > 0){
+                r_dPower = 0.1;
+                l_dPower = 0;
+            }
+            else if (getAngle() < 0){
+                l_dPower = 0.1;
+                r_dPower = 0;
+            }else{
+                l_dPower = 0;
+                r_dPower = 0;
+            }
+
+
             // set power levels.
-            ldrive1.setPower(d_power);
-            ldrive2.setPower(d_power);
-            rdrive1.setPower(d_power);
-            rdrive2.setPower(d_power);
+            ldrive1.setPower(d_power + l_dPower);
+            ldrive2.setPower(d_power + l_dPower);
+            rdrive1.setPower(d_power + r_dPower);
+            rdrive2.setPower(d_power + r_dPower);
 
             telemetry.addData("left position", ldrive2.getCurrentPosition());
             telemetry.addData("right position", rdrive2.getCurrentPosition());
