@@ -505,22 +505,27 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             elevator.setPower(-1);
             slide1.setPower(1);
             slide2.setPower(1);
-            sleep(300);
+            sleep(400);
             slide1.setPower(0);
             slide2.setPower(0);
             sleep(700);
             elevator.setPower(0);
-            ldrive1.setPower(0.5);
-            ldrive2.setPower(0.5);
-            rdrive1.setPower(0.8);
-            rdrive2.setPower(0.8);
-            sleep(1000);
+            ldrive1.setPower(0.3);
+            ldrive2.setPower(0.3);
+            rdrive1.setPower(0.55);
+            rdrive2.setPower(0.55);
+            sleep(650);
+            ldrive1.setPower(0.22);
+            ldrive2.setPower(0.22);
+            rdrive1.setPower(0.45);
+            rdrive2.setPower(0.45);
+            sleep(600);
             elevator.setPower(1);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            sleep(1200);
+            sleep(1300);
             elevator.setPower(0);
             sleep(500);
             ldrive1.setPower(-0.3);
@@ -554,23 +559,37 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             rdrive2.setPower(0);
             elevator.setPower(-1);
             sleep(500);
+
             ldrive1.setPower(-0.5);
             ldrive2.setPower(-0.5);
             rdrive1.setPower(-0.7);
             rdrive2.setPower(-0.7);
-            sleep(300);
-            elevator.setPower(1);
-            sleep(950);
+            sleep(100);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            elevator.setPower(0);
+            elevator.setPower(1);
+            sleep(950);
+
             slide1.setPower(1);
             slide2.setPower(1);
             sleep(500);
             slide1.setPower(0);
             slide2.setPower(0);
+
+            ldrive1.setPower(-0.5);
+            ldrive2.setPower(-0.5);
+            rdrive1.setPower(-0.7);
+            rdrive2.setPower(-0.7);
+            sleep(400);
+
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            elevator.setPower(0);
+
 
             h++;
             telemetry.addData("h:", h);
