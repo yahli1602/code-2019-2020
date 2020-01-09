@@ -34,6 +34,8 @@ public class PIDdrive_11226_2 extends LinearOpMode {
     boolean aButton, bButton, touched;
     PIDController pidRotate, aPID, dPID;
     double d_error = 0;
+    private double d_maximumOutput = 0.7;	// |maximum output|
+    private double d_minimumOutput = -0.7;	// |minimum output|
     double sign;
     double d_prevError = 0;
     double d_startPoint = 0;
@@ -47,11 +49,18 @@ public class PIDdrive_11226_2 extends LinearOpMode {
     double d_kI = 0;
     double d_kD = 0;
 
-    private final double perimeter = 4 * Math.PI;
+    /*private final double perimeter = 4 * Math.PI;
     private final double ticksPerRevolution = 1120;
     private final double inchesPerTick = perimeter / ticksPerRevolution;
     private final double ticksPerSpin = ticksPerRevolution * 40;
-    private final double ticksPerInch = 1 / inchesPerTick;
+    private final double ticksPerInch = 1 / inchesPerTick;*/
+
+    private final double perimeter = 4 * Math.PI;
+    private final double ticksPerRevolution = 1120;
+    private final double inchesPerTick = perimeter / ticksPerRevolution;
+    private final double ticksPerSpin = ticksPerRevolution * 25;
+    private final double ticksPerInch = 1 / perimeter * ticksPerSpin;
+
 
     // called when init button is  pressed.
     @Override
@@ -281,58 +290,62 @@ public class PIDdrive_11226_2 extends LinearOpMode {
     private void driveInches(double inches, double d_power) {
 
 
+        d_maximumOutput = d_power;
+        d_minimumOutput = d_power;
+
         d_setpoint = inches;
 
+        d_startPoint = rdrive1.getCurrentPosition();
 
-        cuurentPosition = rdrive2.getCurrentPosition() / ticksPerInch;
+
+        cuurentPosition = rdrive1.getCurrentPosition() / ticksPerInch;
         d_error = d_setpoint - cuurentPosition;
 
         while (d_error > 0 && opModeIsActive()) {
 
-            cuurentPosition = rdrive2.getCurrentPosition() / ticksPerInch;
+            cuurentPosition = rdrive1.getCurrentPosition() / ticksPerInch;
 
             d_error = d_setpoint - cuurentPosition;
-            integral = integral + d_error;
-            if (d_error == 0 || d_error > d_setpoint){
+
+            if (integral * d_kI < d_maximumOutput && integral * d_kI > d_minimumOutput){
+                integral = integral + d_error;
+            }
+
+            if (d_error == 0 || d_error < d_setpoint){
                 integral = 0;
             }
+
 
             //if (error is outside useful range)
             //integral = 0;
             derivative = d_error - d_prevError;
             d_prevError = d_error;
             d_power = d_error * d_kP + integral * d_kI + derivative * d_kD;
-            sleep(15);
 
 
 
 
-            telemetry.addData("1 imu heading", lastAngles.firstAngle);
-            telemetry.addData("2 global heading", globalAngle);
-            telemetry.addData("3 correc;ption", correction);
-            telemetry.addData("4 turn rotation", rotation);
+
+            telemetry.addData("dError",d_error);
             telemetry.addData("cPosition",cuurentPosition);
             telemetry.addData("dPower",d_power);
 
 
             telemetry.update();
-            if (d_power > 0){
-                sign = 1;
-            }else{
-                sign = -1;
-            }
 
             // set power levels.
-            if (Math.abs(d_power) > 1)
-                d_power = 1;
-            else if (Math.abs(d_power) < -1)
-                d_power = -1;
+            if (d_power > 1) d_power = 1;
+
+
+            else if (d_power < -1) d_power = -1;
 
 
             ldrive1.setPower(d_power);
             ldrive2.setPower(d_power);
             rdrive1.setPower(d_power);
             rdrive2.setPower(d_power);
+
+            sleep(15);
 
             telemetry.addData("left position", ldrive2.getCurrentPosition());
             telemetry.addData("right position", rdrive2.getCurrentPosition());

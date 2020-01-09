@@ -159,7 +159,7 @@ public class PIDdrive_practice_11229 extends LinearOpMode
         f = 0;
         while (opModeIsActive() && f == 0)
         {
-            driveInches(44,0.7);
+            driveInches(48,0.7);
             f++;
 
         }
@@ -325,7 +325,7 @@ public class PIDdrive_practice_11229 extends LinearOpMode
 
         while (dPID.getError() > 0 && opModeIsActive()) {
 
-            cuurentPosition = (rDrive1.getCurrentPosition() - d_startPoint)/ ticksPerInch;
+            cuurentPosition = (rDrive1.getCurrentPosition())/ ticksPerInch - d_startPoint;
             dPID.setInput(cuurentPosition);
             d_power = dPID.performPID();
 

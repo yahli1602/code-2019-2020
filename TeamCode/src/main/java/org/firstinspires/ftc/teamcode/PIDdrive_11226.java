@@ -49,10 +49,10 @@ public class PIDdrive_11226 extends LinearOpMode {
     double d_kD = 0;
 
     private final double perimeter = 4 * Math.PI;
-    private final double ticksPerRevolution = 1120 * 25;
+    private final double ticksPerRevolution = 1120;
     private final double inchesPerTick = perimeter / ticksPerRevolution;
-    private final double ticksPerSpin = ticksPerRevolution * 40;
-    private final double ticksPerInch = 1 / inchesPerTick;
+    private final double ticksPerSpin = ticksPerRevolution * 25;
+    private final double ticksPerInch = 1 / perimeter * ticksPerSpin;
 
     // called when init button is  pressed.
     @Override
@@ -129,6 +129,9 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         dPID = new PIDController(0.2, 0, 0);
 
+
+        ;
+
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
 
@@ -159,7 +162,7 @@ public class PIDdrive_11226 extends LinearOpMode {
         int q = 0;
         while (opModeIsActive() && q == 0) {
 
-            driveInches(48, 0.7);
+            driveInches(17, 0.7);
             q++;
 
         }
@@ -282,23 +285,10 @@ public class PIDdrive_11226 extends LinearOpMode {
     private void driveInches(double inches, double d_power) {
 
 
-        rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
-        rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         dPID.setSetpoint(inches);
         dPID.setOutputRange(-0.7,0.7);
+        dPID.setInputRange(-500,500);
 
 
         d_startPoint = rdrive1.getCurrentPosition();
@@ -314,11 +304,13 @@ public class PIDdrive_11226 extends LinearOpMode {
             d_power = dPID.performPID();
 
 
-            telemetry.addData("1 imu heading", lastAngles.firstAngle);
-            telemetry.addData("2 global heading", globalAngle);
-            telemetry.addData("3 correc;ption", correction);
-            telemetry.addData("4 turn rotation", rotation);
+            telemetry.addData("error",dPID.getError());
             telemetry.addData("cPosition", cuurentPosition);
+            telemetry.addData("startP",d_startPoint);
+
+            telemetry.addData("left power", ldrive1.getPower());
+            telemetry.addData("right power", rdrive1.getPower());
+
             telemetry.addData("dPower", d_power);
 
 
@@ -339,15 +331,15 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
             // set power levels.
-            ldrive1.setPower(d_power);
-            ldrive2.setPower(d_power);
-            rdrive1.setPower(d_power);
-            rdrive2.setPower(d_power);
+
+            rdrive1.setPower(0.5);
+            rdrive2.setPower(0.5);
+            ldrive1.setPower(0.5);
+            ldrive2.setPower(0.5);
 
             telemetry.addData("left position", ldrive1.getCurrentPosition());
             telemetry.addData("right position", rdrive1.getCurrentPosition());
-            telemetry.addData("left power", ldrive1.getPower());
-            telemetry.addData("right power", rdrive1.getPower());
+
         }
 
 
