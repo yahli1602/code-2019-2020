@@ -24,7 +24,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Autonomous(name = "PID practice2", group = "PID")
+@Autonomous(name = "PID 11226", group = "PID")
 
 public class PIDdrive_11226 extends LinearOpMode {
     DcMotor ldrive1, ldrive2, rdrive1, rdrive2, slide1, slide2, elevator;
@@ -49,7 +49,7 @@ public class PIDdrive_11226 extends LinearOpMode {
     double d_kD = 0;
 
     private final double perimeter = 4 * Math.PI;
-    private final double ticksPerRevolution = 1120;
+    private final double ticksPerRevolution = 1120 * 25;
     private final double inchesPerTick = perimeter / ticksPerRevolution;
     private final double ticksPerSpin = ticksPerRevolution * 40;
     private final double ticksPerInch = 1 / inchesPerTick;
@@ -78,10 +78,10 @@ public class PIDdrive_11226 extends LinearOpMode {
         slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        rdrive1.setDirection(DcMotor.Direction.REVERSE);
-        rdrive2.setDirection(DcMotor.Direction.REVERSE);
-        ldrive1.setDirection(DcMotor.Direction.FORWARD);
-        ldrive2.setDirection(DcMotor.Direction.FORWARD);
+        rdrive1.setDirection(DcMotor.Direction.FORWARD);
+        rdrive2.setDirection(DcMotor.Direction.FORWARD);
+        ldrive1.setDirection(DcMotor.Direction.REVERSE);
+        ldrive2.setDirection(DcMotor.Direction.REVERSE);
         slide1.setDirection(DcMotor.Direction.FORWARD);
         slide2.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
@@ -101,13 +101,6 @@ public class PIDdrive_11226 extends LinearOpMode {
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        int h = 0;
-        while (opModeIsActive()) {
-            while (h == 0) {
-                driveInches(24, 1);
-            }
-        }
 
         // get a reference to REV Touch sensor.
 
@@ -289,19 +282,34 @@ public class PIDdrive_11226 extends LinearOpMode {
     private void driveInches(double inches, double d_power) {
 
 
+        rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         dPID.setSetpoint(inches);
-        dPID.setOutputRange(-1, 1);
+        dPID.setOutputRange(-0.7,0.7);
 
 
-        d_startPoint = rdrive2.getCurrentPosition();
+        d_startPoint = rdrive1.getCurrentPosition();
 
-        cuurentPosition = (rdrive2.getCurrentPosition() - d_startPoint) / ticksPerInch;
+        cuurentPosition = (rdrive1.getCurrentPosition() - d_startPoint) / ticksPerInch;
         dPID.setInput(cuurentPosition);
         dPID.performPID();
 
         while (dPID.getError() > 0 && opModeIsActive()) {
 
-            cuurentPosition = (rdrive2.getCurrentPosition() - d_startPoint) / ticksPerInch;
+            cuurentPosition = (rdrive1.getCurrentPosition() - d_startPoint) / ticksPerInch;
             dPID.setInput(cuurentPosition);
             d_power = dPID.performPID();
 
@@ -317,29 +325,29 @@ public class PIDdrive_11226 extends LinearOpMode {
             telemetry.update();
 
 
-            if (getAngle() > 0){
-                r_dPower = 0.1;
-                l_dPower = 0;
-            }
-            else if (getAngle() < 0){
+            /*if (getAngle() > 0){
                 l_dPower = 0.1;
                 r_dPower = 0;
+            }
+            else if (getAngle() < 0){
+                r_dPower = 0.1;
+                l_dPower = 0;
             }else{
                 l_dPower = 0;
                 r_dPower = 0;
-            }
+            }*/
 
 
             // set power levels.
-            ldrive1.setPower(d_power + l_dPower);
-            ldrive2.setPower(d_power + l_dPower);
-            rdrive1.setPower(d_power + r_dPower);
-            rdrive2.setPower(d_power + r_dPower);
+            ldrive1.setPower(d_power);
+            ldrive2.setPower(d_power);
+            rdrive1.setPower(d_power);
+            rdrive2.setPower(d_power);
 
-            telemetry.addData("left position", ldrive2.getCurrentPosition());
-            telemetry.addData("right position", rdrive2.getCurrentPosition());
-            telemetry.addData("left power", ldrive2.getPower());
-            telemetry.addData("right power", rdrive2.getPower());
+            telemetry.addData("left position", ldrive1.getCurrentPosition());
+            telemetry.addData("right position", rdrive1.getCurrentPosition());
+            telemetry.addData("left power", ldrive1.getPower());
+            telemetry.addData("right power", rdrive1.getPower());
         }
 
 

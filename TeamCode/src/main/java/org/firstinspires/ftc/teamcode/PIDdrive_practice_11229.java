@@ -31,7 +31,7 @@ public class PIDdrive_practice_11229 extends LinearOpMode
 {
     DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
     BNO055IMU               imu;
-    Servo                   collectRight,collectLeft;
+
     Orientation             lastAngles = new Orientation();
     double                  globalAngle, power = .07, correction, rotation;
     boolean                 aButton, bButton, touched;
@@ -41,13 +41,14 @@ public class PIDdrive_practice_11229 extends LinearOpMode
     double                  d_startPoint = 0;
     double cuurentPosition = 0;
     int h = 0;
+    int f = 0;
     double integral = 0;
     double derivative = 0;
 
     private final double perimeter = 4 * Math.PI;
     private final double ticksPerRevolution = 1120;
     private final double inchesPerTick = perimeter / ticksPerRevolution;
-    private final double ticksPerSpin = ticksPerRevolution * 40;
+    private final double ticksPerSpin = ticksPerRevolution * 20;
     private final double ticksPerInch = 1 / inchesPerTick;
 
     // called when init button is  pressed.
@@ -61,18 +62,16 @@ public class PIDdrive_practice_11229 extends LinearOpMode
         slide1 = hardwareMap.get(DcMotor.class, "slide");
 
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        collectRight = hardwareMap.get(Servo.class, "collect right");
-        collectLeft = hardwareMap.get(Servo.class, "collect left");
 
 
-        rDrive1.setDirection(DcMotor.Direction.REVERSE);
-        rDrive2.setDirection(DcMotor.Direction.REVERSE);
-        lDrive1.setDirection(DcMotor.Direction.FORWARD);
-        lDrive2.setDirection(DcMotor.Direction.FORWARD);
+
+        rDrive1.setDirection(DcMotor.Direction.FORWARD);
+        rDrive2.setDirection(DcMotor.Direction.FORWARD);
+        lDrive1.setDirection(DcMotor.Direction.REVERSE);
+        lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide1.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
-        collectRight.setDirection(Servo.Direction.FORWARD);
-        collectLeft.setDirection(Servo.Direction.REVERSE);
+
 
         rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -123,7 +122,8 @@ public class PIDdrive_practice_11229 extends LinearOpMode
         // straight line. P value controls how sensitive the correction is.
         a_pidDrive = new PIDController(0, 0, 0);
 
-        dPID = new PIDController(0.2,0,0);
+        dPID = new PIDController(0.15,0,0);
+        dPID.enable();
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
@@ -156,9 +156,11 @@ public class PIDdrive_practice_11229 extends LinearOpMode
 
         // drive until end of period.
 
-        while (opModeIsActive())
+        f = 0;
+        while (opModeIsActive() && f == 0)
         {
             driveInches(44,0.7);
+            f++;
 
         }
             // Use PID with imu input to drive in a straight line.
@@ -287,33 +289,48 @@ public class PIDdrive_practice_11229 extends LinearOpMode
 
     private void driveInches(double inches, double d_power) {
 
+        h = 0;
+
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         dPID.setSetpoint(inches);
-        dPID.setOutputRange(-1, 1);
+        dPID.setOutputRange(-0.7, 0.7);
 
 
 
 
 
-        d_startPoint = rDrive2.getCurrentPosition();
+        d_startPoint = rDrive1.getCurrentPosition();
 
 
-        cuurentPosition = (rDrive2.getCurrentPosition() - d_startPoint)/ ticksPerInch;
+
+
+        cuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
         dPID.setInput(cuurentPosition);
         dPID.performPID();
 
 
         while (dPID.getError() > 0 && opModeIsActive()) {
 
-            cuurentPosition = (rDrive2.getCurrentPosition() - d_startPoint)/ ticksPerInch;
+            cuurentPosition = (rDrive1.getCurrentPosition() - d_startPoint)/ ticksPerInch;
             dPID.setInput(cuurentPosition);
             d_power = dPID.performPID();
 
 
-            telemetry.addData("1 imu heading", lastAngles.firstAngle);
-            telemetry.addData("2 global heading", globalAngle);
-            telemetry.addData("3 correc;ption", correction);
-            telemetry.addData("4 turn rotation", rotation);
+            telemetry.addData("d_error",dPID.getError());
             telemetry.addData("cPosition",cuurentPosition);
             telemetry.addData("error",dPID.getError());
             telemetry.addData("dPower",d_power);
@@ -326,7 +343,7 @@ public class PIDdrive_practice_11229 extends LinearOpMode
             lDrive2.setPower(d_power);
 
             if (h == 0 && opModeIsActive()){
-                sleep(200);
+                sleep(75);
                 h++;
             }
 
