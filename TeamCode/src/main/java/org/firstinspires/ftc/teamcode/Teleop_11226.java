@@ -36,6 +36,7 @@ public class Teleop_11226 extends LinearOpMode {
     private TouchSensor cubeIn = null;
     private boolean Fast = true;
     // problem fixing
+    private boolean hold180 = false;
     private double fix = 0;
 
     @Override
@@ -175,9 +176,20 @@ public class Teleop_11226 extends LinearOpMode {
 
 
             //elevator
-            if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
+            if (gamepad2.right_stick_y > 0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
-            } else {
+            }
+            else if (gamepad2.right_stick_y < -0.2){
+                elevator.setPower(gamepad2.right_stick_y);
+                while(hold180){
+                    if(elevator.getCurrentPosition() > -2000){
+                        turnHold.setPower(1);
+                        sleep(1200);
+                        turnHold.setPower(0);
+                    }
+                }
+            }
+            else {
                 elevator.setPower(0);
             }
 
@@ -245,6 +257,10 @@ public class Teleop_11226 extends LinearOpMode {
             } else {
                 turnHold.setPower(0);
             }
+
+
+            // Automations
+
 
 
         }

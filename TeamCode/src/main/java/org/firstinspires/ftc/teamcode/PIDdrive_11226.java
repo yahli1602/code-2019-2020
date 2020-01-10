@@ -17,14 +17,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Autonomous(name = "PID 11226", group = "PID")
+@Autonomous(name = "PID drive 11226 2", group = "PID")
 
 public class PIDdrive_11226 extends LinearOpMode {
     DcMotor ldrive1, ldrive2, rdrive1, rdrive2, slide1, slide2, elevator;
@@ -35,24 +34,35 @@ public class PIDdrive_11226 extends LinearOpMode {
     boolean aButton, bButton, touched;
     PIDController pidRotate, aPID, dPID;
     double d_error = 0;
+    private double d_maximumOutput = 0.7;	// |maximum output|
+    private double d_minimumOutput = -0.7;	// |minimum output|
+    double sign;
     double d_prevError = 0;
     double d_startPoint = 0;
+    double d_setpoint = 0;
     double cuurentPosition = 0;
-    double l_dPower = 0;
-    double r_dPower = 0;
     double integral = 0;
     double derivative = 0;
+    double r_dPower = 0;
+    double l_dPower = 0;
 
 
-    double d_kP = 0;
+    double d_kP = 0.1;
     double d_kI = 0;
     double d_kD = 0;
 
-    private final double perimeter = 4 * Math.PI;
+    /*private final double perimeter = 4 * Math.PI;
     private final double ticksPerRevolution = 1120;
+    private final double inchesPerTick = perimeter / ticksPerRevolution;
+    private final double ticksPerSpin = ticksPerRevolution * 40;
+    private final double ticksPerInch = 1 / inchesPerTick;*/
+
+    private final double perimeter = 4 * Math.PI;
+    private final double ticksPerRevolution = 28;
     private final double inchesPerTick = perimeter / ticksPerRevolution;
     private final double ticksPerSpin = ticksPerRevolution * 25;
     private final double ticksPerInch = 1 / perimeter * ticksPerSpin;
+
 
     // called when init button is  pressed.
     @Override
@@ -129,9 +139,6 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         dPID = new PIDController(0.2, 0, 0);
 
-
-        ;
-
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
 
@@ -162,7 +169,7 @@ public class PIDdrive_11226 extends LinearOpMode {
         int q = 0;
         while (opModeIsActive() && q == 0) {
 
-            driveInches(17, 0.7);
+            driveInches(48, 0.7);
             q++;
 
         }
@@ -285,61 +292,83 @@ public class PIDdrive_11226 extends LinearOpMode {
     private void driveInches(double inches, double d_power) {
 
 
+        d_maximumOutput = d_power;
+        d_minimumOutput = d_power;
 
-        dPID.setSetpoint(inches);
-        dPID.setOutputRange(-0.7,0.7);
-        dPID.setInputRange(-500,500);
-
+        d_setpoint = inches;
 
         d_startPoint = rdrive1.getCurrentPosition();
 
-        cuurentPosition = (rdrive1.getCurrentPosition() - d_startPoint) / ticksPerInch;
-        dPID.setInput(cuurentPosition);
-        dPID.performPID();
 
-        while (dPID.getError() > 0 && opModeIsActive()) {
+        cuurentPosition = rdrive1.getCurrentPosition() / ticksPerInch;
+        d_error = d_setpoint - cuurentPosition;
 
-            cuurentPosition = (rdrive1.getCurrentPosition() - d_startPoint) / ticksPerInch;
-            dPID.setInput(cuurentPosition);
-            d_power = dPID.performPID();
+        while (d_error > 0 && opModeIsActive()) {
+
+            cuurentPosition = rdrive1.getCurrentPosition() / ticksPerInch;
+
+            d_error = d_setpoint - cuurentPosition;
+
+            if (integral * d_kI < d_maximumOutput && integral * d_kI > d_minimumOutput){
+                integral = integral + d_error;
+            }
+
+            if (d_error == 0 || d_error < d_setpoint){
+                integral = 0;
+            }
 
 
-            telemetry.addData("error",dPID.getError());
-            telemetry.addData("cPosition", cuurentPosition);
-            telemetry.addData("startP",d_startPoint);
+            //if (error is outside useful range)
+            //integral = 0;
+            derivative = d_error - d_prevError;
+            d_prevError = d_error;
+            d_power = d_error * d_kP + integral * d_kI + derivative * d_kD;
 
-            telemetry.addData("left power", ldrive1.getPower());
-            telemetry.addData("right power", rdrive1.getPower());
 
-            telemetry.addData("dPower", d_power);
+
+
+
+            telemetry.addData("dError",d_error);
+            telemetry.addData("cPosition",cuurentPosition);
+            telemetry.addData("dPower",d_power);
 
 
             telemetry.update();
 
-
-            /*if (getAngle() > 0){
-                l_dPower = 0.1;
-                r_dPower = 0;
-            }
-            else if (getAngle() < 0){
-                r_dPower = 0.1;
-                l_dPower = 0;
-            }else{
-                l_dPower = 0;
-                r_dPower = 0;
-            }*/
-
-
             // set power levels.
+            if (d_power > 1) d_power = 1;
 
-            rdrive1.setPower(0.5);
-            rdrive2.setPower(0.5);
-            ldrive1.setPower(0.5);
-            ldrive2.setPower(0.5);
 
-            telemetry.addData("left position", ldrive1.getCurrentPosition());
-            telemetry.addData("right position", rdrive1.getCurrentPosition());
+            else if (d_power < -1) d_power = -1;
 
+            if (getAngle() > 0){
+                r_dPower = 0.17;
+                l_dPower = 0;
+
+            }else if(getAngle() < 0){
+                l_dPower = 0.17;
+                r_dPower = 0;
+            }else{
+                r_dPower = 0;
+                l_dPower = 0;
+            }
+
+
+            ldrive1.setPower(d_power + l_dPower);
+            ldrive2.setPower(d_power + l_dPower);
+            rdrive1.setPower(d_power + r_dPower);
+            rdrive2.setPower(d_power + r_dPower);
+
+            telemetry.addData("dError",d_error);
+            telemetry.addData("cPosition",cuurentPosition);
+            telemetry.addData("dPower",d_power);
+
+            sleep(15);
+
+            telemetry.addData("left position", ldrive2.getCurrentPosition());
+            telemetry.addData("right position", rdrive2.getCurrentPosition());
+            telemetry.addData("left power", ldrive2.getPower());
+            telemetry.addData("right power", rdrive2.getPower());
         }
 
 

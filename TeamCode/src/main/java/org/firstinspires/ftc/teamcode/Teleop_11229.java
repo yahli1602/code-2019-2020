@@ -33,6 +33,40 @@ public class Teleop_11229 extends LinearOpMode {
 
     private TouchSensor stoneIn = null;
 
+    private double startPosition;
+    private double kp = 0.3;
+    private double errorT;
+    private double uT;
+    private double perimeter = 4 * Math.PI;
+    private double ticksPerRevolution = 1120;
+    private double inchesPerTick = 40 * perimeter / ticksPerRevolution;
+    private double ticksPerInch = 1 / inchesPerTick;
+
+    private void Elevator(double inches) {
+        errorT = inches;
+        startPosition = elevator.getCurrentPosition() / ticksPerInch;
+        if (inches > 0) {
+            while (errorT > 0 && opModeIsActive()) {
+                errorT = inches * 4 * Math.PI - Math.abs(elevator.getCurrentPosition() / ticksPerInch) + Math.abs(startPosition);
+                uT = errorT * kp;
+                elevator.setPower(-uT);
+
+                telemetry.addData("uT", uT);
+                telemetry.addData("power", elevator.getPower());
+                telemetry.addData("errorT", errorT);
+                telemetry.update();
+            }
+            elevator.setPower(0);
+        } else {
+            while (errorT < 0 && opModeIsActive()) {
+                errorT = -inches - elevator.getCurrentPosition() / ticksPerInch - startPosition;
+                uT = errorT * kp;
+                elevator.setPower(uT);
+            }
+            elevator.setPower(0);
+        }
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
@@ -75,7 +109,6 @@ public class Teleop_11229 extends LinearOpMode {
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
         while (opModeIsActive()) {
             //Drive/turn tank
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
@@ -98,10 +131,10 @@ public class Teleop_11229 extends LinearOpMode {
                 rDrive1.setPower(0.5);
                 rDrive2.setPower(0.5);
                 lDrive1.setPower(0.4);
-                lDrive2.setPower(0.4 );
+                lDrive2.setPower(0.4);
                 collectRight.setPosition(0.3);
                 collectLeft.setPosition(0.7);
-            } else if(gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
+            } else if (gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
                 lDrive1.setPower(0);
@@ -114,13 +147,12 @@ public class Teleop_11229 extends LinearOpMode {
                 lDrive2.setPower(0.7);
                 sleep(3000);
 
-            } else if(gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
+            } else if (gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
                 lDrive1.setPower(0);
                 lDrive2.setPower(0);
             }
-
 
 
             //slide
@@ -188,6 +220,30 @@ public class Teleop_11229 extends LinearOpMode {
                 elevator.setPower(0);
             }
 
+            if (gamepad2.dpad_up) {
+                while (errorT > 0 && opModeIsActive()) {
+                    errorT = 336 - elevator.getCurrentPosition();
+                    uT = errorT * kp;
+                    elevator.setPower(-uT);
+
+                    telemetry.addData("uT", uT);
+                    telemetry.addData("power", elevator.getPower());
+                    telemetry.addData("errorT", errorT);
+                    telemetry.update();
+                }
+                elevator.setPower(0);
+            } else if (gamepad2.dpad_down) {
+                while (errorT < 0 && opModeIsActive()) {
+                    errorT = -744 - elevator.getCurrentPosition();
+                    uT = errorT * kp;
+                    elevator.setPower(uT);
+
+                    telemetry.addData("uT", uT);
+                    telemetry.addData("power", elevator.getPower());
+                    telemetry.addData("errorT", errorT);
+                    telemetry.update();
+                }
+            }
 
             if (stoneIn.isPressed()) {
                 telemetry.addData("Touch sensor is pressed", "the stone is inside");
@@ -200,13 +256,11 @@ public class Teleop_11229 extends LinearOpMode {
             if (gamepad2.right_trigger > 0) {
                 collectRight.setPosition(0.7);
                 collectLeft.setPosition(0.2);
-            }
-            else if (gamepad2.left_trigger > 0) {
+            } else if (gamepad2.left_trigger > 0) {
                 collectLeft.setPosition(0.7);
                 collectRight.setPosition(0.2);
 
-            }
-            else {
+            } else {
                 collectRight.setPosition(0);
                 collectLeft.setPosition(0);
             }

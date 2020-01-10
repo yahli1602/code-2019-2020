@@ -52,10 +52,10 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
     private double lastError;
     private double lastPosition;
     private double perimeter = 4 * Math.PI;
-    private double ticksPerRevolution = 1120;
+    private double ticksPerRevolution = 1120 * 25;
     private double inchesPerTick = perimeter / ticksPerRevolution;
-    private double ticksPerSpin = ticksPerRevolution * 40;
     private double ticksPerInch = 1 / inchesPerTick;
+    private double ticksPerSpin = ticksPerRevolution * 40;
     private double diameter = 18;
     private double setPoint;
     private double startPosition;
@@ -292,7 +292,7 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
         }
     }
 
-    private void Elevator(double inches) {
+    private void Elevator(double inches){
         startPosition = elevator.getCurrentPosition();
         if (inches > 0) {
             while (errorT > 0 && opModeIsActive()) {
@@ -304,7 +304,7 @@ public class Auto_11226_B_Blue_Build_Zone extends LinearOpMode {
             while (errorT > 0 && opModeIsActive()) {
                 errorT = -inches - elevator.getCurrentPosition() / ticksPerInch - startPosition;
                 uT = errorT * kp;
-                elevator.setPower(uT);
+                elevator.setPower(-uT);
             }
         }
     }
