@@ -56,7 +56,7 @@ public class PIDdrive_11226_2 extends LinearOpMode {
     private final double ticksPerInch = 1 / inchesPerTick;*/
 
     private final double perimeter = 4 * Math.PI;
-    private final double ticksPerRevolution = 1120;
+    private final double ticksPerRevolution = 28;
     private final double inchesPerTick = perimeter / ticksPerRevolution;
     private final double ticksPerSpin = ticksPerRevolution * 25;
     private final double ticksPerInch = 1 / perimeter * ticksPerSpin;
@@ -344,6 +344,10 @@ public class PIDdrive_11226_2 extends LinearOpMode {
             ldrive2.setPower(d_power);
             rdrive1.setPower(d_power);
             rdrive2.setPower(d_power);
+
+            telemetry.addData("dError",d_error);
+            telemetry.addData("cPosition",cuurentPosition);
+            telemetry.addData("dPower",d_power);
 
             sleep(15);
 
