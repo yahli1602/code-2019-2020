@@ -30,6 +30,22 @@ public class PIDcon {
         m_kD = kD;
     }
 
+    public double getError(){
+        return m_error;
+    }
+
+    public double getKP(){
+        return m_kP;
+    }
+
+    public double getKI(){
+        return m_kI;
+    }
+
+    public double getKD(){
+        return m_kD;
+    }
+
     public void setSetPoint(double setpoint){
         m_setpoint = setpoint;
     }
@@ -45,14 +61,11 @@ public class PIDcon {
         m_sensorValue = sensorValue;
     }
 
+
     public void reset(){
         m_prevError = 0;
         m_error = 0;
         m_resulte = 0;
-    }
-
-    public double getError(){
-        return m_error;
     }
 
 

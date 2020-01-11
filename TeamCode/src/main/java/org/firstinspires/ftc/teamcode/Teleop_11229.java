@@ -31,7 +31,10 @@ public class Teleop_11229 extends LinearOpMode {
     private Servo collectRight = null;
     private Servo collectLeft = null;
 
+
     private TouchSensor stoneIn = null;
+
+    private PIDcon ePID = new PIDcon();
 
     private boolean Fast = true;
     private double startPosition;
@@ -43,31 +46,6 @@ public class Teleop_11229 extends LinearOpMode {
     private double inchesPerTick = 40 * perimeter / ticksPerRevolution;
     private double ticksPerInch = 1 / inchesPerTick;
 
-    private void Elevator(double inches) {
-        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        errorT = inches;
-        if (inches > 0) {
-            while (errorT > 0 && opModeIsActive() && elevator.getCurrentPosition() > -1120 && elevator.getCurrentPosition() < 100) {
-                errorT = inches * 4 * Math.PI - Math.abs(elevator.getCurrentPosition() / ticksPerInch);
-                uT = errorT * kp;
-                elevator.setPower(-uT);
-
-                telemetry.addData("uT", uT);
-                telemetry.addData("power", elevator.getPower());
-                telemetry.addData("errorT", errorT);
-                telemetry.update();
-            }
-            elevator.setPower(0);
-        } else {
-            while (errorT < 0 && opModeIsActive()) {
-                errorT = -inches - elevator.getCurrentPosition() / ticksPerInch - startPosition;
-                uT = errorT * kp;
-                elevator.setPower(uT);
-            }
-            elevator.setPower(0);
-        }
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -80,6 +58,11 @@ public class Teleop_11229 extends LinearOpMode {
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
+
+        ePID.PIDcon(0.2,0,0);
+
+
+
 
         waitForStart();
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
@@ -112,8 +95,6 @@ public class Teleop_11229 extends LinearOpMode {
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         while (opModeIsActive()) {
-//put cube on plate
-
 
             //Drive/turn tank
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
@@ -125,7 +106,7 @@ public class Teleop_11229 extends LinearOpMode {
                 lDrive1.setPower(gamepad1.left_stick_y);
                 lDrive2.setPower(gamepad1.left_stick_y);
             }
-
+//put cube on plate
             else if (gamepad2.a && gamepad1.atRest()) {
                 rDrive1.setPower(0.4);
                 rDrive2.setPower(0.4);
@@ -208,11 +189,7 @@ public class Teleop_11229 extends LinearOpMode {
                 elevator.setPower(0);
             }
 
-            if (gamepad2.dpad_up) {
-                Elevator(5);
-            } else if (gamepad2.dpad_down) {
-                Elevator(-5);
-            }
+
 
             if (stoneIn.isPressed()) {
                 telemetry.addData("Touch sensor is pressed", "the stone is inside");
@@ -237,5 +214,26 @@ public class Teleop_11229 extends LinearOpMode {
 
         }
 
+    }
+
+    private void elevatorHight(double ticks){
+        ePID.setSensorValue(elevator.getCurrentPosition());
+        ePID.setSetPoint(ticks);
+        ePID.setOutputRange(-0.7,0.7);
+        while(ePID.getError() != 0){
+            elevator.setPower(ePID.calculate());
+        }
+    }
+
+    private void setElevatorPosition(int ep){
+        double ticks;
+
+        if (ep == 1) ticks = 1;
+        else if (ep == 2) ticks = 2;
+        else if (ep == 3) ticks = 3;
+        else if (ep == 4) ticks = 4;
+        else ticks = 0;
+
+        elevatorHight(ticks);
     }
 }
