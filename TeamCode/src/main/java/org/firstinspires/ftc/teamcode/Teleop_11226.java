@@ -21,8 +21,7 @@ public class Teleop_11226 extends LinearOpMode {
     private DcMotor rDrive2 = null;
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
-    private DcMotor slide1 = null;
-    private DcMotor slide2 = null;
+    private DcMotor slide = null;
     //elevator
     private DcMotor elevator = null;
     //collection
@@ -46,8 +45,7 @@ public class Teleop_11226 extends LinearOpMode {
         rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
-        slide1 = hardwareMap.get(DcMotor.class, "slide1");
-        slide2 = hardwareMap.get(DcMotor.class, "slide2");
+        slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
         //collectRight = hardwareMap.get(Servo.class, "collectRight");
         //collectLeft = hardwareMap.get(Servo.class, "collectLeft");
@@ -60,16 +58,14 @@ public class Teleop_11226 extends LinearOpMode {
         rDrive2.setDirection(DcMotor.Direction.FORWARD);
         lDrive1.setDirection(DcMotor.Direction.REVERSE);
         lDrive2.setDirection(DcMotor.Direction.REVERSE);
-        slide1.setDirection(DcMotor.Direction.FORWARD);
-        slide2.setDirection(DcMotor.Direction.FORWARD);
+        slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
 //
         rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         while (opModeIsActive()) {
 
@@ -164,14 +160,11 @@ public class Teleop_11226 extends LinearOpMode {
 
 
             if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2 && Fast) {
-                slide1.setPower(gamepad1.right_stick_x);
-                slide2.setPower(gamepad1.right_stick_x);
+                slide.setPower(gamepad1.right_stick_x);
             } else if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2 && !Fast) {
-                slide1.setPower(gamepad1.right_stick_x / 2);
-                slide2.setPower(gamepad1.right_stick_x / 2);
+                slide.setPower(gamepad1.right_stick_x / 2);
             } else {
-                slide1.setPower(0);
-                slide2.setPower(0);
+                slide.setPower(0);
             }
 
 

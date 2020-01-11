@@ -33,6 +33,7 @@ public class Teleop_11229 extends LinearOpMode {
 
     private TouchSensor stoneIn = null;
 
+    private boolean Fast = true;
     private double startPosition;
     private double kp = 0.3;
     private double errorT;
@@ -43,11 +44,12 @@ public class Teleop_11229 extends LinearOpMode {
     private double ticksPerInch = 1 / inchesPerTick;
 
     private void Elevator(double inches) {
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         errorT = inches;
-        startPosition = elevator.getCurrentPosition() / ticksPerInch;
         if (inches > 0) {
-            while (errorT > 0 && opModeIsActive()) {
-                errorT = inches * 4 * Math.PI - Math.abs(elevator.getCurrentPosition() / ticksPerInch) + Math.abs(startPosition);
+            while (errorT > 0 && opModeIsActive() && elevator.getCurrentPosition() > -1120 && elevator.getCurrentPosition() < 100) {
+                errorT = inches * 4 * Math.PI - Math.abs(elevator.getCurrentPosition() / ticksPerInch);
                 uT = errorT * kp;
                 elevator.setPower(-uT);
 
@@ -110,50 +112,33 @@ public class Teleop_11229 extends LinearOpMode {
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         while (opModeIsActive()) {
+//put cube on plate
+
+
             //Drive/turn tank
             if (gamepad1.right_stick_y > 0.2 || gamepad1.right_stick_y < -0.2) {
                 rDrive1.setPower(gamepad1.right_stick_y);
                 rDrive2.setPower(gamepad1.right_stick_y);
-            } else {
-                rDrive1.setPower(0);
-                rDrive2.setPower(0);
             }
+
             if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                 lDrive1.setPower(gamepad1.left_stick_y);
                 lDrive2.setPower(gamepad1.left_stick_y);
-            } else {
-                lDrive1.setPower(0);
-                lDrive2.setPower(0);
             }
 
-            //Drop cube on plate
-            if (gamepad2.a) {
-                rDrive1.setPower(0.5);
-                rDrive2.setPower(0.5);
-                lDrive1.setPower(0.4);
-                lDrive2.setPower(0.4);
-                collectRight.setPosition(0.3);
+            else if (gamepad2.a && gamepad1.atRest()) {
+                rDrive1.setPower(0.4);
+                rDrive2.setPower(0.4);
+                lDrive1.setPower(0.3);
+                lDrive2.setPower(0.3);
+                collectRight.setPosition(0.2);
                 collectLeft.setPosition(0.7);
-            } else if (gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
+            } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
                 lDrive1.setPower(0);
                 lDrive2.setPower(0);
             }
-            if (gamepad1.x) {
-                rDrive1.setPower(-0.7);
-                rDrive2.setPower(-0.7);
-                lDrive1.setPower(0.7);
-                lDrive2.setPower(0.7);
-                sleep(3000);
-
-            } else if (gamepad1.right_stick_y == 0 && gamepad1.left_stick_y == 0) {
-                rDrive1.setPower(0);
-                rDrive2.setPower(0);
-                lDrive1.setPower(0);
-                lDrive2.setPower(0);
-            }
-
 
             //slide
             if (gamepad1.right_trigger > 0) {
@@ -169,6 +154,9 @@ public class Teleop_11229 extends LinearOpMode {
                 telemetry.addData("Slide Power:", slide.getPower());
                 telemetry.update();
             }
+
+
+            //Drop cube on plate
 
             /*//Drive gilad
             if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
@@ -221,28 +209,9 @@ public class Teleop_11229 extends LinearOpMode {
             }
 
             if (gamepad2.dpad_up) {
-                while (errorT > 0 && opModeIsActive()) {
-                    errorT = 336 - elevator.getCurrentPosition();
-                    uT = errorT * kp;
-                    elevator.setPower(-uT);
-
-                    telemetry.addData("uT", uT);
-                    telemetry.addData("power", elevator.getPower());
-                    telemetry.addData("errorT", errorT);
-                    telemetry.update();
-                }
-                elevator.setPower(0);
+                Elevator(5);
             } else if (gamepad2.dpad_down) {
-                while (errorT < 0 && opModeIsActive()) {
-                    errorT = -744 - elevator.getCurrentPosition();
-                    uT = errorT * kp;
-                    elevator.setPower(uT);
-
-                    telemetry.addData("uT", uT);
-                    telemetry.addData("power", elevator.getPower());
-                    telemetry.addData("errorT", errorT);
-                    telemetry.update();
-                }
+                Elevator(-5);
             }
 
             if (stoneIn.isPressed()) {
@@ -267,5 +236,6 @@ public class Teleop_11229 extends LinearOpMode {
 
 
         }
+
     }
 }
