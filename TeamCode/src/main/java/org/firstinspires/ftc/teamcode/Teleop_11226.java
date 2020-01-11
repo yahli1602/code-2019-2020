@@ -35,6 +35,8 @@ public class Teleop_11226 extends LinearOpMode {
     private Servo grabber = null;
     private TouchSensor cubeIn = null;
     private boolean Fast = true;
+    private PIDcon ePID = new PIDcon();
+    int elevatorPosition;
     // problem fixing
     private boolean hold180 = false;
     private double fix = 0;
@@ -71,12 +73,16 @@ public class Teleop_11226 extends LinearOpMode {
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        ePID.PIDcon(0.1,0,0);
+
         while (opModeIsActive()) {
 
             telemetry.addData("gamepad1 at rest", gamepad1.atRest());
             telemetry.addData("gamepad2 at rest", gamepad2.atRest());
             telemetry.addData("y", gamepad2.y);
             telemetry.addData("drive", gamepad1.left_stick_y);
+            telemetry.addData("elevator ticks",elevator.getCurrentPosition());
             telemetry.update();
 
             //drive
@@ -246,16 +252,30 @@ public class Teleop_11226 extends LinearOpMode {
 
 
             //turn collection
-            if (gamepad2.dpad_right) {
+            if (gamepad2.right_bumper) {
                 turnHold.setPower(1);
                 sleep(1200);
                 turnHold.setPower(0);
-            } else if (gamepad2.dpad_left) {
+            } else if (gamepad2.left_bumper) {
                 turnHold.setPower(-1);
                 sleep(1200);
                 turnHold.setPower(0);
             } else {
                 turnHold.setPower(0);
+            }
+
+            if (gamepad2.dpad_up) {
+                setElevatorPosition(1);
+
+            } else if (gamepad2.dpad_right) {
+                setElevatorPosition(2);
+
+            }else if (gamepad2.dpad_down){
+                setElevatorPosition(3);
+
+            }else if (gamepad2.dpad_left){
+                setElevatorPosition(4);
+
             }
 
 
@@ -266,4 +286,26 @@ public class Teleop_11226 extends LinearOpMode {
         }
 
     }
+
+    private void elevatorHight(double ticks){
+        ePID.setSensorValue(elevator.getCurrentPosition());
+        ePID.setSetPoint(ticks);
+        ePID.setOutputRange(-0.7,0.7);
+        while(ePID.getError() != 0){
+            elevator.setPower(ePID.calculate());
+        }
+    }
+
+    private void setElevatorPosition(int ep){
+        double ticks;
+
+        if (ep == 1) ticks = 1;
+        else if (ep == 2) ticks = 2;
+        else if (ep == 3) ticks = 3;
+        else if (ep == 4) ticks = 4;
+        else ticks = 0;
+
+        elevatorHight(ticks);
+    }
+
 }
