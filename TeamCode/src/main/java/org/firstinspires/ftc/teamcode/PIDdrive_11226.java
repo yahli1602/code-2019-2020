@@ -135,9 +135,9 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
-        aPID = new PIDController(0.3, 0, 0);
+        //aPID = new PIDController(0.2, 0, 0);
 
-        dPID = new PIDController(0.2, 0, 0);
+        dPID = new PIDController(0.05, 0, 0);
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
@@ -336,22 +336,9 @@ public class PIDdrive_11226 extends LinearOpMode {
             telemetry.update();
 
             // set power levels.
-            if (d_power > 1) d_power = 1;
 
 
-            else if (d_power < -1) d_power = -1;
 
-            if (getAngle() > 0){
-                r_dPower = 0.17;
-                l_dPower = 0;
-
-            }else if(getAngle() < 0){
-                l_dPower = 0.17;
-                r_dPower = 0;
-            }else{
-                r_dPower = 0;
-                l_dPower = 0;
-            }
 
 
             ldrive1.setPower(d_power + l_dPower);
