@@ -51,10 +51,10 @@ public class PIDdrive_11229 extends LinearOpMode
     double derivative = 0;
 
     private final double perimeter = 4 * Math.PI;
-    private final double ticksPerRevolution = 1120;
+    private final double ticksPerRevolution = 28;
     private final double inchesPerTick = perimeter / ticksPerRevolution;
     private final double ticksPerSpin = ticksPerRevolution * 20;
-    private final double ticksPerInch = 1 / inchesPerTick;
+    private final double ticksPerInch = 1 / perimeter* ticksPerSpin;
 
     // called when init button is  pressed.
     @Override
@@ -65,7 +65,6 @@ public class PIDdrive_11229 extends LinearOpMode
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-
         elevator = hardwareMap.get(DcMotor.class, "elevator");
 
 
@@ -111,7 +110,7 @@ public class PIDdrive_11229 extends LinearOpMode
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = false;
 
-        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C 0port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -127,9 +126,9 @@ public class PIDdrive_11229 extends LinearOpMode
         // straight line. P value controls how sensitive the correction is.
 
 
-        dPID.PIDcon(0.15,0,0);
+        dPID.PIDcon(0.03,0,0);
 
-        aPID.PIDcon(0.15,0,0);
+        aPID.PIDcon(0.02,0,0);
 
 
         telemetry.addData("Mode", "calibrating...");
@@ -251,13 +250,12 @@ public class PIDdrive_11229 extends LinearOpMode
 
 
 
-
         cuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
         dPID.setSensorValue(cuurentPosition);
         dPID.calculate();
 
 
-        while (dPID.getError() > 0 && opModeIsActive()) {
+        while (dPID.getError() != 0 && opModeIsActive()) {
 
 
 
@@ -282,10 +280,6 @@ public class PIDdrive_11229 extends LinearOpMode
             lDrive1.setPower(d_power - coraction);
             lDrive2.setPower(d_power - coraction);
 
-            if (h == 0 && opModeIsActive()){
-                sleep(75);
-                h++;
-            }
 
             rDrive1.setPower(d_power + coraction);
             rDrive2.setPower(d_power + coraction);

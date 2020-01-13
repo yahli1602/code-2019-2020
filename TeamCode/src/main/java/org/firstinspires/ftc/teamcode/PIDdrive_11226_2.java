@@ -25,7 +25,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Autonomous(name = "PID drive 11226 2", group = "PID")
 
-public class PIDdrive_11226_2 extends LinearOpMode {
+public class
+PIDdrive_11226_2 extends LinearOpMode {
     DcMotor ldrive1, ldrive2, rdrive1, rdrive2, slide1, slide2, elevator;
     CRServo hold;
     BNO055IMU imu;
@@ -35,8 +36,8 @@ public class PIDdrive_11226_2 extends LinearOpMode {
     PIDcon dPID = new PIDcon();
     PIDcon pidRotate = new PIDcon();
     double d_error = 0;
-    private double d_maximumOutput = 0.7;	// |maximum output|
-    private double d_minimumOutput = -0.7;	// |minimum output|
+    private double d_maximumOutput = 0.7;    // |maximum output|
+    private double d_minimumOutput = -0.7;    // |minimum output|
     int sign;
     double d_prevError = 0;
     double d_startPoint = 0;
@@ -132,7 +133,7 @@ public class PIDdrive_11226_2 extends LinearOpMode {
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0,0,0);
+        pidRotate.PIDcon(0, 0, 0);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
@@ -292,7 +293,7 @@ public class PIDdrive_11226_2 extends LinearOpMode {
     private void driveInches(double inches, double d_power) {
 
 
-        dPID.setOutputRange(-d_power,d_power);
+        dPID.setOutputRange(-d_power, d_power);
 
         dPID.setSetPoint(inches);
 
@@ -313,14 +314,9 @@ public class PIDdrive_11226_2 extends LinearOpMode {
             d_power = dPID.calculate();
 
 
-
-
-
-
-
-            telemetry.addData("dError",d_error);
-            telemetry.addData("cPosition",cuurentPosition);
-            telemetry.addData("dPower",d_power);
+            telemetry.addData("dError", d_error);
+            telemetry.addData("cPosition", cuurentPosition);
+            telemetry.addData("dPower", d_power);
 
 
             telemetry.update();
@@ -332,9 +328,6 @@ public class PIDdrive_11226_2 extends LinearOpMode {
             else if (d_power < 0) sign = -1;
 
 
-
-
-
             if (sign == 1) {
                 if (getAngle() > 0) {
                     r_dPower = 0.17;
@@ -344,7 +337,7 @@ public class PIDdrive_11226_2 extends LinearOpMode {
                     l_dPower = 0.17;
                     r_dPower = 0;
                 }
-            }else if (sign == -1) {
+            } else if (sign == -1) {
                 if (getAngle() > 0) {
                     r_dPower = 0;
                     l_dPower = -0.17;
@@ -355,7 +348,7 @@ public class PIDdrive_11226_2 extends LinearOpMode {
                 }
             }
 
-            if (getAngle() == 0){
+            if (getAngle() == 0) {
                 l_dPower = 0;
                 r_dPower = 0;
             }
@@ -366,9 +359,9 @@ public class PIDdrive_11226_2 extends LinearOpMode {
             rdrive1.setPower(d_power + r_dPower);
             rdrive2.setPower(d_power + r_dPower);
 
-            telemetry.addData("dError",d_error);
-            telemetry.addData("cPosition",cuurentPosition);
-            telemetry.addData("dPower",d_power);
+            telemetry.addData("dError", d_error);
+            telemetry.addData("cPosition", cuurentPosition);
+            telemetry.addData("dPower", d_power);
 
             sleep(15);
 

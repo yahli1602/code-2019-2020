@@ -135,7 +135,7 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
-        aPID = new PIDController(0.2, 0, 0);
+        aPID = new PIDController(0.3, 0, 0);
 
         dPID = new PIDController(0.2, 0, 0);
 

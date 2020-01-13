@@ -79,17 +79,17 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 rDrive2.setPower(gamepad1.left_stick_y);
                 lDrive1.setPower(gamepad1.left_stick_y);
                 lDrive2.setPower(gamepad1.left_stick_y);
-            } else if (gamepad1.left_trigger > 0.2) {
-                rDrive1.setPower(-gamepad1.left_trigger);
-                rDrive2.setPower(-gamepad1.left_trigger);
-                lDrive1.setPower(gamepad1.left_trigger);
-                lDrive2.setPower(gamepad1.left_trigger);
+            } else if (gamepad1.left_trigger > 0) {
+                rDrive1.setPower(-gamepad1.left_trigger/2);
+                rDrive2.setPower(-gamepad1.left_trigger/2);
+                lDrive1.setPower(gamepad1.left_trigger/2);
+                lDrive2.setPower(gamepad1.left_trigger/2);
 
-            } else if (gamepad1.right_trigger > 0.2) {
-                rDrive1.setPower(gamepad1.right_trigger);
-                rDrive2.setPower(gamepad1.right_trigger);
-                lDrive1.setPower(-gamepad1.right_trigger);
-                lDrive2.setPower(-gamepad1.right_trigger);
+            } else if (gamepad1.right_trigger > 0) {
+                rDrive1.setPower(gamepad1.right_trigger/2);
+                rDrive2.setPower(gamepad1.right_trigger/2);
+                lDrive1.setPower(-gamepad1.right_trigger/2);
+                lDrive2.setPower(-gamepad1.right_trigger/2);
 
             }
             //Drop cube on plate

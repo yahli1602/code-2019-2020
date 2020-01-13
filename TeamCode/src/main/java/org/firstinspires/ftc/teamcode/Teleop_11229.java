@@ -45,6 +45,7 @@ public class Teleop_11229 extends LinearOpMode {
     private double ticksPerRevolution = 1120;
     private double inchesPerTick = 40 * perimeter / ticksPerRevolution;
     private double ticksPerInch = 1 / inchesPerTick;
+    private int timesOfUsage = 0;
 
 
     @Override
@@ -59,9 +60,7 @@ public class Teleop_11229 extends LinearOpMode {
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
 
-        ePID.PIDcon(0.2,0,0);
-
-
+        ePID.PIDcon(0.2, 0, 0);
 
 
         waitForStart();
@@ -106,6 +105,7 @@ public class Teleop_11229 extends LinearOpMode {
                 lDrive1.setPower(gamepad1.left_stick_y);
                 lDrive2.setPower(gamepad1.left_stick_y);
             }
+
 //put cube on plate
             else if (gamepad2.a && gamepad1.atRest()) {
                 rDrive1.setPower(0.4);
@@ -136,6 +136,19 @@ public class Teleop_11229 extends LinearOpMode {
                 telemetry.update();
             }
 
+            if (gamepad1.right_trigger > 0) {
+                slide.setPower(-gamepad1.right_trigger / 2);
+                telemetry.addData("Slide Power:", slide.getPower());
+                telemetry.update();
+            } else if (gamepad1.left_trigger > 0) {
+                slide.setPower(gamepad1.left_trigger / 2);
+                telemetry.addData("Slide Power:", slide.getPower());
+                telemetry.update();
+            } else {
+                slide.setPower(0);
+                telemetry.addData("Slide Power:", slide.getPower());
+                telemetry.update();
+            }
 
             //Drop cube on plate
 
@@ -189,7 +202,9 @@ public class Teleop_11229 extends LinearOpMode {
                 elevator.setPower(0);
             }
 
-
+            if (gamepad2.dpad_up) {
+                setElevatorPosition(1);
+            }
 
             if (stoneIn.isPressed()) {
                 telemetry.addData("Touch sensor is pressed", "the stone is inside");
@@ -216,22 +231,22 @@ public class Teleop_11229 extends LinearOpMode {
 
     }
 
-    private void elevatorHight(double ticks){
+    private void elevatorHight(double ticks) {
+        double setPoint;
+
         ePID.setSensorValue(elevator.getCurrentPosition());
-        ePID.setSetPoint(ticks);
-        ePID.setOutputRange(-0.7,0.7);
-        while(ePID.getError() != 0){
+        ePID.setSetPoint(0);
+        ePID.setOutputRange(-0.7, 0.7);
+        while (ePID.getError() != 0) {
             elevator.setPower(ePID.calculate());
         }
+        timesOfUsage++;
     }
 
-    private void setElevatorPosition(int ep){
+    private void setElevatorPosition(int ep) {
         double ticks;
 
         if (ep == 1) ticks = 1;
-        else if (ep == 2) ticks = 2;
-        else if (ep == 3) ticks = 3;
-        else if (ep == 4) ticks = 4;
         else ticks = 0;
 
         elevatorHight(ticks);
