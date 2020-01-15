@@ -201,7 +201,7 @@ public class Teleop_11226 extends LinearOpMode {
             }
 
             //push cube in
-            if (gamepad2.x) {
+            if (gamepad2.b) {
                 if (!pushCube) {
                     push.setPosition(180);
                     pushCube = true;

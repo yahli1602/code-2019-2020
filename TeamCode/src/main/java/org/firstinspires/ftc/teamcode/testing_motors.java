@@ -62,8 +62,8 @@ public class testing_motors extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;*/
-    //private DcMotor motor1 = null;
-    private Servo hold = null;
+    private DcMotor motor1 = null;
+    //private Servo hold = null;
     //elevator
     /*private DcMotor elevator = null;
     //fold collection
@@ -91,8 +91,8 @@ public class testing_motors extends LinearOpMode {
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         grabber1 = hardwareMap.get(Servo.class, "grabber1");
         grabber2 = hardwareMap.get(Servo.class, "grabber2");*/
-        //motor1 = hardwareMap.get(DcMotor.class, "motor1");
-        hold = hardwareMap.get(Servo.class, "hold");
+        motor1 = hardwareMap.get(DcMotor.class, "motor1");
+        //hold = hardwareMap.get(Servo.class, "hold");
         waitForStart();
         /*rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
@@ -103,8 +103,8 @@ public class testing_motors extends LinearOpMode {
         foldcollect.setDirection(DcMotor.Direction.FORWARD);
         grabber1.setDirection(Servo.Direction.FORWARD);
         grabber2.setDirection(Servo.Direction.REVERSE);*/
-        //motor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        hold.setDirection(Servo.Direction.FORWARD);
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
+        //hold.setDirection(Servo.Direction.FORWARD);
 
         /*rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -112,13 +112,13 @@ public class testing_motors extends LinearOpMode {
         lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
-        //motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        hold.setPosition(0);
+        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //hold.setPosition(0);
 
         runtime.reset();
-int x=0;
-        /*while (opModeIsActive() && x==0) {
-            rDrive1.setPower(1);
+        int x = 0;
+        while (opModeIsActive()) {
+            /*rDrive1.setPower(1);
             rDrive2.setPower(1);
             x++;
         }
@@ -162,7 +162,7 @@ int x=0;
 
 
         }*/
-        boolean pinch = false;
+        /*boolean pinch = false;
         if(gamepad2.y){
             if(pinch){
                 hold.setPosition(25);
@@ -170,6 +170,14 @@ int x=0;
             else{
                 hold.setPosition(0);
                 pinch = false;
+            }
+        }*/
+
+            if(gamepad1.a && opModeIsActive()) {
+                motor1.setPower(0.5);
+            }
+            else{
+                motor1.setPower(0);
             }
         }
     }
