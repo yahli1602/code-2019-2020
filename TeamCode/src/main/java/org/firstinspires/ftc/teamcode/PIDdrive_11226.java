@@ -38,22 +38,25 @@ public class PIDdrive_11226 extends LinearOpMode {
     PIDcon pidRotate = new PIDcon();
     PIDcon aPID = new PIDcon();
     PIDcon ePID = new PIDcon();
+    PIDcon sPID = new PIDcon();
+    PIDcon ScPID = new PIDcon();
     double d_error = 0;
-    private double d_maximumOutput = 0.7;	// |maximum output|
-    private double d_minimumOutput = -0.7;	// |minimum output|
-    int sign;
-
+    double                  s_startPoint = 0;
+    double                  sc_startPoint = 0;
+    double                  Scoraction;
+    double ScurrentPosition = 0;
     double RcuurentPosition = 0;
     double LcuurentPosition = 0;
     double d_prevError = 0;
     double d_RstartPoint = 0;
     double d_LstartPoint = 0;
-    double d_setpoint = 0;
+
 
     double integral = 0;
     double derivative = 0;
     double  d_Rpower = 0;
     double  d_Lpower = 0;
+    double  d_Spower = 0;
     double coraction = 0;
 
 
@@ -152,7 +155,10 @@ public class PIDdrive_11226 extends LinearOpMode {
         dRPID.PIDcon(0.07, 0, 0.12);
         dLPID.PIDcon(0.07, 0, 0.12);
 
-        aPID.PIDcon(0.2,0,0.06);
+        aPID.PIDcon(0.2,0,0.1);
+
+        sPID.PIDcon(0.1,0,0);
+        ScPID.PIDcon(0,0,0);
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
@@ -188,7 +194,7 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
 
-            driveInches(32, -0.6,0.6);
+            slideInches(48, 0,1);
 
             q++;
 
@@ -325,7 +331,7 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.05,0.05);
+        aPID.setOutputRange(-0.07,0.07);
 
         RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (ldrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -379,14 +385,14 @@ public class PIDdrive_11226 extends LinearOpMode {
             rdrive1.setPower(d_Rpower + coraction);
             rdrive2.setPower(d_Rpower + coraction);
 
-            if (d_Rpower <0.06 && opModeIsActive()){
+            /*if (d_Rpower <0.06 && opModeIsActive()){
                 dRPID.setSensorValue(inches);
                 dRPID.calculate();
             }
             if (d_Lpower <0.06 && opModeIsActive()){
                 dLPID.setSensorValue(inches);
                 dLPID.calculate();
-            }
+            }*/
 
 
 
@@ -406,6 +412,196 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
     }
+
+    private void backInches(double inches, double minPower, double maxPower) {
+
+        d_Rpower = 0;
+        d_Lpower = 0;
+
+        dRPID.setOutputRange(minPower,maxPower);
+        dLPID.setOutputRange(minPower,maxPower);
+
+        dRPID.setSetPoint(inches);
+        dLPID.setSetPoint(inches);
+
+
+        d_RstartPoint = rdrive1.getCurrentPosition();
+        d_LstartPoint = ldrive1.getCurrentPosition();
+
+
+        aPID.setSetPoint(0);
+        aPID.setOutputRange(-0.07,0.07);
+
+        RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
+        LcuurentPosition = (ldrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
+
+        dRPID.setSensorValue(RcuurentPosition);
+        dLPID.setSensorValue(LcuurentPosition);
+
+        dRPID.calculate();
+        dLPID.calculate();
+
+
+
+        while (dRPID.getError() < 0 && dLPID.getError() < 0 && opModeIsActive()) {
+
+            RcuurentPosition = (rdrive1.getCurrentPosition()) / ticksPerInch;
+            dRPID.setSensorValue(RcuurentPosition);
+
+            d_Rpower = dRPID.calculate();
+
+
+            LcuurentPosition = (ldrive1.getCurrentPosition()) / ticksPerInch;
+            dLPID.setSensorValue(LcuurentPosition);
+
+            d_Lpower = dLPID.calculate();
+
+            aPID.setSensorValue(getAngle());
+            coraction = aPID.calculate();
+
+
+
+
+
+
+
+
+
+
+            telemetry.update();
+
+            // set power levels.
+
+
+
+
+
+
+
+
+            ldrive1.setPower(d_Lpower - coraction);
+            ldrive2.setPower(d_Lpower - coraction);
+            rdrive1.setPower(d_Rpower + coraction);
+            rdrive2.setPower(d_Rpower + coraction);
+
+
+
+
+
+            sleep(15);
+
+            telemetry.addData("left position", ldrive2.getCurrentPosition());
+            telemetry.addData("right position", rdrive2.getCurrentPosition());
+            telemetry.addData("left power", ldrive2.getPower());
+            telemetry.addData("right power", rdrive2.getPower());
+        }
+
+
+        ldrive1.setPower(0);
+        ldrive2.setPower(0);
+        rdrive1.setPower(0);
+        rdrive2.setPower(0);
+
+
+    }
+
+    private void slideInches(double inches, double minPower, double maxPower) {
+
+
+
+        sPID.setOutputRange(minPower,maxPower);
+
+
+        sPID.setSetPoint(inches);
+
+
+
+        s_startPoint = slide1.getCurrentPosition();
+
+
+
+        ScPID.setSetPoint(0);
+        ScPID.setOutputRange(-0.07,0.07);
+
+        ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / ticksPerInch;
+
+
+        sPID.setSensorValue(ScurrentPosition);
+
+
+        sPID.calculate();
+
+
+
+
+        while (sPID.getError() > 0 && opModeIsActive()) {
+
+            ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / ticksPerInch;
+            sPID.setSensorValue(ScurrentPosition);
+
+            d_Spower = sPID.calculate();
+
+
+            ScPID.setSensorValue(getAngle());
+            Scoraction = ScPID.calculate();
+
+
+
+
+
+
+
+
+
+
+            telemetry.update();
+
+            // set power levels.
+
+
+
+
+
+
+
+
+            slide1.setPower(d_Spower);
+
+            ldrive1.setPower(-coraction);
+            ldrive2.setPower(-coraction);
+            rdrive1.setPower(coraction);
+            rdrive2.setPower(coraction);
+
+
+            /*if (d_Rpower <0.06 && opModeIsActive()){
+                dRPID.setSensorValue(inches);
+                dRPID.calculate();
+            }
+            if (d_Lpower <0.06 && opModeIsActive()){
+                dLPID.setSensorValue(inches);
+                dLPID.calculate();
+            }*/
+
+
+
+            sleep(15);
+
+            telemetry.addData("left position", ldrive2.getCurrentPosition());
+            telemetry.addData("right position", rdrive2.getCurrentPosition());
+            telemetry.addData("left power", ldrive2.getPower());
+            telemetry.addData("right power", rdrive2.getPower());
+        }
+
+
+        slide1.setPower(0);
+        ldrive1.setPower(0);
+        ldrive2.setPower(0);
+        rdrive1.setPower(0);
+        rdrive2.setPower(0);
+
+
+    }
+
     private void elevatorHight(double ticks){
         ePID.setSensorValue(elevator.getCurrentPosition());
         ePID.setSetPoint(ticks);
@@ -426,6 +622,8 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         elevatorHight(ticks);
     }
+
+
 
 
 }

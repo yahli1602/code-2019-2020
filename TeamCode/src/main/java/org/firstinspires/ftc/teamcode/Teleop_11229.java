@@ -191,10 +191,7 @@ public class Teleop_11229 extends LinearOpMode {
             } else {
                 slide.setPower(0);
             }*/
-            telemetry.addData("rtrigger:", gamepad1.right_trigger);
-            telemetry.addData("ltrigger:", gamepad1.left_trigger);
-            telemetry.addData("drive:", rDrive1.getPower());
-            telemetry.update();
+
 //elevator
             if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
@@ -210,8 +207,7 @@ public class Teleop_11229 extends LinearOpMode {
                 telemetry.addData("Touch sensor is pressed", "the stone is inside");
             }
 
-            telemetry.addData("elevator", elevator.getCurrentPosition());
-            telemetry.update();
+
 
             //collection
             if (gamepad2.right_trigger > 0) {
@@ -228,6 +224,9 @@ public class Teleop_11229 extends LinearOpMode {
 
             telemetry.addData("rticks",rDrive1.getCurrentPosition());
             telemetry.addData("lticks",lDrive1.getCurrentPosition());
+            telemetry.addData("rpower",rDrive1.getPower());
+            telemetry.addData("lpower",lDrive1.getPower());
+
             telemetry.update();
 
 

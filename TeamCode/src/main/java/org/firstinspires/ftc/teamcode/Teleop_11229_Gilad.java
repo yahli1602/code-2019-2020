@@ -39,7 +39,6 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
 
-        waitForStart();
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
         lDrive1.setDirection(DcMotor.Direction.FORWARD);
@@ -69,6 +68,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        waitForStart();
 
         while (opModeIsActive()) {
             //Drive/turn tank
@@ -112,10 +112,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             } else {
                 slide.setPower(0);
             }
-            telemetry.addData("rtrigger:", gamepad1.right_trigger);
-            telemetry.addData("ltrigger:", gamepad1.left_trigger);
-            telemetry.addData("drive:", rDrive1.getPower());
-            telemetry.update();
+
 //elevator
             if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
@@ -128,8 +125,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 telemetry.addData("Touch sensor is pressed", "the stone is inside");
             }
 
-            telemetry.addData("elevator", elevator.getCurrentPosition());
-            telemetry.update();
+
 
             //collection
             if (gamepad2.right_trigger > 0.2) {

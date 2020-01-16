@@ -312,12 +312,7 @@ public class PIDdrive_11229 extends LinearOpMode
             telemetry.addData("LcurrentP", lDrive1.getCurrentPosition());
             telemetry.update();
 
-            sleep(200);
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-            rDrive1.setPower(0);
-            rDrive2.setPower(0);
-            sleep(500);
+            sleep(15);
 
 
 
