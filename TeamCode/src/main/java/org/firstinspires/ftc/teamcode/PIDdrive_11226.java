@@ -331,7 +331,7 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         while (dPID.getError() != 0 && opModeIsActive()) {
 
-            cuurentPosition = (rdrive1.getCurrentPosition() - d_startPoint) / ticksPerInch;
+            cuurentPosition = (rdrive1.getCurrentPosition()) / ticksPerInch;
             dPID.setSensorValue(cuurentPosition);
 
             d_power = dPID.calculate();

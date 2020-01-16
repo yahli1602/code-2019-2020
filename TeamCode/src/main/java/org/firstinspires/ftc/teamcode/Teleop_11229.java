@@ -226,6 +226,10 @@ public class Teleop_11229 extends LinearOpMode {
                 collectLeft.setPosition(0);
             }
 
+            telemetry.addData("rticks",rDrive1.getCurrentPosition());
+            telemetry.addData("lticks",lDrive1.getCurrentPosition());
+            telemetry.update();
+
 
         }
 

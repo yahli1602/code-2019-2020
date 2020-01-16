@@ -5,8 +5,8 @@ public class PIDcon {
 
     double m_error = 0;
 
-    private double m_maximumOutput = 0.7;	// |maximum output|
-    private double m_minimumOutput = -0.7;	// |minimum output|
+    private double m_maximumOutput = 0;	// |maximum output|
+    private double m_minimumOutput = 0;	// |minimum output|
 
     private double m_prevError = 0;
     private double m_startPoint = 0;
@@ -16,8 +16,6 @@ public class PIDcon {
 
     double integral = 0;
     double derivative = 0;
-
-
 
 
     double m_kP = 0;
@@ -70,6 +68,8 @@ public class PIDcon {
 
 
     public double calculate(){
+
+
         m_error = m_setpoint - m_sensorValue;
 
         if (integral * m_kI < m_maximumOutput && integral * m_kI > m_minimumOutput){
@@ -87,10 +87,14 @@ public class PIDcon {
         m_prevError = m_error;
         m_resulte = m_error * m_kP + integral * m_kI + derivative * m_kD;
 
-        if (m_resulte > m_maximumOutput) m_resulte = m_maximumOutput;
+        // Record sign of result.
 
-
-        else if (m_resulte < m_minimumOutput) m_resulte = m_minimumOutput;
+        // Make sure the final result is within bounds. If we constrain the result, we make
+        // sure the sign of the constrained result matches the original result sign.
+        if (m_resulte > m_maximumOutput)
+                m_resulte = m_maximumOutput;
+        else if (m_resulte < m_minimumOutput)
+            m_resulte = m_minimumOutput;
 
         return m_resulte;
     }
