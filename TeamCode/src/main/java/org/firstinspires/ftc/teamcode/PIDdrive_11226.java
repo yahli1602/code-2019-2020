@@ -41,9 +41,9 @@ public class PIDdrive_11226 extends LinearOpMode {
     PIDcon sPID = new PIDcon();
     PIDcon ScPID = new PIDcon();
     double d_error = 0;
-    double                  s_startPoint = 0;
-    double                  sc_startPoint = 0;
-    double                  Scoraction;
+    double s_startPoint = 0;
+    double sc_startPoint = 0;
+    double Scoraction;
     double ScurrentPosition = 0;
     double RcuurentPosition = 0;
     double LcuurentPosition = 0;
@@ -54,9 +54,9 @@ public class PIDdrive_11226 extends LinearOpMode {
 
     double integral = 0;
     double derivative = 0;
-    double  d_Rpower = 0;
-    double  d_Lpower = 0;
-    double  d_Spower = 0;
+    double d_Rpower = 0;
+    double d_Lpower = 0;
+    double d_Spower = 0;
     double coraction = 0;
 
 
@@ -76,6 +76,9 @@ public class PIDdrive_11226 extends LinearOpMode {
     private final double ticksPerSpin = ticksPerRevolution * 25;
     private final double ticksPerInch = 1 / perimeter * ticksPerSpin;
 
+    private final double SticksPerSpin = ticksPerRevolution * 36;
+    private final double SticksPerInch = 1 / perimeter * SticksPerSpin;
+
 
     // called when init button is  pressed.
     @Override
@@ -93,7 +96,7 @@ public class PIDdrive_11226 extends LinearOpMode {
         collectLeft = hardwareMap.get(Servo.class, "collect left");
         cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
 
-        ePID.PIDcon(0.1,0,0);
+        ePID.PIDcon(0.1, 0, 0);
 
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -146,7 +149,7 @@ public class PIDdrive_11226 extends LinearOpMode {
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0,0,0);
+        pidRotate.PIDcon(0, 0, 0);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
@@ -155,10 +158,10 @@ public class PIDdrive_11226 extends LinearOpMode {
         dRPID.PIDcon(0.07, 0, 0.12);
         dLPID.PIDcon(0.07, 0, 0.12);
 
-        aPID.PIDcon(0.2,0,0.1);
+        aPID.PIDcon(0.2, 0, 0.1);
 
-        sPID.PIDcon(0.1,0,0);
-        ScPID.PIDcon(0,0,0);
+        sPID.PIDcon(0.5, 0.4, 0.15);
+        ScPID.PIDcon(0, 0, 0);
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
@@ -191,10 +194,7 @@ public class PIDdrive_11226 extends LinearOpMode {
         while (opModeIsActive() && q == 0) {
 
 
-
-
-
-            driveInches(90, 0,0.6);
+            slideInches(48, -1, 1);
 
             q++;
 
@@ -319,8 +319,8 @@ public class PIDdrive_11226 extends LinearOpMode {
         d_Rpower = 0;
         d_Lpower = 0;
 
-        dRPID.setOutputRange(minPower,maxPower);
-        dLPID.setOutputRange(minPower,maxPower);
+        dRPID.setOutputRange(minPower, maxPower);
+        dLPID.setOutputRange(minPower, maxPower);
 
         dRPID.setSetPoint(inches);
         dLPID.setSetPoint(inches);
@@ -331,7 +331,7 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.07,0.07);
+        aPID.setOutputRange(-0.07, 0.07);
 
         RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (ldrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -341,7 +341,6 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         dRPID.calculate();
         dLPID.calculate();
-
 
 
         while (dRPID.getError() > 0 && dLPID.getError() > 0 && opModeIsActive()) {
@@ -361,23 +360,9 @@ public class PIDdrive_11226 extends LinearOpMode {
             coraction = aPID.calculate();
 
 
-
-
-
-
-
-
-
-
             telemetry.update();
 
             // set power levels.
-
-
-
-
-
-
 
 
             ldrive1.setPower(d_Lpower - coraction);
@@ -395,11 +380,12 @@ public class PIDdrive_11226 extends LinearOpMode {
             }*/
 
 
-
             telemetry.addData("left position", ldrive2.getCurrentPosition());
             telemetry.addData("right position", rdrive2.getCurrentPosition());
             telemetry.addData("left power", ldrive2.getPower());
             telemetry.addData("right power", rdrive2.getPower());
+            telemetry.addData("coraction", coraction);
+            telemetry.addData("angle", getAngle());
             sleep(150);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
@@ -424,8 +410,8 @@ public class PIDdrive_11226 extends LinearOpMode {
         d_Rpower = 0;
         d_Lpower = 0;
 
-        dRPID.setOutputRange(minPower,maxPower);
-        dLPID.setOutputRange(minPower,maxPower);
+        dRPID.setOutputRange(minPower, maxPower);
+        dLPID.setOutputRange(minPower, maxPower);
 
         dRPID.setSetPoint(inches);
         dLPID.setSetPoint(inches);
@@ -436,7 +422,7 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.07,0.07);
+        aPID.setOutputRange(-0.07, 0.07);
 
         RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (ldrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -446,7 +432,6 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         dRPID.calculate();
         dLPID.calculate();
-
 
 
         while (dRPID.getError() < 0 && dLPID.getError() < 0 && opModeIsActive()) {
@@ -466,32 +451,15 @@ public class PIDdrive_11226 extends LinearOpMode {
             coraction = aPID.calculate();
 
 
-
-
-
-
-
-
-
-
             telemetry.update();
 
             // set power levels.
-
-
-
-
-
-
 
 
             ldrive1.setPower(d_Lpower - coraction);
             ldrive2.setPower(d_Lpower - coraction);
             rdrive1.setPower(d_Rpower + coraction);
             rdrive2.setPower(d_Rpower + coraction);
-
-
-
 
 
             sleep(15);
@@ -514,22 +482,19 @@ public class PIDdrive_11226 extends LinearOpMode {
     private void slideInches(double inches, double minPower, double maxPower) {
 
 
-
-        sPID.setOutputRange(minPower,maxPower);
+        sPID.setOutputRange(minPower, maxPower);
 
 
         sPID.setSetPoint(inches);
 
 
-
         s_startPoint = slide1.getCurrentPosition();
 
 
-
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.07,0.07);
+        ScPID.setOutputRange(-0.07, 0.07);
 
-        ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / ticksPerInch;
+        ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / SticksPerInch;
 
 
         sPID.setSensorValue(ScurrentPosition);
@@ -538,11 +503,9 @@ public class PIDdrive_11226 extends LinearOpMode {
         sPID.calculate();
 
 
-
-
         while (sPID.getError() > 0 && opModeIsActive()) {
 
-            ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / ticksPerInch;
+            ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
 
             d_Spower = sPID.calculate();
@@ -552,23 +515,9 @@ public class PIDdrive_11226 extends LinearOpMode {
             Scoraction = ScPID.calculate();
 
 
-
-
-
-
-
-
-
-
             telemetry.update();
 
             // set power levels.
-
-
-
-
-
-
 
 
             slide1.setPower(d_Spower);
@@ -589,7 +538,6 @@ public class PIDdrive_11226 extends LinearOpMode {
             }*/
 
 
-
             sleep(15);
 
             telemetry.addData("left position", ldrive2.getCurrentPosition());
@@ -608,16 +556,16 @@ public class PIDdrive_11226 extends LinearOpMode {
 
     }
 
-    private void elevatorHight(double ticks){
+    private void elevatorHight(double ticks) {
         ePID.setSensorValue(elevator.getCurrentPosition());
         ePID.setSetPoint(ticks);
-        ePID.setOutputRange(-0.7,0.7);
-        while(ePID.getError() != 0){
+        ePID.setOutputRange(-0.7, 0.7);
+        while (ePID.getError() != 0) {
             elevator.setPower(ePID.calculate());
         }
     }
 
-    private void setElevatorPosition(int ep){
+    private void setElevatorPosition(int ep) {
         double ticks;
 
         if (ep == 1) ticks = 0;
@@ -628,8 +576,6 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         elevatorHight(ticks);
     }
-
-
 
 
 }

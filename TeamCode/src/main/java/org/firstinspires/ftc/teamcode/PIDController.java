@@ -20,6 +20,8 @@ public class PIDController
     private double m_setpoint = 0.0;
     private double m_error = 0.0;
     private double m_result = 0.0;
+    private double sTicksPerRevolution = 1120 * 40;
+
 
     /**
      * Allocate a PID object with the given constants for P, I, D
