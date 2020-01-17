@@ -194,7 +194,7 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
 
-            slideInches(48, 0,1);
+            driveInches(90, 0,0.6);
 
             q++;
 
@@ -396,12 +396,18 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
 
-            sleep(15);
-
             telemetry.addData("left position", ldrive2.getCurrentPosition());
             telemetry.addData("right position", rdrive2.getCurrentPosition());
             telemetry.addData("left power", ldrive2.getPower());
             telemetry.addData("right power", rdrive2.getPower());
+            sleep(150);
+            ldrive1.setPower(0);
+            ldrive2.setPower(0);
+            rdrive1.setPower(0);
+            rdrive2.setPower(0);
+            sleep(700);
+
+
         }
 
 
