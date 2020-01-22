@@ -41,9 +41,9 @@ public class PIDdrive_11226 extends LinearOpMode {
     PIDcon sPID = new PIDcon();
     PIDcon ScPID = new PIDcon();
     double d_error = 0;
-    double                  s_startPoint = 0;
-    double                  sc_startPoint = 0;
-    double                  Scoraction;
+    double s_startPoint = 0;
+    double sc_startPoint = 0;
+    double Scoraction;
     double ScurrentPosition = 0;
     double RcuurentPosition = 0;
     double LcuurentPosition = 0;
@@ -54,9 +54,9 @@ public class PIDdrive_11226 extends LinearOpMode {
 
     double integral = 0;
     double derivative = 0;
-    double  d_Rpower = 0;
-    double  d_Lpower = 0;
-    double  d_Spower = 0;
+    double d_Rpower = 0;
+    double d_Lpower = 0;
+    double d_Spower = 0;
     double coraction = 0;
 
 
@@ -76,6 +76,9 @@ public class PIDdrive_11226 extends LinearOpMode {
     private final double ticksPerSpin = ticksPerRevolution * 25;
     private final double ticksPerInch = 1 / perimeter * ticksPerSpin;
 
+    private final double SticksPerSpin = ticksPerRevolution * 36;
+    private final double SticksPerInch = 1 / perimeter * SticksPerSpin;
+
 
     // called when init button is  pressed.
     @Override
@@ -93,7 +96,7 @@ public class PIDdrive_11226 extends LinearOpMode {
         collectLeft = hardwareMap.get(Servo.class, "collect left");
         cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
 
-        ePID.PIDcon(0.1,0,0);
+        ePID.PIDcon(0.1, 0, 0);
 
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -146,19 +149,19 @@ public class PIDdrive_11226 extends LinearOpMode {
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0.01,0,0);
+        pidRotate.PIDcon(0, 0, 0);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
 
 
-        dRPID.PIDcon(0.07, 0, 0.12);
-        dLPID.PIDcon(0.07, 0, 0.12);
+        dRPID.PIDcon(0.07, 0, 0.03);
+        dLPID.PIDcon(0.07, 0, 0.2);
 
-        aPID.PIDcon(0.2,0,0.1);
+        aPID.PIDcon(0.2, 0, 0.1);
 
-        sPID.PIDcon(0.1,0,0);
-        ScPID.PIDcon(0,0,0);
+        sPID.PIDcon(0.5, 0.4, 0.15);
+        ScPID.PIDcon(0, 0, 0);
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
@@ -191,10 +194,7 @@ public class PIDdrive_11226 extends LinearOpMode {
         while (opModeIsActive() && q == 0) {
 
 
-
-
-
-            driveInches(48,-0.6,0.6);
+            driveInches(48, -0.7, 0.7);
 
             q++;
 
@@ -203,13 +203,20 @@ public class PIDdrive_11226 extends LinearOpMode {
 
     }
 
-
+    /**
+     * Resets the cumulative angle tracking to zero.
+     */
     private void resetAngle() {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         globalAngle = 0;
     }
 
+    /**
+     * Get current cumulative angle rotation from last reset.
+     *
+     * @return Angle in degrees. + = left, - = right from zero point.
+     */
     private double getAngle() {
         // We experimentally determined the Z axis is the axis we want to use for heading angle.
         // We have to process the angle because the imu works in euler angles so the Z axis is
@@ -232,8 +239,11 @@ public class PIDdrive_11226 extends LinearOpMode {
         return globalAngle;
     }
 
-
-
+    /**
+     * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
+     *
+     * @param degrees Degrees to turn, + is left - is right
+     */
     private void rotate(int degrees, double power) {
         // restart imu angle tracking.
         resetAngle();
@@ -251,38 +261,43 @@ public class PIDdrive_11226 extends LinearOpMode {
         // turning the robot back toward the setpoint value.
 
         pidRotate.reset();
-        pidRotate.setSetPoint(degrees);
+
         pidRotate.setOutputRange(0, power);
 
 
+        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
+        // clockwise (right).
 
-        pidRotate.setSensorValue(getAngle());
-        pidRotate.calculate();
+        // rotate until turn is completed.
 
         if (degrees < 0) {
+            // On right turn we have to get off zero first.
+            while (opModeIsActive() && getAngle() == 0) {
+                ldrive1.setPower(power);
+                ldrive2.setPower(power);
+                rdrive1.setPower(-power);
+                rdrive2.setPower(-power);
+                sleep(100);
+            }
 
             do {
-                pidRotate.setSensorValue(getAngle());
-                power = pidRotate.calculate();
+                power = pidRotate.calculate(); // power will be - on right turn.
                 ldrive1.setPower(-power);
                 ldrive2.setPower(-power);
                 rdrive1.setPower(power);
                 rdrive2.setPower(power);
 
-            } while (opModeIsActive() && pidRotate.getError() != 0);
-        } else
+            } while (opModeIsActive());
+        } else    // left turn.
             do {
-                pidRotate.setSensorValue(getAngle());
-                power = pidRotate.calculate();
+                power = pidRotate.calculate(); // power will be + on left turn.
                 ldrive1.setPower(-power);
                 ldrive2.setPower(-power);
                 rdrive1.setPower(power);
                 rdrive2.setPower(power);
+            } while (opModeIsActive());
 
-
-            } while (opModeIsActive() && pidRotate.getError() != 0);
-
-
+        // turn the motors off.
         rdrive1.setPower(0);
         rdrive2.setPower(0);
         ldrive1.setPower(0);
@@ -291,30 +306,22 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         rotation = getAngle();
 
-
+        // wait for rotation to stop.
         sleep(500);
 
-
+        // reset angle tracking on new heading.
         resetAngle();
     }
 
-
-
-    private void driveInches(double inches ,double minimumP ,double maximumP){
-        if (inches > 0){
-            forwardInches(inches,minimumP,maximumP);
-        }else if (inches < 0){
-            backInches(inches,minimumP,maximumP);
-        }
-    }
-
-    private void forwardInches(double inches, double minPower, double maxPower) {
+    private void driveInches(double inches, double minPower, double maxPower) {
 
         d_Rpower = 0;
         d_Lpower = 0;
 
-        dRPID.setOutputRange(minPower,maxPower);
-        dLPID.setOutputRange(minPower,maxPower);
+        double accelerate = 0.05;
+
+        dRPID.setOutputRange(minPower, maxPower);
+        dLPID.setOutputRange(minPower, maxPower);
 
         dRPID.setSetPoint(inches);
         dLPID.setSetPoint(inches);
@@ -325,10 +332,10 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.07,0.07);
+        aPID.setOutputRange(-0.01, 0.01);
 
         RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
-        LcuurentPosition = (ldrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
+        LcuurentPosition = (ldrive1.getCurrentPosition() - d_LstartPoint) / ticksPerInch;
 
         dRPID.setSensorValue(RcuurentPosition);
         dLPID.setSensorValue(LcuurentPosition);
@@ -336,49 +343,52 @@ public class PIDdrive_11226 extends LinearOpMode {
         dRPID.calculate();
         dLPID.calculate();
 
+        if(dRPID.calculate() == maxPower && accelerate < dRPID.calculate()){
+            d_Rpower = accelerate;
+            accelerate += 0.05;
+        }
 
+        int n = 1;
 
         while (dRPID.getError() > 0 && dLPID.getError() > 0 && opModeIsActive()) {
 
             RcuurentPosition = (rdrive1.getCurrentPosition()) / ticksPerInch;
             dRPID.setSensorValue(RcuurentPosition);
 
-            d_Rpower = dRPID.calculate();
-
-
             LcuurentPosition = (ldrive1.getCurrentPosition()) / ticksPerInch;
             dLPID.setSensorValue(LcuurentPosition);
 
-            d_Lpower = dLPID.calculate();
-
             aPID.setSensorValue(getAngle());
+
+            d_Lpower = dLPID.calculate();
+            d_Rpower = dRPID.calculate();
             coraction = aPID.calculate();
 
+            if(dRPID.calculate() == maxPower && accelerate < dRPID.calculate()){
+                d_Rpower = accelerate;
+                accelerate += 0.05;
+            }
+            if(dLPID.calculate() == maxPower && accelerate < dLPID.calculate()){
+                d_Lpower = accelerate;
+                accelerate += 0.05;
+            }
 
-
-
-
-
-
-
-
+            /*if(d_Rpower < 0.0001 && d_error < inches){
+                coraction = 0;
+            }*/
 
             telemetry.update();
 
             // set power levels.
 
+            ldrive1.setPower(d_Lpower - (coraction / n));
+            ldrive2.setPower(d_Lpower - (coraction / n));
+            rdrive1.setPower(d_Rpower + (coraction / n));
+            rdrive2.setPower(d_Rpower + (coraction / n));
 
-
-
-
-
-
-
-            ldrive1.setPower(d_Lpower - coraction);
-            ldrive2.setPower(d_Lpower - coraction);
-            rdrive1.setPower(d_Rpower + coraction);
-            rdrive2.setPower(d_Rpower + coraction);
-
+            if ((d_error / 9 / 16) % 1 == 0) {
+                n++;
+            }
             /*if (d_Rpower <0.06 && opModeIsActive()){
                 dRPID.setSensorValue(inches);
                 dRPID.calculate();
@@ -389,13 +399,14 @@ public class PIDdrive_11226 extends LinearOpMode {
             }*/
 
 
-
-            sleep(50);
-
             telemetry.addData("left position", ldrive2.getCurrentPosition());
             telemetry.addData("right position", rdrive2.getCurrentPosition());
             telemetry.addData("left power", ldrive2.getPower());
             telemetry.addData("right power", rdrive2.getPower());
+            telemetry.addData("coraction", coraction);
+            telemetry.addData("angle", getAngle());
+            sleep(15);
+
         }
 
 
@@ -412,8 +423,10 @@ public class PIDdrive_11226 extends LinearOpMode {
         d_Rpower = 0;
         d_Lpower = 0;
 
-        dRPID.setOutputRange(minPower,maxPower);
-        dLPID.setOutputRange(minPower,maxPower);
+        double accelerate = -0.05;
+
+        dRPID.setOutputRange(minPower, maxPower);
+        dLPID.setOutputRange(minPower, maxPower);
 
         dRPID.setSetPoint(inches);
         dLPID.setSetPoint(inches);
@@ -424,7 +437,7 @@ public class PIDdrive_11226 extends LinearOpMode {
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.07,0.07);
+        aPID.setOutputRange(-0.07, 0.07);
 
         RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (ldrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -435,6 +448,14 @@ public class PIDdrive_11226 extends LinearOpMode {
         dRPID.calculate();
         dLPID.calculate();
 
+        if(dRPID.calculate() == minPower && accelerate > dRPID.calculate()){
+            d_Rpower = accelerate;
+            accelerate -= 0.05;
+        }
+        if(dLPID.calculate() == minPower && accelerate > dLPID.calculate()){
+            d_Lpower = accelerate;
+            accelerate -= 0.05;
+        }
 
 
         while (dRPID.getError() < 0 && dLPID.getError() < 0 && opModeIsActive()) {
@@ -453,24 +474,18 @@ public class PIDdrive_11226 extends LinearOpMode {
             aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
-
-
-
-
-
-
-
-
+            if(dRPID.calculate() == maxPower && accelerate < dRPID.calculate()){
+                d_Rpower = accelerate;
+                accelerate += 0.05;
+            }
+            if(dLPID.calculate() == maxPower && accelerate < dLPID.calculate()){
+                d_Lpower = accelerate;
+                accelerate += 0.05;
+            }
 
             telemetry.update();
 
             // set power levels.
-
-
-
-
-
-
 
 
             ldrive1.setPower(d_Lpower - coraction);
@@ -478,11 +493,7 @@ public class PIDdrive_11226 extends LinearOpMode {
             rdrive1.setPower(d_Rpower + coraction);
             rdrive2.setPower(d_Rpower + coraction);
 
-
-
-
-
-            sleep(50);
+            sleep(15);
 
             telemetry.addData("left position", ldrive2.getCurrentPosition());
             telemetry.addData("right position", rdrive2.getCurrentPosition());
@@ -499,27 +510,22 @@ public class PIDdrive_11226 extends LinearOpMode {
 
     }
 
+    private void slideInches(double inches, double minPower, double maxPower) {
 
 
-    private void forwardSlideInches(double inches, double minPower, double maxPower) {
-
-
-
-        sPID.setOutputRange(minPower,maxPower);
+        sPID.setOutputRange(minPower, maxPower);
 
 
         sPID.setSetPoint(inches);
 
 
-
         s_startPoint = slide1.getCurrentPosition();
 
 
-
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.07,0.07);
+        ScPID.setOutputRange(-0.07, 0.07);
 
-        ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / ticksPerInch;
+        ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / SticksPerInch;
 
 
         sPID.setSensorValue(ScurrentPosition);
@@ -528,11 +534,9 @@ public class PIDdrive_11226 extends LinearOpMode {
         sPID.calculate();
 
 
-
-
         while (sPID.getError() > 0 && opModeIsActive()) {
 
-            ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / ticksPerInch;
+            ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
 
             d_Spower = sPID.calculate();
@@ -542,23 +546,9 @@ public class PIDdrive_11226 extends LinearOpMode {
             Scoraction = ScPID.calculate();
 
 
-
-
-
-
-
-
-
-
             telemetry.update();
 
             // set power levels.
-
-
-
-
-
-
 
 
             slide1.setPower(d_Spower);
@@ -569,18 +559,22 @@ public class PIDdrive_11226 extends LinearOpMode {
             rdrive2.setPower(coraction);
 
 
+            /*if (d_Rpower <0.06 && opModeIsActive()){
+                dRPID.setSensorValue(inches);
+                dRPID.calculate();
+            }
+            if (d_Lpower <0.06 && opModeIsActive()){
+                dLPID.setSensorValue(inches);
+                dLPID.calculate();
+            }*/
 
 
+            sleep(15);
 
-
-            telemetry.addData("ScurrentP", ScurrentPosition);
-            telemetry.addData("S error", sPID.getError());
-
-            telemetry.update();
-
-            sleep(50);
-
-
+            telemetry.addData("left position", ldrive2.getCurrentPosition());
+            telemetry.addData("right position", rdrive2.getCurrentPosition());
+            telemetry.addData("left power", ldrive2.getPower());
+            telemetry.addData("right power", rdrive2.getPower());
         }
 
 
@@ -593,18 +587,16 @@ public class PIDdrive_11226 extends LinearOpMode {
 
     }
 
-
-
-    private void elevatorHight(double ticks){
+    private void elevatorHight(double ticks) {
         ePID.setSensorValue(elevator.getCurrentPosition());
         ePID.setSetPoint(ticks);
-        ePID.setOutputRange(-0.7,0.7);
-        while(ePID.getError() != 0){
+        ePID.setOutputRange(-0.7, 0.7);
+        while (ePID.getError() != 0) {
             elevator.setPower(ePID.calculate());
         }
     }
 
-    private void setElevatorPosition(int ep){
+    private void setElevatorPosition(int ep) {
         double ticks;
 
         if (ep == 1) ticks = 0;
@@ -615,8 +607,6 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         elevatorHight(ticks);
     }
-
-
 
 
 }
