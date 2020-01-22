@@ -25,8 +25,8 @@ public class Teleop_11226 extends LinearOpMode {
     //elevator
     private DcMotor elevator = null;
     //collection
-    private DcMotor collectRight = null;
-    private DcMotor collectLeft = null;
+    private Servo collectRight = null;
+    private Servo collectLeft = null;
     private Servo push = null;
     private CRServo hold = null;
     private CRServo turnHold = null;
@@ -49,8 +49,8 @@ public class Teleop_11226 extends LinearOpMode {
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        collectRight = hardwareMap.get(DcMotor.class, "collectRight");
-        collectLeft = hardwareMap.get(DcMotor.class, "collectLeft");
+        collectRight = hardwareMap.get(Servo.class, "collectRight");
+        collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         push = hardwareMap.get(Servo.class, "push");
         hold = hardwareMap.get(CRServo.class, "hold");
         turnHold = hardwareMap.get(CRServo.class, "turnHold");
@@ -62,8 +62,7 @@ public class Teleop_11226 extends LinearOpMode {
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
-        collectLeft.setDirection(DcMotor.Direction.REVERSE);
-        collectRight.setDirection(DcMotor.Direction.FORWARD);
+
 //
         rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -184,14 +183,14 @@ public class Teleop_11226 extends LinearOpMode {
 
             //collect
             if (gamepad2.right_trigger > 0) {
-                collectRight.setPower(1);
-                collectLeft.setPower(1);
+                collectRight.setPosition(0.7);
+                collectLeft.setPosition(0.2);
             } else if (gamepad2.left_trigger > 0) {
-                collectLeft.setPower(-1);
-                collectRight.setPower(-1);
+                collectLeft.setPosition(0.7);
+                collectRight.setPosition(0.2);
             } else {
-                collectRight.setPower(0);
-                collectLeft.setPower(0);
+                collectRight.setPosition(0);
+                collectLeft.setPosition(0);
             }
             if (gamepad1.a) {
                 Fast = true;
@@ -202,14 +201,11 @@ public class Teleop_11226 extends LinearOpMode {
 
             //push cube in
             if (gamepad2.b) {
-                if (!pushCube) {
-                    push.setPosition(180);
-                    pushCube = true;
-                } else {
-                    push.setPosition(0);
-                    pushCube = false;
-                }
+                push.setPosition(0);
+            }else{
+                push.setPosition(180);
             }
+
 
             //pinch
             if(gamepad2.y){

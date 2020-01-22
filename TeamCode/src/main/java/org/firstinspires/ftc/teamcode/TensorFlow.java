@@ -371,4 +371,98 @@ public class TensorFlow extends LinearOpMode {
 
     }
 
+    public int detectSkystone(){
+
+
+
+
+        if (tfod != null) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                telemetry.addData("# Object Detected", updatedRecognitions.size());
+
+                // step through the list of recognitions and display boundary info.
+
+
+
+                if (updatedRecognitions.size() == 3){
+                    seeSkystone = -1;
+                    seeStone1 = -1;
+                    seeStone2 = -1;
+
+                    if (seeSkystone == -1 && seeStone1 == -1 && seeStone2 == -1){
+
+                        if (updatedRecognitions.get(0).equals(LABEL_SECOND_ELEMENT)){
+                            skyStoneX = updatedRecognitions.get(0).getLeft();
+                        }else if (updatedRecognitions.get(0).equals(LABEL_FIRST_ELEMENT)){
+                            Stone1X = updatedRecognitions.get(0).getLeft();
+                        }
+
+
+                        if (updatedRecognitions.get(1).equals(LABEL_SECOND_ELEMENT)){
+                            skyStoneX = updatedRecognitions.get(1).getLeft();
+
+                        }else if (Stone1X != 0){
+
+                            Stone2X = updatedRecognitions.get(1).getLeft();
+                        }else if(Stone1X == 0){
+                            Stone1X = updatedRecognitions.get(1).getLeft();
+                        }
+
+                        if (updatedRecognitions.get(2).equals(LABEL_SECOND_ELEMENT)){
+                            skyStoneX = updatedRecognitions.get(2).getLeft();
+                        }else if (updatedRecognitions.get(2).equals(LABEL_FIRST_ELEMENT)){
+                            Stone2X = updatedRecognitions.get(2).getLeft();
+                        }
+
+
+                        if (skyStoneX < Stone1X && skyStoneX < Stone2X){
+                            skystonePostion = -1;
+                        }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+                            skystonePostion = 1;
+                        }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
+                            skystonePostion = 0;
+                        }
+                        telemetry.addData("skyStone position",skystonePostion);
+                    }
+
+
+                }
+
+                if (updatedRecognitions.equals(LABEL_SECOND_ELEMENT)){
+                    telemetry.addData("can see skyStone","start laasof");
+                }
+
+
+
+
+                telemetry.update();
+            }
+
+
+        }
+
+        return skystonePostion;
+    }
+    public void VUTFinit(){
+        initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+    }
+
+    public int rundetection(){
+
+
+
+        skystonePostion = detectSkystone();
+
+        return skystonePostion;
+    }
+
 }
