@@ -11,6 +11,11 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+
+
 
 @TeleOp(name = "Teleop 11226", group = "Linear Opmode")
 public class Teleop_11226 extends LinearOpMode {
@@ -39,6 +44,29 @@ public class Teleop_11226 extends LinearOpMode {
     // problem fixing
     private boolean hold180 = false;
     private double fix = 0;
+
+class turnHP extends TimerTask{
+    @Override
+    public void run() {
+        turnHold.setPower(1);
+    }
+}
+
+
+class turnHM extends TimerTask{
+    @Override
+    public void run() {
+        turnHold.setPower(1);
+    }
+}
+
+
+    turnHP turnHPlus = new turnHP();
+    turnHM turnHMinus = new turnHM();
+
+
+
+
 
     @Override
     //
@@ -213,6 +241,8 @@ public class Teleop_11226 extends LinearOpMode {
             }
             else if(gamepad2.x){
                 hold.setPower(1);
+            }else{
+                hold.setPower(0);
             }
 
             /*if(gamepad2.b){
@@ -222,13 +252,25 @@ public class Teleop_11226 extends LinearOpMode {
             }*/
 
             //turn collection
-            if (gamepad2.right_bumper) {
+            /*if (gamepad2.right_bumper) {
                 turnHold.setPower(1);
                 sleep(2000);
                 turnHold.setPower(0);
             } else if (gamepad2.left_bumper) {
                 turnHold.setPower(-1);
                 sleep(2000);
+                turnHold.setPower(0);
+            } else {
+                turnHold.setPower(0);
+            }*/
+
+            if (gamepad2.right_bumper) {
+                Timer timer1 = new Timer();
+                timer1.schedule(turnHPlus,2000);
+                turnHold.setPower(0);
+            } else if (gamepad2.left_bumper) {
+                Timer timer2 = new Timer();
+                timer2.schedule(turnHMinus,2000);
                 turnHold.setPower(0);
             } else {
                 turnHold.setPower(0);

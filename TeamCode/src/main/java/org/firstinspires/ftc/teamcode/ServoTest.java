@@ -54,22 +54,22 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class ServoTest extends LinearOpMode {
 
     // Declare OpMode members.
-    private CRServo hell = null;
+    private Servo bazim = null;
 
     @Override
     public void runOpMode() {
 
-        hell = hardwareMap.get(CRServo.class, "1");
+        bazim = hardwareMap.get(Servo.class, "bazim");
         // Wait for the game to start (driver presses PLAY)
+
         waitForStart();
 
         // run until the end of the match (driver presses STOP)
+
         while (opModeIsActive()) {
-            hell.setPower(-1);
-            sleep(1000);
-            hell.setPower(1);
-            sleep(10000);
-            hell.setPower(0);
+
+            bazim.setPosition(3);
+
 
 
             // Choose to drive using either Tank Mode, or POV Mode

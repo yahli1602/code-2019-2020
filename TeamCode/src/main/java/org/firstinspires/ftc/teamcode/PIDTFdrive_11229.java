@@ -16,6 +16,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -35,6 +36,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
 {
     DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
     BNO055IMU               imu;
+    Servo                   bazim;
 
     Orientation             lastAngles = new Orientation();
     double                  globalAngle, correction, rotation;
@@ -119,6 +121,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
+        bazim = hardwareMap.get(Servo.class, "bazim");
 
 
 
@@ -181,7 +184,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0.01,0.0005,0);
+        pidRotate.PIDcon(0.01,0.0015,0.135);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
@@ -190,10 +193,10 @@ public class PIDTFdrive_11229 extends LinearOpMode
         dRPID.PIDcon(0.05,0,0);
         dLPID.PIDcon(0.05,0,0);
 
-        sPID.PIDcon(0.005,0.0005,0.1);
+        sPID.PIDcon(0.005,0.0009,0.1);
         ScPID.PIDcon(0.02,0,0.07);
 
-        aPID.PIDcon(0.0035,0,0);
+        aPID.PIDcon(0.05,0,0);
 
 
         telemetry.addData("Mode", "calibrating...");
@@ -222,7 +225,10 @@ public class PIDTFdrive_11229 extends LinearOpMode
 
         if (tfod != null) {
             tfod.activate();
+            telemetry.addData("can", "activate");
+            telemetry.update();
         }
+
 
         waitForStart();
 
@@ -254,29 +260,59 @@ public class PIDTFdrive_11229 extends LinearOpMode
 
 
 
-            slideInches(20,0,0.6);
+            slideInches(24,0.03,0.5);
 
             telemetry.addData("skyStone P",skystonePostion);
             telemetry.update();
-            rotate(90,0.25,false);
+            if (skystonePostion == 1 || skystonePostion == 3){
+                rotate(90,0.1,false);
+            }
             telemetry.addData("angle",getAngle());
             telemetry.update();
 
 
             if (skystonePostion == 1){
-                slideInches(4.5,0.05,0.4);
-
-            }else if (skystonePostion == 2){
-                slideInches(-4,0.05,0.4);
-
+                slideInches(7.5,0.04,0.2);
             }else if (skystonePostion == 3){
-                slideInches(-11,0.05,-0.4);
+                slideInches(-3,0.04,-0.2);
             }
-            rotate(-70,0.25,true);
-            slideInches(6,0,0.2);
-            sleep(2000);
-            slideInches(-12,0,-0.1);
-            driveInches(60,0,0.1);
+            rotate(-90,0.1,true);
+            slideInches(7,0.03,0.09);
+            sleep(50);
+            bazim.setPosition(90);
+            telemetry.addData("bazim poisition",bazim.getPosition());
+            telemetry.update();
+            sleep(700);
+            slideInches(-7,0,-0.5);
+            sleep(50);
+            rotate(-90,0.1,true);
+            if (skystonePostion == 1){
+                slideInches(68,0,0.6);
+            }else if (skystonePostion == 2){
+                slideInches(60,0,0.6);
+            }else if (skystonePostion == 3){
+                slideInches(52,0,0.6);
+            }
+
+            bazim.setPosition(0);
+            sleep(50);
+            slideInches(-13,0,-0.6);
+            lDrive1.setPower(-1);
+            lDrive2.setPower(-1);
+            rDrive1.setPower(-1);
+            rDrive2.setPower(-1);
+            sleep(100);
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+            rDrive1.setPower(0);
+            rDrive2.setPower(0);
+            elevator.setPower(1);
+            sleep(400);
+            elevator.setPower(-1);
+            sleep(100);
+            elevator.setPower(0);
+
+
 
 
             //slideInches(40,-0.5,0.5);
@@ -371,7 +407,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
                 rDrive1.setPower(power);
                 rDrive2.setPower(power);
 
-            } while (opModeIsActive() && pidRotate.getError() < -1.5 || pidRotate.getError() > 1.5);
+            } while (opModeIsActive() && pidRotate.getError() != 0 );
         } else
             do {
                 pidRotate.setSensorValue(getAngle());

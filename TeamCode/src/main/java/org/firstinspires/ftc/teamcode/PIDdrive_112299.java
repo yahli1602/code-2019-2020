@@ -140,7 +140,7 @@ public class PIDdrive_112299 extends LinearOpMode
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0.01,0.0001,0.05);
+        pidRotate.PIDcon(0.004,0.00051,0.025);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
@@ -193,11 +193,11 @@ public class PIDdrive_112299 extends LinearOpMode
         {
 
 
-            driveInches(48,0,0.6);
+            rotate(90,0.2,true);
             telemetry.addData("Error",dRPID.getError());
             telemetry.addData("angle",getAngle());
             telemetry.update();
-            sleep(2000);
+            sleep(7000);
 
 
             f++;
@@ -245,9 +245,12 @@ public class PIDdrive_112299 extends LinearOpMode
     }
 
 
-    private void rotate(int degrees, double power) {
+    private void rotate(int degrees, double power,boolean reset) {
         // restart imu angle tracking.
-        resetAngle();
+        if (reset){
+            resetAngle();
+        }
+
 
         // if degrees > 359 we cap at 359 with same sign as original degrees.
         if (Math.abs(degrees) > 359) degrees = (int) Math.copySign(359, degrees);
@@ -282,7 +285,7 @@ public class PIDdrive_112299 extends LinearOpMode
                 telemetry.addData("angle",getAngle());
                 telemetry.update();
 
-            } while (opModeIsActive() && pidRotate.getError() != 0);
+            } while (opModeIsActive() && pidRotate.getError() != 0);// && pidRotate.getError() < 0.05 && pidRotate.getError() > -0.05 );
         } else
             do {
                 pidRotate.setSensorValue(getAngle());
@@ -295,7 +298,7 @@ public class PIDdrive_112299 extends LinearOpMode
                 telemetry.update();
 
 
-            } while (opModeIsActive() && pidRotate.getError() != 0);
+            } while (opModeIsActive() && pidRotate.getError() != 0);// && pidRotate.getError() < 0.05 && pidRotate.getError() > -0.05);
 
 
         rDrive1.setPower(0);

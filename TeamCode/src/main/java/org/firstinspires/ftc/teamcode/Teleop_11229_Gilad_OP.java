@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 
-@TeleOp(name = "Teleop_11229_Gilad", group = "Linear Opmode")
+@TeleOp(name = "Teleop_11229_Gilad_OP", group = "Linear Opmode")
 
-public class Teleop_11229_Gilad extends LinearOpMode {
+public class Teleop_11229_Gilad_OP extends LinearOpMode {
 
     //driving motors
     private DcMotor rDrive1 = null;
@@ -26,8 +26,6 @@ public class Teleop_11229_Gilad extends LinearOpMode {
     private Servo collectLeft = null;
 
     private TouchSensor stoneIn = null;
-
-    boolean fast = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -101,7 +99,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 lDrive1.setPower(0.4);
                 lDrive2.setPower(0.4);
                 collectRight.setPosition(0.2);
-                collectLeft.setPosition(0.8);
+                collectLeft.setPosition(0.7);
             } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
@@ -116,8 +114,10 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
 
 //elevator
-            if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
-                elevator.setPower(gamepad2.right_stick_y);
+            if (gamepad1.dpad_up) {
+                elevator.setPower(1);
+            }else if (gamepad1.dpad_down) {
+                elevator.setPower(-1);
             } else {
                 elevator.setPower(0);
             }
@@ -130,10 +130,10 @@ public class Teleop_11229_Gilad extends LinearOpMode {
 
 
             //collection
-            if (gamepad2.right_trigger > 0.2) {
+            if (gamepad1.right_bumper) {
                 collectRight.setPosition(0.7);
                 collectLeft.setPosition(0.2);
-            } else if (gamepad2.left_trigger > 0.2) {
+            } else if (gamepad1.left_bumper) {
                 collectLeft.setPosition(0.7);
                 collectRight.setPosition(0.2);
 
