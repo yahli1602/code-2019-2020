@@ -1,15 +1,3 @@
-// Simple autonomous program that drives bot forward until end of period
-// or touch sensor is hit. If touched, backs up a bit and turns 90 degrees
-// right and keeps going. Demonstrates obstacle avoidance and use of the
-// REV Hub's built in IMU in place of a gyro. Also uses gamepad1 buttons to
-// simulate touch sensor press and supports left as well as right turn.
-//
-// Also uses PID controller to drive in a straight line when not
-// avoiding an obstacle.
-//
-// Use PID controller to manage motor power during 90 degree turn to reduce
-// overshoot.
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -51,6 +39,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
     PIDcon dLPID = new PIDcon();
     PIDcon pidRotate = new PIDcon();
     PIDcon aPID = new PIDcon();
+    PIDcon SaPID = new PIDcon();
     PIDcon sPID = new PIDcon();
     PIDcon ScPID = new PIDcon();
 
@@ -184,7 +173,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0.01,0.0015,0.135);
+        pidRotate.PIDcon(0.01,0.0018,0.135);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
@@ -195,8 +184,10 @@ public class PIDTFdrive_11229 extends LinearOpMode
 
         sPID.PIDcon(0.005,0.0009,0.1);
         ScPID.PIDcon(0.02,0,0.07);
+        SaPID.PIDcon(0.025,0,0);
 
         aPID.PIDcon(0.05,0,0);
+
 
 
         telemetry.addData("Mode", "calibrating...");
@@ -251,6 +242,10 @@ public class PIDTFdrive_11229 extends LinearOpMode
         {
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
+            slideInches(5,0.03,0.6);
+
+            sleep(300);
+
 
 
             if (updatedRecognitions.size() == 3) skystonePostion = seeThreeObj(updatedRecognitions);
@@ -258,37 +253,45 @@ public class PIDTFdrive_11229 extends LinearOpMode
 
             tfod.deactivate();
 
-
-
-            slideInches(24,0.03,0.5);
-
             telemetry.addData("skyStone P",skystonePostion);
             telemetry.update();
+
+            slideInches(16,0,0.5);
+
+
+            telemetry.addData("angle",getAngle());
+            telemetry.update();
             if (skystonePostion == 1 || skystonePostion == 3){
-                rotate(90,0.1,false);
+                rotate(90,0.1,true);
+                telemetry.addData("turning","");
+                telemetry.update();
+
             }
             telemetry.addData("angle",getAngle());
             telemetry.update();
 
 
             if (skystonePostion == 1){
-                slideInches(7.5,0.04,0.2);
+                slideInches(5,0.03,0.2);
             }else if (skystonePostion == 3){
-                slideInches(-3,0.04,-0.2);
+                slideInches(-4,0.03,-0.2);
             }
-            rotate(-90,0.1,true);
+
+            if (skystonePostion == 1 || skystonePostion == 3){
+                rotate(-90,0.1,true);
+            }
             slideInches(7,0.03,0.09);
             sleep(50);
             bazim.setPosition(90);
             telemetry.addData("bazim poisition",bazim.getPosition());
             telemetry.update();
             sleep(700);
-            slideInches(-7,0,-0.5);
+            slideInches(-6,0,-0.5);
             sleep(50);
-            rotate(-90,0.1,true);
+            rotate(-90,0.1,false);
             if (skystonePostion == 1){
                 slideInches(68,0,0.6);
-            }else if (skystonePostion == 2){
+            }else if (skystonePostion == 2 || skystonePostion == 0){
                 slideInches(60,0,0.6);
             }else if (skystonePostion == 3){
                 slideInches(52,0,0.6);
@@ -296,12 +299,12 @@ public class PIDTFdrive_11229 extends LinearOpMode
 
             bazim.setPosition(0);
             sleep(50);
-            slideInches(-13,0,-0.6);
+            slideInches(-10,0,-0.6);
             lDrive1.setPower(-1);
             lDrive2.setPower(-1);
             rDrive1.setPower(-1);
             rDrive2.setPower(-1);
-            sleep(100);
+            sleep(300);
             lDrive1.setPower(0);
             lDrive2.setPower(0);
             rDrive1.setPower(0);
@@ -327,7 +330,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
         if (tfod != null) {
             tfod.shutdown();
         }
-            // Use PID with imu input to drive in a straight line.
+        // Use PID with imu input to drive in a straight line.
 
     }
 
@@ -407,7 +410,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
                 rDrive1.setPower(power);
                 rDrive2.setPower(power);
 
-            } while (opModeIsActive() && pidRotate.getError() != 0 );
+            } while (opModeIsActive() && pidRotate.getError() < 0.625 || pidRotate.getError() > -0.625 );
         } else
             do {
                 pidRotate.setSensorValue(getAngle());
@@ -418,7 +421,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
                 rDrive2.setPower(power);
 
 
-            } while (opModeIsActive() && pidRotate.getError() != 0);
+            } while (opModeIsActive() && pidRotate.getError() < 0.625 || pidRotate.getError() > -0.625 );
 
 
         rDrive1.setPower(0);
@@ -693,6 +696,9 @@ public class PIDTFdrive_11229 extends LinearOpMode
         ScPID.setSetPoint(0);
         ScPID.setOutputRange(-0.02,0.02);
 
+        SaPID.setSetPoint(0);
+        SaPID.setOutputRange(-0.04,0.04);
+
 
 
 
@@ -719,12 +725,12 @@ public class PIDTFdrive_11229 extends LinearOpMode
             d_Spower = sPID.calculate();
 
             RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
-            ScPID.setSensorValue(RcuurentPosition);
-            Rpower = ScPID.calculate();
+            SaPID.setSensorValue(RcuurentPosition);
+            Rpower = SaPID.calculate();
 
             LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
-            ScPID.setSensorValue(LcuurentPosition);
-            Lpower = ScPID.calculate();
+            SaPID.setSensorValue(LcuurentPosition);
+            Lpower = SaPID.calculate();
 
 
             ScPID.setSensorValue(getAngle());
@@ -803,6 +809,9 @@ public class PIDTFdrive_11229 extends LinearOpMode
         ScPID.setSetPoint(0);
         ScPID.setOutputRange(-0.02,0.02);
 
+        SaPID.setSetPoint(0);
+        SaPID.setOutputRange(-0.04,0.04);
+
 
 
         s_startPoint = -slide1.getCurrentPosition();
@@ -827,12 +836,12 @@ public class PIDTFdrive_11229 extends LinearOpMode
             d_Spower = sPID.calculate();
 
             RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
-            ScPID.setSensorValue(RcuurentPosition);
-            Rpower = ScPID.calculate();
+            SaPID.setSensorValue(RcuurentPosition);
+            Rpower = SaPID.calculate();
 
             LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
-            ScPID.setSensorValue(LcuurentPosition);
-            Lpower = ScPID.calculate();
+            SaPID.setSensorValue(LcuurentPosition);
+            Lpower = SaPID.calculate();
 
 
             ScPID.setSensorValue(getAngle());
@@ -843,10 +852,11 @@ public class PIDTFdrive_11229 extends LinearOpMode
 
             // set power levels.`
             slide1.setPower(d_Spower);
-            lDrive1.setPower(-Scoraction);
-            lDrive2.setPower(-Scoraction);
-            rDrive1.setPower(Scoraction);
-            rDrive2.setPower(Scoraction);
+            slide1.setPower(d_Spower);
+            lDrive1.setPower(Lpower - Scoraction);
+            lDrive2.setPower(Lpower - Scoraction);
+            rDrive1.setPower(Rpower + Scoraction);
+            rDrive2.setPower(Rpower + Scoraction);
 
 
 
@@ -989,7 +999,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.45;
+        tfodParameters.minimumConfidence = 0.5;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
