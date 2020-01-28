@@ -113,7 +113,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 lDrive2.setPower(0);
             }
 
-            if (gamepad1.right_stick_x > 0 || gamepad1.right_stick_x < 0) {
+            if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
                 slide.setPower(-gamepad1.right_stick_x);
             } else {
                 slide.setPower(0);
