@@ -25,6 +25,9 @@ public class Teleop_11229_Gilad extends LinearOpMode {
     private Servo collectRight = null;
     private Servo collectLeft = null;
 
+
+    private Servo bazim = null;
+
     private TouchSensor stoneIn = null;
 
     boolean fast = true;
@@ -40,6 +43,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
+        bazim = hardwareMap.get(Servo.class,"bazim");
 
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
@@ -82,24 +86,24 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 lDrive1.setPower(gamepad1.left_stick_y);
                 lDrive2.setPower(gamepad1.left_stick_y);
             } else if (gamepad1.left_trigger > 0) {
-                rDrive1.setPower(-gamepad1.left_trigger * 0.8);
-                rDrive2.setPower(-gamepad1.left_trigger * 0.8);
-                lDrive1.setPower(gamepad1.left_trigger * 0.8);
-                lDrive2.setPower(gamepad1.left_trigger * 0.8);
+                rDrive1.setPower(-gamepad1.left_trigger * 0.7);
+                rDrive2.setPower(-gamepad1.left_trigger * 0.7);
+                lDrive1.setPower(gamepad1.left_trigger * 0.7);
+                lDrive2.setPower(gamepad1.left_trigger * 0.7);
 
             } else if (gamepad1.right_trigger > 0) {
-                rDrive1.setPower(gamepad1.right_trigger * 0.8);
-                rDrive2.setPower(gamepad1.right_trigger * 0.8);
-                lDrive1.setPower(-gamepad1.right_trigger * 0.8);
-                lDrive2.setPower(-gamepad1.right_trigger * 0.8);
+                rDrive1.setPower(gamepad1.right_trigger * 0.7);
+                rDrive2.setPower(gamepad1.right_trigger * 0.7);
+                lDrive1.setPower(-gamepad1.right_trigger * 0.7);
+                lDrive2.setPower(-gamepad1.right_trigger * 0.7);
 
             }
             //Drop cube on plate
             else if (gamepad2.a && gamepad1.atRest()) {
-                rDrive1.setPower(0.5);
-                rDrive2.setPower(0.5);
-                lDrive1.setPower(0.4);
-                lDrive2.setPower(0.4);
+                rDrive1.setPower(0.4);
+                rDrive2.setPower(0.4);
+                lDrive1.setPower(0.2);
+                lDrive2.setPower(0.2);
                 collectRight.setPosition(0.2);
                 collectLeft.setPosition(0.8);
             } else {
@@ -141,9 +145,20 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 collectRight.setPosition(0);
                 collectLeft.setPosition(0);
             }
+
+            if (gamepad2.x){
+                bazim.setPosition(1);
+            }else{
+                bazim.setPosition(0);
+            }
+
+
             telemetry.addData("rticks",rDrive1.getCurrentPosition());
             telemetry.addData("lticks",lDrive1.getCurrentPosition());
             telemetry.update();
+
+
+
         }
     }
 }

@@ -33,7 +33,7 @@ public class Teleop_11226 extends LinearOpMode {
     private Servo collectRight = null;
     private Servo collectLeft = null;
     private Servo push = null;
-    private CRServo hold = null;
+    private Servo hold = null;
     private CRServo turnHold = null;
     //moving Foundation
     private Servo grabber = null;
@@ -80,7 +80,7 @@ class turnHM extends TimerTask{
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         push = hardwareMap.get(Servo.class, "push");
-        hold = hardwareMap.get(CRServo.class, "hold");
+        hold = hardwareMap.get(Servo.class, "hold");
         turnHold = hardwareMap.get(CRServo.class, "turnHold");
         //grabber = hardwareMap.get(Servo.class, "grabber");
         waitForStart();
@@ -228,7 +228,7 @@ class turnHM extends TimerTask{
             }
 
             //push cube in
-            if (gamepad2.b) {
+            if (gamepad2.dpad_right) {
                 push.setPosition(0);
             }else{
                 push.setPosition(180);
@@ -236,13 +236,16 @@ class turnHM extends TimerTask{
 
 
             //pinch
-            if(gamepad2.y){
-                hold.setPower(-1);
+            if(!gamepad2.x){
+                if (gamepad2.y) {
+                    hold.setPosition(0);
+                }
+                else if (!gamepad2.y && gamepad2.dpad_left){
+                    hold.setPosition(0);
+                }
             }
             else if(gamepad2.x){
-                hold.setPower(1);
-            }else{
-                hold.setPower(0);
+                hold.setPosition(180);
             }
 
             /*if(gamepad2.b){
@@ -252,30 +255,27 @@ class turnHM extends TimerTask{
             }*/
 
             //turn collection
-            /*if (gamepad2.right_bumper) {
+            if (gamepad2.right_bumper) {
                 turnHold.setPower(1);
-                sleep(2000);
-                turnHold.setPower(0);
             } else if (gamepad2.left_bumper) {
                 turnHold.setPower(-1);
-                sleep(2000);
-                turnHold.setPower(0);
+
             } else {
                 turnHold.setPower(0);
-            }*/
-
+            }
+/*
             if (gamepad2.right_bumper) {
                 Timer timer1 = new Timer();
                 timer1.schedule(turnHPlus,2000);
                 turnHold.setPower(0);
+                telemetry.addData("timer has finished", Fast);
             } else if (gamepad2.left_bumper) {
                 Timer timer2 = new Timer();
                 timer2.schedule(turnHMinus,2000);
                 turnHold.setPower(0);
-            } else {
-                turnHold.setPower(0);
+                telemetry.addData("timer has finished", Fast);
             }
-
+*/
             if (gamepad2.dpad_up) {
                 setElevatorPosition(1);
 
