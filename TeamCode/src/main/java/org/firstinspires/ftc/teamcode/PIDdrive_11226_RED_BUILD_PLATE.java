@@ -202,7 +202,7 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
 
             driveInches(35, 0.03, 0.7);
             turnPinch();
-            backInches(20,-0.7,-0.03);
+            backInches(20,-0.03,-0.7);
             telemetry.addData("angle", getAngle());
             telemetry.update();
             sleep(2000);
@@ -494,6 +494,7 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
 
         double Raccelerate = -0.05;
         double Laccelerate = -0.05;
+        inches = inches * -1;
 
         dRPID.setOutputRange(minPower, maxPower);
         dLPID.setOutputRange(minPower, maxPower);
@@ -520,7 +521,7 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
 
 
 
-        while (dRPID.getError() > 0 && dLPID.getError() < 0 && opModeIsActive()) {
+        while (dRPID.getError() < 0 && dLPID.getError() < 0 && opModeIsActive()) {
 
             RcuurentPosition = (rdrive1.getCurrentPosition()) / ticksPerInch;
             dRPID.setSensorValue(RcuurentPosition);
@@ -538,11 +539,11 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
 
             if (dRPID.calculate() == maxPower && Raccelerate < dRPID.calculate()) {
                 d_Rpower = Raccelerate;
-                Raccelerate += 0.05;
+                Raccelerate -= 0.05;
             }
             if (dLPID.calculate() == maxPower && Laccelerate < dLPID.calculate()) {
                 d_Lpower = Laccelerate;
-                Laccelerate += 0.05;
+                Laccelerate -= 0.05;
             }
 
 

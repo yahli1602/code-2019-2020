@@ -104,8 +104,8 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 rDrive2.setPower(0.4);
                 lDrive1.setPower(0.2);
                 lDrive2.setPower(0.2);
-                collectRight.setPosition(0.2);
-                collectLeft.setPosition(0.8);
+                collectRight.setPosition(0.3);
+                collectLeft.setPosition(0.7);
             } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
