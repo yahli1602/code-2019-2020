@@ -33,7 +33,7 @@ public class Teleop_11226 extends LinearOpMode {
     private Servo collectRight = null;
     private Servo collectLeft = null;
     private Servo push = null;
-    private Servo hold = null;
+    private CRServo hold = null;
     private CRServo turnHold = null;
     //moving Foundation
     private Servo grabber = null;
@@ -80,14 +80,14 @@ class turnHM extends TimerTask{
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         push = hardwareMap.get(Servo.class, "push");
-        hold = hardwareMap.get(Servo.class, "hold");
+        hold = hardwareMap.get(CRServo.class, "hold");
         turnHold = hardwareMap.get(CRServo.class, "turnHold");
         //grabber = hardwareMap.get(Servo.class, "grabber");
         waitForStart();
-        rDrive1.setDirection(DcMotor.Direction.REVERSE);
-        rDrive2.setDirection(DcMotor.Direction.REVERSE);
-        lDrive1.setDirection(DcMotor.Direction.FORWARD);
-        lDrive2.setDirection(DcMotor.Direction.FORWARD);
+        rDrive1.setDirection(DcMotor.Direction.FORWARD);
+        rDrive2.setDirection(DcMotor.Direction.FORWARD);
+        lDrive1.setDirection(DcMotor.Direction.REVERSE);
+        lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
 
@@ -119,16 +119,16 @@ class turnHM extends TimerTask{
                     lDrive2.setPower(gamepad1.left_stick_y - fix);
                 }
                 else if (gamepad1.left_trigger > 0.2) {
-                    rDrive1.setPower(-gamepad1.left_trigger - fix);
-                    rDrive2.setPower(-gamepad1.left_trigger - fix);
-                    lDrive1.setPower(gamepad1.left_trigger + fix);
-                    lDrive2.setPower(gamepad1.left_trigger + fix);
+                    rDrive1.setPower(gamepad1.left_trigger - fix);
+                    rDrive2.setPower(gamepad1.left_trigger - fix);
+                    lDrive1.setPower(-gamepad1.left_trigger + fix);
+                    lDrive2.setPower(-gamepad1.left_trigger + fix);
                 }
                 else if (gamepad1.right_trigger > 0.2) {
-                    rDrive1.setPower(gamepad1.right_trigger + fix);
-                    rDrive2.setPower(gamepad1.right_trigger + fix);
-                    lDrive1.setPower(-gamepad1.right_trigger - fix);
-                    lDrive2.setPower(-gamepad1.right_trigger - fix);
+                    rDrive1.setPower(-gamepad1.right_trigger + fix);
+                    rDrive2.setPower(-gamepad1.right_trigger + fix);
+                    lDrive1.setPower(gamepad1.right_trigger - fix);
+                    lDrive2.setPower(gamepad1.right_trigger - fix);
                 }
                 else{
                     rDrive1.setPower(0);
@@ -236,17 +236,15 @@ class turnHM extends TimerTask{
 
 
             //pinch
-            if(!gamepad2.x){
-                if (gamepad2.y) {
-                    hold.setPosition(0);
-                }
-                else if (!gamepad2.y && gamepad2.dpad_left){
-                    hold.setPosition(0);
-                }
+            if(gamepad2.x) {
+                hold.setPower(1);
             }
-            else if(gamepad2.x){
-                hold.setPosition(180);
+            else if (gamepad2.y) {
+                hold.setPower(0);
             }
+
+
+
 
             /*if(gamepad2.b){
                 setElevatorPosition(2);

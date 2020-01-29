@@ -196,18 +196,22 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
 
 
         // drive until end of period.
-        int q = 0;
-        while (opModeIsActive() && q == 0) {
+        int yoavi = 0;
+        while (opModeIsActive() && yoavi == 0) {
 
 
-            driveInches(35, 0.03, 0.7);
-            turnPinch();
-            backInches(20,-0.03,-0.7);
-            telemetry.addData("angle", getAngle());
+            driveInches(40, 0.03, 0.7);
+            telemetry.addData("drive finished:", rdrive1.getCurrentPosition());
             telemetry.update();
-            sleep(2000);
-
-            q++;
+            sleep(50);
+            turnPinch();
+            telemetry.addData("pinch finished:", elevator.getCurrentPosition());
+            telemetry.update();
+            backInches(20,-0.03,-0.7);
+            telemetry.addData("drive back finished:", ldrive1.getCurrentPosition());
+            telemetry.update();
+            sleep(3000);
+            yoavi++;
 
         }
         // Use PID with imu input to drive in a straight line.
@@ -219,15 +223,13 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
         sleep(600);
         elevator.setPower(0);
         sleep(50);
-        turnHold.setPower(-1);
+        /*turnHold.setPower(-1);
         sleep(2500);
         turnHold.setPower(0);
-        sleep(50);
+        sleep(50);*/
         elevator.setPower(-1);
         sleep(1200);
         elevator.setPower(0);
-
-
     }
 
     /**
@@ -492,9 +494,8 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
         d_Rpower = 0;
         d_Lpower = 0;
 
-        double Raccelerate = -0.05;
-        double Laccelerate = -0.05;
-        inches = inches * -1;
+        double Raccelerate = 0.05;
+        double Laccelerate = 0.05;
 
         dRPID.setOutputRange(minPower, maxPower);
         dLPID.setOutputRange(minPower, maxPower);
@@ -513,15 +514,15 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
         RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (ldrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
 
-        dRPID.setSensorValue(RcuurentPosition);
-        dLPID.setSensorValue(LcuurentPosition);
+        dRPID.setSensorValue(-RcuurentPosition);
+        dLPID.setSensorValue(-LcuurentPosition);
 
         dRPID.calculate();
         dLPID.calculate();
 
 
 
-        while (dRPID.getError() < 0 && dLPID.getError() < 0 && opModeIsActive()) {
+        while (dRPID.getError() > 0 && dLPID.getError() < 0 && opModeIsActive()) {
 
             RcuurentPosition = (rdrive1.getCurrentPosition()) / ticksPerInch;
             dRPID.setSensorValue(RcuurentPosition);
@@ -539,11 +540,11 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
 
             if (dRPID.calculate() == maxPower && Raccelerate < dRPID.calculate()) {
                 d_Rpower = Raccelerate;
-                Raccelerate -= 0.05;
+                Raccelerate += 0.05;
             }
             if (dLPID.calculate() == maxPower && Laccelerate < dLPID.calculate()) {
                 d_Lpower = Laccelerate;
-                Laccelerate -= 0.05;
+                Laccelerate += 0.05;
             }
 
 
@@ -551,10 +552,10 @@ public class PIDdrive_11226_RED_BUILD_PLATE extends LinearOpMode {
             // set power levels.
 
 
-            ldrive1.setPower(d_Lpower - coraction);
-            ldrive2.setPower(d_Lpower - coraction);
-            rdrive1.setPower(d_Rpower + coraction);
-            rdrive2.setPower(d_Rpower + coraction);
+            ldrive1.setPower(-(d_Lpower - coraction));
+            ldrive2.setPower(-(d_Lpower - coraction));
+            rdrive1.setPower(-(d_Rpower + coraction));
+            rdrive2.setPower(-(d_Rpower + coraction));
 
             sleep(15);
 
