@@ -125,7 +125,7 @@ class turnHM extends TimerTask{
                     lDrive2.setPower(-gamepad1.left_trigger + fix);
                 }
                 else if (gamepad1.right_trigger > 0.2) {
-                    rDrive1.setPower(-gamepad1.right_trigger + fix);
+                    rDrive1.setPower( -gamepad1.right_trigger + fix);
                     rDrive2.setPower(-gamepad1.right_trigger + fix);
                     lDrive1.setPower(gamepad1.right_trigger - fix);
                     lDrive2.setPower(gamepad1.right_trigger - fix);
