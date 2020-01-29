@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name="Red2Stone 11229", group="Stone")
+@Autonomous(name="RedStone 11229", group="Stone")
 
 public class Red2Stone_11229 extends LinearOpMode
 {
@@ -240,20 +240,17 @@ public class Red2Stone_11229 extends LinearOpMode
 
         {
             slideInches(30,0.03,0.4);
-            bazim.setPosition(0.56);
-            slideInches(12,-0.03,-0.06);
-            rotate(-90,0.15,true);
+            bazim.setPosition(60);
+            sleep(400);
+            slide1.setPower(-1);
+            sleep(600);
+            slide1.setPower(0);
+            rotate(-90,0.2,true);
             slideInches(60,0,0.5);
             bazim.setPosition(0);
-            slideInches(-52,0,-0.5);
-            rotate(90,0.2,true);
-            slideInches(14,0.03,0.4);
-            bazim.setPosition(0.56);
-            slideInches(-16,-0.03,-0.5);
-            rotate(-90,0.15,true);
-            slideInches(52,0,0.5);
-            bazim.setPosition(0);
-            slideInches(-10,0,-0.6);
+            slide1.setPower(-1);
+            sleep(600);
+            slide1.setPower(0);
             lDrive1.setPower(-1);
             lDrive2.setPower(-1);
             rDrive1.setPower(-1);
@@ -263,6 +260,11 @@ public class Red2Stone_11229 extends LinearOpMode
             lDrive2.setPower(0);
             rDrive1.setPower(0);
             rDrive2.setPower(0);
+            elevator.setPower(1);
+            sleep(400);
+            elevator.setPower(-1);
+            sleep(100);
+            elevator.setPower(0);
 
 
 

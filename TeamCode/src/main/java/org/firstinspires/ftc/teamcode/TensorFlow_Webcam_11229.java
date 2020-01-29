@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -43,7 +44,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-
+@Disabled
 @Autonomous(name = "TensorFlow Webcam 11229", group = "Concept")
 public class TensorFlow_Webcam_11229 extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";

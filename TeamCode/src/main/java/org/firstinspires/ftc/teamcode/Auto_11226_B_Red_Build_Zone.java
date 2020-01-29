@@ -32,7 +32,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.internal.android.dex.EncodedValueReader;
 
 import java.util.List;
-
+@Disabled
 @Autonomous(name = "Auto 11226 Red Build Zone", group = "Autonomous")
 public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";

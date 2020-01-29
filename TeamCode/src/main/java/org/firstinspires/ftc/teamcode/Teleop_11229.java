@@ -1,6 +1,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -16,7 +17,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.dex.file.ValueEncoder
 
 
 @TeleOp(name = "Teleop_11229", group = "Linear Opmode")
-
+@Disabled
 public class Teleop_11229 extends LinearOpMode {
 
     //driving motors

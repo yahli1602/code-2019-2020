@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.util.Range;
 
 
 import org.firstinspires.ftc.robotcore.internal.android.dex.EncodedValueReader;
-
+@Disabled
 @Autonomous(name = "Auto 11229", group = "Autonomous")
 public class Auto_11229_B extends LinearOpMode {
 

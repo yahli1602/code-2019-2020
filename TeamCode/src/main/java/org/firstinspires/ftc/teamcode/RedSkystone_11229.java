@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
-
+@Disabled
 @Autonomous(name="RedSkystone 11229", group="Skystone")
 
 public class RedSkystone_11229 extends LinearOpMode
@@ -327,7 +328,7 @@ public class RedSkystone_11229 extends LinearOpMode
 
             slideInches(30,0.03,0.4);
             bazim.setPosition(0.56);
-            slideInches(-12,0.03,0.06);
+            slideInches(-12,-0.03,-0.06);
             rotate(-90,1.5,true);
             slideInches(60,0,0.5);
             bazim.setPosition(0);

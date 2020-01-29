@@ -86,7 +86,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 @TeleOp(name="vuforiaWebcam", group ="Concept")
-
+@Disabled
 public class vuforiaWebcam11229 extends LinearOpMode {
 
 
