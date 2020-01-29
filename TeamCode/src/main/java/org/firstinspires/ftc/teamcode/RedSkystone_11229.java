@@ -18,9 +18,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name="PIDTF 11229", group="PID")
+@Autonomous(name="RedSkystone 11229", group="Skystone")
 
-public class PIDTFdrive_11229 extends LinearOpMode
+public class RedSkystone_11229 extends LinearOpMode
 {
     DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
     BNO055IMU               imu;
@@ -240,7 +240,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
         while (opModeIsActive() && f == 0)
 
         {
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            /*List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
             slideInches(5,0.03,0.6);
 
@@ -274,6 +274,9 @@ public class PIDTFdrive_11229 extends LinearOpMode
             if (skystonePostion == 1){
                 slideInches(5,0.03,0.2);
             }else if (skystonePostion == 3){
+
+
+
                 slideInches(-4,0.03,-0.2);
             }
 
@@ -320,6 +323,32 @@ public class PIDTFdrive_11229 extends LinearOpMode
 
             //slideInches(40,-0.5,0.5);
 
+             */
+
+            slideInches(30,0.03,0.4);
+            bazim.setPosition(0.56);
+            slideInches(-12,0.03,0.06);
+            rotate(-90,1.5,true);
+            slideInches(60,0,0.5);
+            bazim.setPosition(0);
+            slideInches(-52,0,-0.5);
+            rotate(90,0.2,true);
+            slideInches(14,0.03,0.4);
+            bazim.setPosition(0.56);
+            slideInches(-16,-0.03,-0.5);
+            rotate(-90,0.15,true);
+            slideInches(52,0,0.5);
+            bazim.setPosition(0);
+            slideInches(-10,0,-0.6);
+            lDrive1.setPower(-1);
+            lDrive2.setPower(-1);
+            rDrive1.setPower(-1);
+            rDrive2.setPower(-1);
+            sleep(300);
+            lDrive1.setPower(0);
+            lDrive2.setPower(0);
+            rDrive1.setPower(0);
+            rDrive2.setPower(0);
 
 
 
@@ -999,7 +1028,7 @@ public class PIDTFdrive_11229 extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.5;
+        tfodParameters.minimumConfidence = 0.45;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }

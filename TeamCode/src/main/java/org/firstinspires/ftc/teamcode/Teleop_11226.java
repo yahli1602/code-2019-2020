@@ -15,8 +15,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-
-
 @TeleOp(name = "Teleop 11226", group = "Linear Opmode")
 public class Teleop_11226 extends LinearOpMode {
     private boolean pinch = false;
@@ -63,9 +61,6 @@ class turnHM extends TimerTask{
 
     turnHP turnHPlus = new turnHP();
     turnHM turnHMinus = new turnHM();
-
-
-
 
 
     @Override
@@ -136,27 +131,23 @@ class turnHM extends TimerTask{
                     lDrive1.setPower(0);
                     lDrive2.setPower(0);
                 }
-            }
-            else{
+            } else {
                 if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                     rDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
                     rDrive2.setPower(gamepad1.left_stick_y / 2 - fix);
                     lDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
                     lDrive2.setPower(gamepad1.left_stick_y / 2 - fix);
-                }
-                else if (gamepad1.left_trigger > 0.2) {
+                } else if (gamepad1.left_trigger > 0.2) {
                     rDrive1.setPower(-gamepad1.left_trigger / 2 - fix);
                     rDrive2.setPower(-gamepad1.left_trigger / 2 - fix);
                     lDrive1.setPower(gamepad1.left_trigger / 2 + fix);
                     lDrive2.setPower(gamepad1.left_trigger / 2 + fix);
-                }
-                else if (gamepad1.right_trigger > 0.2) {
+                } else if (gamepad1.right_trigger > 0.2) {
                     rDrive1.setPower(gamepad1.right_trigger / 2 + fix);
                     rDrive2.setPower(gamepad1.right_trigger / 2 + fix);
                     lDrive1.setPower(-gamepad1.right_trigger / 2 - fix);
                     lDrive2.setPower(-gamepad1.right_trigger / 2 - fix);
-                }
-                else {
+                } else {
                     rDrive1.setPower(0);
                     rDrive2.setPower(0);
                     lDrive1.setPower(0);
@@ -165,8 +156,8 @@ class turnHM extends TimerTask{
             }
 
 
-            while(lDrive1.isBusy()){
-                if(Fast) {
+            while (lDrive1.isBusy()) {
+                if (Fast) {
                     if ((gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) && lDrive2.getPower() != gamepad1.left_stick_y) {
                         fix = lDrive2.getPower() - gamepad1.left_stick_y;
                     } else if (gamepad1.left_trigger > 0.2 && rDrive2.getPower() != gamepad1.left_trigger) {
@@ -176,18 +167,14 @@ class turnHM extends TimerTask{
                     } else if (lDrive2.isBusy()) {
                         fix = lDrive2.getPower();
                     }
-                }
-                else{
-                    if((gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) && lDrive2.getPower()*2 != gamepad1.left_stick_y){
+                } else {
+                    if ((gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) && lDrive2.getPower() * 2 != gamepad1.left_stick_y) {
                         fix = lDrive2.getPower() - gamepad1.left_stick_y;
-                    }
-                    else if(gamepad1.left_trigger > 0.2 && rDrive2.getPower()*2 != gamepad1.left_trigger){
+                    } else if (gamepad1.left_trigger > 0.2 && rDrive2.getPower() * 2 != gamepad1.left_trigger) {
                         fix = rDrive2.getPower() - gamepad1.left_trigger;
-                    }
-                    else if(gamepad1.right_trigger > 0.2 && lDrive2.getPower()*2 != gamepad1.right_trigger){
+                    } else if (gamepad1.right_trigger > 0.2 && lDrive2.getPower() * 2 != gamepad1.right_trigger) {
                         fix = lDrive2.getPower() - gamepad1.right_trigger;
-                    }
-                    else if(lDrive2.isBusy()){
+                    } else if (lDrive2.isBusy()) {
                         fix = lDrive2.getPower();
                     }
                 }
@@ -196,7 +183,7 @@ class turnHM extends TimerTask{
 
             if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
                 slide.setPower(gamepad1.right_stick_x);
-            }  else {
+            } else {
                 slide.setPower(0);
             }
 
@@ -204,8 +191,7 @@ class turnHM extends TimerTask{
             //elevator
             if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
-            }
-            else {
+            } else {
                 elevator.setPower(0);
             }
 
@@ -230,7 +216,7 @@ class turnHM extends TimerTask{
             //push cube in
             if (gamepad2.dpad_right) {
                 push.setPosition(0);
-            }else{
+            } else {
                 push.setPosition(180);
             }
 
@@ -280,10 +266,10 @@ class turnHM extends TimerTask{
             } else if (gamepad2.dpad_right) {
                 setElevatorPosition(2);
 
-            }else if (gamepad2.dpad_down){
+            } else if (gamepad2.dpad_down) {
                 setElevatorPosition(3);
 
-            }else if (gamepad2.dpad_left){
+            } else if (gamepad2.dpad_left) {
                 setElevatorPosition(4);
 
             }
@@ -297,16 +283,16 @@ class turnHM extends TimerTask{
 
     }
 
-    private void elevatorHight(double ticks){
+    private void elevatorHight(double ticks) {
         ePID.setSensorValue(elevator.getCurrentPosition());
         ePID.setSetPoint(ticks);
-        ePID.setOutputRange(-0.7,0.7);
-        while(ePID.getError() != 0){
+        ePID.setOutputRange(-0.7, 0.7);
+        while (ePID.getError() != 0) {
             elevator.setPower(ePID.calculate());
         }
     }
 
-    private void setElevatorPosition(int ep){
+    private void setElevatorPosition(int ep) {
         double ticks;
 
         if (ep == 1) ticks = 0;

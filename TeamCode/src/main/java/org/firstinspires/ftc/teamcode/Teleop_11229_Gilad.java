@@ -155,14 +155,15 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
 
             if (gamepad2.x){
-                bazim.setPosition(1);
-            }else{
+                bazim.setPosition(0.5);
+            }else if (gamepad2.b){
                 bazim.setPosition(0);
             }
 
 
             telemetry.addData("rticks",rDrive1.getCurrentPosition());
             telemetry.addData("lticks",lDrive1.getCurrentPosition());
+            telemetry.addData("servo position",bazim.getPosition());
             telemetry.update();
 
 

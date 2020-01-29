@@ -40,16 +40,16 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
 
 
-
     ElapsedTime elapsedTime = new ElapsedTime();
     public DcMotor rdrive1 = null;
     public DcMotor rdrive2 = null;
     public DcMotor ldrive1 = null;
     public DcMotor ldrive2 = null;
     public DcMotor slide1 = null;
-    public DcMotor slide2 = null;
     public DcMotor elevator = null;
-    public CRServo hold = null;
+    public Servo hold = null;
+    public CRServo turnHold = null;
+
     /*private Servo collectRight = null;
     private Servo collectLeft = null;
     private TouchSensor cubeIn = null;*/
@@ -72,9 +72,9 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
 
     BNO055IMU imu;
     Orientation lastAngles = new Orientation();
-    double                  globalAngle, power = .30, correction, rotation;
-    boolean                 aButton, bButton, touched;
-    public PIDController           pidRotate, pidDrive;
+    double globalAngle, power = .30, correction, rotation;
+    boolean aButton, bButton, touched;
+    public PIDController pidRotate, pidDrive;
 
 
     private float skyStoneX = 0;
@@ -102,7 +102,8 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
 
     public void timer(long miliseconds) {
         long x = (long) elapsedTime.milliseconds();
-        while (x < miliseconds + (long) elapsedTime.milliseconds() && opModeIsActive()) {}
+        while (x < miliseconds + (long) elapsedTime.milliseconds() && opModeIsActive()) {
+        }
     }
 
     public void driveInches(double inches) {
@@ -113,11 +114,10 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         if (inches > 0) {
             errorT = inches + setPoint;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
 
 
-
-                if(errorT > 0 && opModeIsActive()) {
+                if (errorT > 0 && opModeIsActive()) {
                     uT = kp * errorT;
                     currentPosition = Math.abs(ldrive2.getCurrentPosition()) / ticksPerInch;
                     errorT -= currentPosition - lastPosition;
@@ -132,7 +132,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
                     telemetry.addData("start", setPoint);
                     telemetry.addData("error", errorT);
                     telemetry.update();
-                }else {
+                } else {
                     ldrive1.setPower(0);
                     ldrive2.setPower(0);
                     rdrive1.setPower(0);
@@ -146,7 +146,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         } else {
             errorT = -inches + setPoint;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > 0 && opModeIsActive()) {
                     uT = kp * errorT;
 
@@ -158,8 +158,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
                     ldrive2.setPower(uT);
                     rdrive1.setPower(uT);
                     rdrive2.setPower(uT);
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -177,7 +176,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         if (deg > 0) {
             errorT = diameter * Math.PI * (deg / 360);
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > 0 && opModeIsActive()) {
 
                     currentPosition = ldrive1.getCurrentPosition() / ticksPerInch - setPoint;
@@ -192,8 +191,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
                     rdrive2.setPower(-uT);
                     telemetry.addData("", uT);
                     telemetry.update();
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -202,11 +200,10 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             rdrive1.setPower(0);
             rdrive2.setPower(0);
             slide1.setPower(0);
-            slide2.setPower(0);
         } else {
             errorT = diameter * Math.PI * (-deg / 360) + setPoint;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > setPoint && opModeIsActive()) {
                     uT = kp * errorT;
 
@@ -221,8 +218,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
                     telemetry.addData("rdrive:", rdrive1.getPower());
                     telemetry.addData("ldrive:", ldrive1.getPower());
                     telemetry.update();
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -231,7 +227,6 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             rdrive1.setPower(0);
             rdrive2.setPower(0);
             slide1.setPower(0);
-            slide2.setPower(0);
         }
     }
 
@@ -242,43 +237,38 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
 
         if (inches > 0) {
             errorT = inches + 4.25;
-                while(errorT > 0 && opModeIsActive()) {
-                    uT = ks * errorT;
+            while (errorT > 0 && opModeIsActive()) {
+                uT = ks * errorT;
 
-                    currentPosition = slide1.getCurrentPosition() / ticksPerInch - setPoint;
-                    errorT -= (currentPosition - lastPosition);
-                    lastPosition = currentPosition;
+                currentPosition = slide1.getCurrentPosition() / ticksPerInch - setPoint;
+                errorT -= (currentPosition - lastPosition);
+                lastPosition = currentPosition;
 
-                    slide1.setPower(uT);
-                    slide2.setPower(uT);
+                slide1.setPower(uT);
 
-                    telemetry.addData("errorT", errorT);
-                    telemetry.addData("uT", uT);
+                telemetry.addData("errorT", errorT);
+                telemetry.addData("uT", uT);
 
-                    telemetry.update();
-                }
+                telemetry.update();
+            }
             slide1.setPower(0);
-            slide2.setPower(0);
         } else {
             errorT = -inches + 4.25;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > 0 && opModeIsActive() && uT > 0) {
                     uT = ks * errorT;
 
                     currentPosition = Math.abs(slide1.getCurrentPosition()) / ticksPerInch - setPoint;
-                    errorT -= Math.abs(currentPosition -lastPosition);
+                    errorT -= Math.abs(currentPosition - lastPosition);
                     lastPosition = currentPosition;
 
                     slide1.setPower(-uT);
-                    slide2.setPower(-uT);
-                }
-                else{
+                } else {
                     x++;
                 }
             }
             slide1.setPower(0);
-            slide2.setPower(0);
         }
     }
 
@@ -301,15 +291,15 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         sleep(500);
     }
 
-    public void drivaBySpin(double spins){
+    public void drivaBySpin(double spins) {
         setPoint = ldrive1.getCurrentPosition() / ticksPerSpin;
 
         if (spins > 0) {
             errorT = (spins + setPoint) / 2;
             lastPosition = 0;
             int x = 0;
-            while(x == 0) {
-                while(errorT > setPoint && opModeIsActive() && uT > 0.3) {
+            while (x == 0) {
+                while (errorT > setPoint && opModeIsActive() && uT > 0.3) {
 
                     uT = kp * errorT;
                     currentPosition = ldrive1.getCurrentPosition() / ticksPerSpin;
@@ -331,7 +321,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             errorT = -spins + setPoint;
             lastPosition = 0;
             int x = 0;
-            while(x == 0) {
+            while (x == 0) {
                 if (errorT > setPoint && opModeIsActive() && uT > 0.3) {
                     uT = kp * errorT;
 
@@ -343,8 +333,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
                     ldrive2.setPower(-uT);
                     rdrive1.setPower(-uT);
                     rdrive2.setPower(-uT);
-                }
-                else{
+                } else {
                     x++;
                 }
             }
@@ -383,7 +372,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
     }*/
 
     // For the closest placement of the skystone
-    private void caseSSP(){
+    private void caseSSP() {
         /*switch (skystonePostion) {
             case 1:
                 driveInches(-14);
@@ -425,10 +414,10 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         rdrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
-        slide1 = hardwareMap.get(DcMotor.class, "slide1");
-        slide2 = hardwareMap.get(DcMotor.class, "slide2");
+        slide1 = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        hold = hardwareMap.get(CRServo.class, "hold");
+        hold = hardwareMap.get(Servo.class, "hold");
+        turnHold = hardwareMap.get(CRServo.class, "turnHold");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
         cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
@@ -438,7 +427,6 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slide2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -446,7 +434,6 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slide2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rdrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -454,7 +441,6 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         ldrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
@@ -464,21 +450,19 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         pidDrive = new PIDController(.05, 0, 0);
 
 
-
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
-        parameters.mode                = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled      = false;
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled = false;
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         imu.initialize(parameters);
 
 
-        while (!isStopRequested() && !imu.isGyroCalibrated())
-        {
+        while (!isStopRequested() && !imu.isGyroCalibrated()) {
             sleep(50);
             idle();
         }
@@ -489,38 +473,34 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         ldrive1.setDirection(DcMotorSimple.Direction.FORWARD);
         ldrive2.setDirection(DcMotorSimple.Direction.FORWARD);
         slide1.setDirection(DcMotorSimple.Direction.FORWARD);
-        slide2.setDirection(DcMotorSimple.Direction.FORWARD);
-        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
-        hold.setDirection(DcMotorSimple.Direction.FORWARD);
+        elevator.setDirection(DcMotorSimple.Direction.REVERSE);
         /*collectRight.setDirection(Servo.Direction.REVERSE);
         collectLeft.setDirection(Servo.Direction.FORWARD);*/
 
         //paramaters for stright drive
 
 
-
-        while (opModeIsActive() && h ==0) {
+        while (opModeIsActive() && h == 0) {
 
             //while(ldrive1.isBusy()){}
-            elevator.setPower(-1);
-            slide1.setPower(1);
-            slide2.setPower(1);
+            turnPinch();
+            slide1.setPower(-1);
             sleep(400);
             slide1.setPower(0);
-            slide2.setPower(0);
             sleep(700);
             elevator.setPower(0);
             ldrive1.setPower(0.3);
             ldrive2.setPower(0.3);
-            rdrive1.setPower(0.55);
-            rdrive2.setPower(0.55);
+            rdrive1.setPower(0.45);
+            rdrive2.setPower(0.45);
+            telemetry.addData("part1 done:", rdrive1.getCurrentPosition());
             sleep(650);
-            ldrive1.setPower(0.22);
-            ldrive2.setPower(0.22);
+            ldrive1.setPower(0.3);
+            ldrive2.setPower(0.3);
             rdrive1.setPower(0.45);
             rdrive2.setPower(0.45);
             sleep(600);
-            elevator.setPower(1);
+            elevator.setPower(-1);
             ldrive1.setPower(0);
             ldrive2.setPower(0);
             rdrive1.setPower(0);
@@ -557,7 +537,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            elevator.setPower(-1);
+            elevator.setPower(1);
             sleep(500);
 
             ldrive1.setPower(-0.5);
@@ -569,14 +549,12 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             ldrive2.setPower(0);
             rdrive1.setPower(0);
             rdrive2.setPower(0);
-            elevator.setPower(1);
+            elevator.setPower(-1);
             sleep(950);
-
+            elevator.setPower(0);
             slide1.setPower(1);
-            slide2.setPower(1);
             sleep(500);
             slide1.setPower(0);
-            slide2.setPower(0);
 
             ldrive1.setPower(-0.5);
             ldrive2.setPower(-0.5);
@@ -607,6 +585,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             sleep(2000);*/
         }
     }
+
     private void initVuforia() {
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -632,19 +611,19 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
     }
 
     //if see 3 diffrent objects
-    private int seeThreeObj(List<Recognition> Recognitions){
+    private int seeThreeObj(List<Recognition> Recognitions) {
 
-        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(0).getLeft();
-        }else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+        } else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)) {
             Stone1X = Recognitions.get(0).getLeft();
         }
 
 
-        if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
+        if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(1).getLeft();
 
-        }else if (Recognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
+        } else if (Recognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
 
             if (Stone1X != 0) {
 
@@ -654,18 +633,18 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
             }
         }
 
-        if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+        if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(2).getLeft();
-        }else if (Recognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
+        } else if (Recognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)) {
             Stone2X = Recognitions.get(2).getLeft();
         }
 
 
-        if (skyStoneX < Stone1X && skyStoneX < Stone2X){
+        if (skyStoneX < Stone1X && skyStoneX < Stone2X) {
             skystonePostion = 1;
-        }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+        } else if (skyStoneX > Stone1X && skyStoneX > Stone2X) {
             skystonePostion = 3;
-        }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
+        } else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
             skystonePostion = 2;
         }
 
@@ -673,8 +652,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
     }
 
 
-    private void resetAngle()
-    {
+    private void resetAngle() {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         globalAngle = 0;
@@ -682,10 +660,10 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
 
     /**
      * Get current cumulative angle rotation from last reset.
+     *
      * @return Angle in degrees. + = left, - = right from zero point.
      */
-    private double getAngle()
-    {
+    private double getAngle() {
         // We experimentally determined the Z axis is the axis we want to use for heading angle.
         // We have to process the angle because the imu works in euler angles so the Z axis is
         // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
@@ -709,10 +687,10 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
 
     /**
      * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
+     *
      * @param degrees Degrees to turn, + is left - is right
      */
-    public void rotate(int degrees, double power)
-    {
+    public void rotate(int degrees, double power) {
         // restart imu angle tracking.
         resetAngle();
 
@@ -740,11 +718,9 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
 
         // rotate until turn is completed.
 
-        if (degrees < 0)
-        {
+        if (degrees < 0) {
             // On right turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() == 0)
-            {
+            while (opModeIsActive() && getAngle() == 0) {
                 ldrive1.setPower(power);
                 ldrive2.setPower(power);
                 rdrive1.setPower(-power);
@@ -752,18 +728,15 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
                 sleep(100);
             }
 
-            do
-            {
+            do {
                 power = pidRotate.performPID(getAngle()); // power will be - on right turn.
                 ldrive1.setPower(-power);
                 ldrive2.setPower(-power);
                 rdrive1.setPower(power);
                 rdrive2.setPower(power);
             } while (opModeIsActive() && !pidRotate.onTarget());
-        }
-        else    // left turn.
-            do
-            {
+        } else    // left turn.
+            do {
                 power = pidRotate.performPID(getAngle()); // power will be + on left turn.
                 ldrive1.setPower(-power);
                 ldrive2.setPower(-power);
@@ -784,6 +757,19 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
 
         // reset angle tracking on new heading.
         resetAngle();
+    }
+
+    public void turnPinch() {
+        elevator.setPower(1);
+        sleep(600);
+        elevator.setPower(0);
+        sleep(50);
+        turnHold.setPower(-1);
+        sleep(2500);
+        turnHold.setPower(0);
+        sleep(50);
+
+
     }
 
 
