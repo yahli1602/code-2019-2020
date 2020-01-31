@@ -28,7 +28,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class auto_park_11226_blue_build_red_stones extends LinearOpMode {
     DcMotor ldrive1, ldrive2, rdrive1, rdrive2, slide1, elevator;
-    Servo hold;
+
     BNO055IMU imu;
     Orientation lastAngles = new Orientation();
     double globalAngle, power = .07, rotation;
@@ -92,7 +92,7 @@ public class auto_park_11226_blue_build_red_stones extends LinearOpMode {
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-        hold = hardwareMap.get(Servo.class, "hold");
+
         elevator = hardwareMap.get(DcMotor.class, "elevator");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
@@ -195,8 +195,9 @@ public class auto_park_11226_blue_build_red_stones extends LinearOpMode {
         // drive until end of period.
         int q = 0;
         while (opModeIsActive() && q == 0) {
+            sleep(20000);
 
-slideInches(30,0.03,0.6);
+            slideInches(30, 0.03, 1);
             q++;
 
         }
@@ -344,7 +345,6 @@ slideInches(30,0.03,0.6);
         SaPID.setOutputRange(-0.7, 0.7);
 
 
-
         RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (ldrive1.getCurrentPosition() - d_LstartPoint) / ticksPerInch;
 
@@ -353,8 +353,6 @@ slideInches(30,0.03,0.6);
 
         dRPID.calculate();
         dLPID.calculate();
-
-
 
 
         int n = 1;
@@ -372,17 +370,16 @@ slideInches(30,0.03,0.6);
             aPID.setSensorValue(getAngle());
 
 
-
             d_Lpower = dLPID.calculate();
             d_Rpower = dRPID.calculate();
             coraction = aPID.calculate();// + 0.04 * (LcuurentPosition - RcuurentPosition);
 
 
-            if(d_Rpower == maxPower && Raccelerate < maxPower){
+            if (d_Rpower == maxPower && Raccelerate < maxPower) {
                 d_Rpower = Raccelerate + coraction;
                 Raccelerate += 0.05;
             }
-            if(d_Lpower == maxPower && Laccelerate < maxPower){
+            if (d_Lpower == maxPower && Laccelerate < maxPower) {
                 d_Lpower = Laccelerate - coraction;
                 Laccelerate += 0.05;
             }
@@ -402,7 +399,7 @@ slideInches(30,0.03,0.6);
                 rdrive1.setPower(d_Rpower);// / n));
                 rdrive2.setPower(d_Rpower);// / n));
                 Con = false;
-            }else {
+            } else {
 
 
             /*if ((d_error / 9 / 16) % 1 == 0) {
@@ -450,7 +447,7 @@ slideInches(30,0.03,0.6);
             telemetry.addData("d_rpower", d_Rpower);
             telemetry.addData("d_lpower", d_Lpower);
             telemetry.addData("angle", getAngle());
-            telemetry.addData("angle",getAngle());
+            telemetry.addData("angle", getAngle());
             telemetry.update();
             sleep(15);
 
@@ -495,11 +492,11 @@ slideInches(30,0.03,0.6);
         dRPID.calculate();
         dLPID.calculate();
 
-        if(dRPID.calculate() == minPower && accelerate > dRPID.calculate()){
+        if (dRPID.calculate() == minPower && accelerate > dRPID.calculate()) {
             d_Rpower = accelerate;
             accelerate -= 0.05;
         }
-        if(dLPID.calculate() == minPower && accelerate > dLPID.calculate()){
+        if (dLPID.calculate() == minPower && accelerate > dLPID.calculate()) {
             d_Lpower = accelerate;
             accelerate -= 0.05;
         }
@@ -521,11 +518,11 @@ slideInches(30,0.03,0.6);
             aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
-            if(dRPID.calculate() == maxPower && accelerate < dRPID.calculate()){
+            if (dRPID.calculate() == maxPower && accelerate < dRPID.calculate()) {
                 d_Rpower = accelerate;
                 accelerate += 0.05;
             }
-            if(dLPID.calculate() == maxPower && accelerate < dLPID.calculate()){
+            if (dLPID.calculate() == maxPower && accelerate < dLPID.calculate()) {
                 d_Lpower = accelerate;
                 accelerate += 0.05;
             }

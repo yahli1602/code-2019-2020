@@ -120,7 +120,7 @@ class turnHM extends TimerTask{
                     lDrive2.setPower(-gamepad1.left_trigger + fix);
                 }
                 else if (gamepad1.right_trigger > 0.2) {
-                    rDrive1.setPower( -gamepad1.right_trigger + fix);
+                    rDrive1.setPower(-gamepad1.right_trigger + fix);
                     rDrive2.setPower(-gamepad1.right_trigger + fix);
                     lDrive1.setPower(gamepad1.right_trigger - fix);
                     lDrive2.setPower(gamepad1.right_trigger - fix);
@@ -138,15 +138,15 @@ class turnHM extends TimerTask{
                     lDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
                     lDrive2.setPower(gamepad1.left_stick_y / 2 - fix);
                 } else if (gamepad1.left_trigger > 0.2) {
-                    rDrive1.setPower(-gamepad1.left_trigger / 2 - fix);
-                    rDrive2.setPower(-gamepad1.left_trigger / 2 - fix);
-                    lDrive1.setPower(gamepad1.left_trigger / 2 + fix);
-                    lDrive2.setPower(gamepad1.left_trigger / 2 + fix);
+                    rDrive1.setPower(gamepad1.left_trigger / 2 - fix);
+                    rDrive2.setPower(gamepad1.left_trigger / 2 - fix);
+                    lDrive1.setPower(-gamepad1.left_trigger / 2 + fix);
+                    lDrive2.setPower(-gamepad1.left_trigger / 2 + fix);
                 } else if (gamepad1.right_trigger > 0.2) {
-                    rDrive1.setPower(gamepad1.right_trigger / 2 + fix);
-                    rDrive2.setPower(gamepad1.right_trigger / 2 + fix);
-                    lDrive1.setPower(-gamepad1.right_trigger / 2 - fix);
-                    lDrive2.setPower(-gamepad1.right_trigger / 2 - fix);
+                    rDrive1.setPower(-gamepad1.right_trigger / 2 + fix);
+                    rDrive2.setPower(-gamepad1.right_trigger / 2 + fix);
+                    lDrive1.setPower(gamepad1.right_trigger / 2 - fix);
+                    lDrive2.setPower(gamepad1.right_trigger / 2 - fix);
                 } else {
                     rDrive1.setPower(0);
                     rDrive2.setPower(0);
@@ -226,6 +226,8 @@ class turnHM extends TimerTask{
                 hold.setPower(1);
             }
             else if (gamepad2.y) {
+                hold.setPower(-1);
+            }else if (gamepad2.dpad_left){
                 hold.setPower(0);
             }
 

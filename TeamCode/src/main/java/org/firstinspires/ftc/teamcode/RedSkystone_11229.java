@@ -18,8 +18,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
-@Disabled
-@Autonomous(name="RedSkystone 11229", group="Skystone")
+
+@Autonomous(name="Drive 11229", group="Skystone")
 
 public class RedSkystone_11229 extends LinearOpMode
 {
@@ -325,31 +325,7 @@ public class RedSkystone_11229 extends LinearOpMode
             //slideInches(40,-0.5,0.5);
 
              */
-
-            slideInches(30,0.03,0.4);
-            bazim.setPosition(0.56);
-            slideInches(-12,-0.03,-0.06);
-            rotate(-90,1.5,true);
-            slideInches(60,0,0.5);
-            bazim.setPosition(0);
-            slideInches(-52,0,-0.5);
-            rotate(90,0.2,true);
-            slideInches(14,0.03,0.4);
-            bazim.setPosition(0.56);
-            slideInches(-16,-0.03,-0.5);
-            rotate(-90,0.15,true);
-            slideInches(52,0,0.5);
-            bazim.setPosition(0);
-            slideInches(-10,0,-0.6);
-            lDrive1.setPower(-1);
-            lDrive2.setPower(-1);
-            rDrive1.setPower(-1);
-            rDrive2.setPower(-1);
-            sleep(300);
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-            rDrive1.setPower(0);
-            rDrive2.setPower(0);
+            driveInches(72,0.03,0.6);
 
 
 
@@ -512,8 +488,8 @@ public class RedSkystone_11229 extends LinearOpMode
         dLPID.setSetPoint(inches);
         dLPID.setOutputRange(minimumP , maximumP);
 
-        //aPID.setSetPoint(0);
-        //aPID.setOutputRange(-0.07,0.07);
+        aPID.setSetPoint(0);
+        aPID.setOutputRange(-0.05,0.05);
 
 
         d_RstartPoint = rDrive1.getCurrentPosition();
@@ -545,27 +521,33 @@ public class RedSkystone_11229 extends LinearOpMode
             dLPID.setSensorValue(LcuurentPosition);
             d_Lpower = dLPID.calculate();
 
-            //aPID.setSensorValue(getAngle());
-            coraction = checkDirection() ;//aPID.calculate();
 
 
 
-            telemetry.update();
+
+            coraction = (LcuurentPosition - RcuurentPosition);
+            telemetry.addData("first coraction",coraction);
+            aPID.setSensorValue(getAngle());
+            coraction = aPID.calculate();
+
+
+            telemetry.addData("second coraction",coraction);
+            telemetry.addData("lpower",d_Lpower);
+            telemetry.addData("rdrive",d_Rpower);
+
 
             // set power levels.`
-            lDrive1.setPower(d_Lpower - coraction);
-            lDrive2.setPower(d_Lpower - coraction);
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
 
-            rDrive1.setPower(d_Rpower + coraction);
-            rDrive2.setPower(d_Rpower + coraction);
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
 
 
-            telemetry.addData("left power", lDrive2.getPower());
-            telemetry.addData("right power", rDrive2.getPower());
-            telemetry.addData("RError",dRPID.getError());
-            telemetry.addData("LError",dLPID.getError());
-            telemetry.addData("RcurrentP", RcuurentPosition);
-            telemetry.addData("LcurrentP", LcuurentPosition);
+            telemetry.addData("right drive P",rDrive1.getPower());
+            telemetry.addData("right current position",RcuurentPosition);
+            telemetry.addData("left drive P",lDrive1.getPower());
+            telemetry.addData("left current position",LcuurentPosition);
             telemetry.update();
 
             sleep(15);
