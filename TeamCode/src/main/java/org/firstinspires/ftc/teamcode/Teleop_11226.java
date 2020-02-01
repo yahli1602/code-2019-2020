@@ -94,7 +94,7 @@ class turnHM extends TimerTask{
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        ePID.PIDcon(0.1,0,0);
+        ePID.PIDcon(0.45,0,0);
 
         while (opModeIsActive()) {
 

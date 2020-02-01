@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.dex.file.ValueEncoder
 
 
 @TeleOp(name = "Teleop_11229", group = "Linear Opmode")
-@Disabled
+
 public class Teleop_11229 extends LinearOpMode {
 
     //driving motors

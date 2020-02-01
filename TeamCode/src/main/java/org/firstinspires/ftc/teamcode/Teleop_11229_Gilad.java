@@ -31,6 +31,8 @@ public class Teleop_11229_Gilad extends LinearOpMode {
     private TouchSensor stoneIn = null;
 
     boolean fast = true;
+    private PIDcon ePID = new PIDcon();
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -72,7 +74,9 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        ePID.PIDcon(0.45,0,0);
 
         waitForStart();
 
@@ -161,13 +165,39 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
 
 
-            telemetry.addData("rticks",rDrive1.getCurrentPosition());
-            telemetry.addData("lticks",lDrive1.getCurrentPosition());
-            telemetry.addData("servo position",bazim.getPosition());
+            if (gamepad2.dpad_up) setElevatorPosition(1);
+            else if (gamepad2.dpad_left) setElevatorPosition(2);
+            else if (gamepad2.dpad_down) setElevatorPosition(3);
+
+            telemetry.addData("SP",slide.getPower());
+            telemetry.addData("elevator ticks",elevator.getCurrentPosition());
             telemetry.update();
 
 
 
         }
+    }
+
+    private void elevatorHight(double ticks) {
+        ePID.setSetPoint(ticks);
+        ePID.setOutputRange(-0.7, 0.7);
+
+        ePID.setSensorValue(ticks);
+        ePID.calculate();
+        while (ePID.getError() != 0 && elevator.getCurrentPosition() < 0) {
+            ePID.setSensorValue(elevator.getCurrentPosition());
+            elevator.setPower(ePID.calculate());
+        }
+    }
+
+    private void setElevatorPosition(int ep) {
+        double ticks;
+
+        if (ep == 1) ticks = 0;
+        else if (ep == 2) ticks = -577;
+        else if (ep == 3) ticks = -1526;
+        else ticks = 0;
+
+        elevatorHight(ticks);
     }
 }
