@@ -177,7 +177,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
 
         }
     }
-
+//elh
     private void elevatorHight(double ticks) {
         ePID.setSetPoint(ticks);
         ePID.setOutputRange(-0.7, 0.7);
