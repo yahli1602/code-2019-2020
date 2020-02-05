@@ -50,17 +50,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@Disabled
+
 @TeleOp(name = "ServoTest", group = "Linear Opmode")
 public class ServoTest extends LinearOpMode {
 
     // Declare OpMode members.
-    private Servo bazim = null;
+    private CRServo bazim = null;
 
     @Override
     public void runOpMode() {
 
-        bazim = hardwareMap.get(Servo.class, "bazim");
+        bazim = hardwareMap.get(CRServo.class, "bazim");
         // Wait for the game to start (driver presses PLAY)
 
         waitForStart();
@@ -69,8 +69,7 @@ public class ServoTest extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            bazim.setPosition(3);
-
+            bazim.setPower(1);
 
 
             // Choose to drive using either Tank Mode, or POV Mode

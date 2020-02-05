@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name="BlueStone 11229", group="Stone")
+@Autonomous(name="BlueStone 11229 3", group="Stone")
 
 public class Blue2Stone_11229 extends LinearOpMode
 {
@@ -37,6 +37,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
     PIDcon dRPID = new PIDcon();
     PIDcon dLPID = new PIDcon();
+    PIDcon RLCPID = new PIDcon();
     PIDcon pidRotate = new PIDcon();
     PIDcon aPID = new PIDcon();
     PIDcon SaPID = new PIDcon();
@@ -46,22 +47,20 @@ public class Blue2Stone_11229 extends LinearOpMode
     TensorFlow TF = new TensorFlow();
 
     PIDcon a_pidDrive = new PIDcon();
-    double                  d_error = 0;
-    double                  d_prevError = 0;
-    double                  d_RstartPoint = 0;
-    double                  d_LstartPoint = 0;
-    double                  a_startPoint = 0;
-    double                  s_startPoint = 0;
-    double                  sc_startPoint = 0;
-    double                  coraction;
-    double                  Scoraction;
+    double d_error = 0;
+    double d_prevError = 0;
+    double d_RstartPoint = 0;
+    double d_LstartPoint = 0;
+    double a_startPoint = 0;
+    double s_startPoint = 0;
+    double sc_startPoint = 0;
+    double coraction;
+    double Scoraction;
     double RcuurentPosition = 0;
     double LcuurentPosition = 0;
     double ScurrentPosition = 0;
 
-    private float skyStoneX = 0;
-    private float Stone1X = 0;
-    private float Stone2X = 0;
+
     int skystonePostion;
     int Stone1Postion;
     int Stone2Postion;
@@ -182,11 +181,13 @@ public class Blue2Stone_11229 extends LinearOpMode
         dRPID.PIDcon(0.05,0,0);
         dLPID.PIDcon(0.05,0,0);
 
+        RLCPID.PIDcon(0.02,0,0);
+
         sPID.PIDcon(0.005,0.0009,0.1);
         ScPID.PIDcon(0.02,0,0.07);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.05,0,0);
+        aPID.PIDcon(0.04,0,0);
 
 
 
@@ -239,35 +240,16 @@ public class Blue2Stone_11229 extends LinearOpMode
         while (opModeIsActive() && f == 0)
 
         {
-            slideInches(30,0.03,0.4);
-            bazim.setPosition(0.60);
-            sleep(400);
-            slide1.setPower(-1);
-            sleep(600);
-            slide1.setPower(0);
-            rotate(90,0.2,true);
-            slideInches(60,0,0.5);
-            bazim.setPosition(0);
-            slide1.setPower(-1);
-            sleep(300);
-            slide1.setPower(0);
-            lDrive1.setPower(-1);
-            lDrive2.setPower(-1);
-            rDrive1.setPower(-1);
-            rDrive2.setPower(-1);
-            sleep(300);
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-            rDrive1.setPower(0);
-            rDrive2.setPower(0);
-            elevator.setPower(1);
-            sleep(400);
-            elevator.setPower(-1);
-            sleep(100);
-            elevator.setPower(0);
 
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
+            if (updatedRecognitions.size() > 0){
+                skystonePostion = seeObj(updatedRecognitions);
+            }
 
+            if (skystonePostion == 1) caseSSP1();
+            else if (skystonePostion == 2) caseSSP2();
+            else if (skystonePostion == 3) caseSSP3();
 
             f++;
 
@@ -385,10 +367,6 @@ public class Blue2Stone_11229 extends LinearOpMode
         resetAngle();
     }
 
-
-
-
-
     private void driveInches(double inches ,double minimumP ,double maximumP){
         if (inches > 0){
             forwardInches(inches,minimumP,maximumP);
@@ -401,10 +379,18 @@ public class Blue2Stone_11229 extends LinearOpMode
 
         double d_Rpower = 0;
         double d_Lpower = 0;
+        double Spower = 0;
 
         dLPID.reset();
         dRPID.reset();
+        RLCPID.reset();
         resetAngle();
+
+        double exelerate = 0.05;
+
+
+        RcuurentPosition = 0;
+        LcuurentPosition = 0;
 
         h = 0;
 
@@ -428,8 +414,11 @@ public class Blue2Stone_11229 extends LinearOpMode
         dLPID.setSetPoint(inches);
         dLPID.setOutputRange(minimumP , maximumP);
 
-        //aPID.setSetPoint(0);
-        //aPID.setOutputRange(-0.07,0.07);
+        aPID.setSetPoint(0);
+        aPID.setOutputRange(-0.04,0.04);
+
+        RLCPID.setSetPoint(0);
+        RLCPID.setOutputRange(-0.2,0.2);
 
 
         d_RstartPoint = rDrive1.getCurrentPosition();
@@ -461,30 +450,46 @@ public class Blue2Stone_11229 extends LinearOpMode
             dLPID.setSensorValue(LcuurentPosition);
             d_Lpower = dLPID.calculate();
 
-            //aPID.setSensorValue(getAngle());
-            coraction = checkDirection() ;//aPID.calculate();
 
 
+            telemetry.addData("first coraction",coraction);
+            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            coraction = aPID.calculate();
 
-            telemetry.update();
+            RLCPID.setSensorValue(-slide1.getCurrentPosition()/ SticksPerInch);
+            Spower = RLCPID.calculate();
+
+
+            telemetry.addData("second coraction",coraction);
+            telemetry.addData("lpower",d_Lpower);
+            telemetry.addData("rdrive",d_Rpower);
+
 
             // set power levels.`
-            lDrive1.setPower(d_Lpower - coraction);
-            lDrive2.setPower(d_Lpower - coraction);
 
-            rDrive1.setPower(d_Rpower + coraction);
-            rDrive2.setPower(d_Rpower + coraction);
+            if (exelerate < maximumP && opModeIsActive()){
+                d_Lpower = exelerate;
+                d_Rpower = exelerate;
+                exelerate = exelerate + 0.05;
+            }
+
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
+
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
+            if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
+
+            //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
 
 
-            telemetry.addData("left power", lDrive2.getPower());
-            telemetry.addData("right power", rDrive2.getPower());
-            telemetry.addData("RError",dRPID.getError());
-            telemetry.addData("LError",dLPID.getError());
-            telemetry.addData("RcurrentP", RcuurentPosition);
-            telemetry.addData("LcurrentP", LcuurentPosition);
+
+            telemetry.addData("Spower",Spower);
+            telemetry.addData("Slide power",slide1.getPower());
+            telemetry.addData("R CP",rDrive1.getCurrentPosition()/ ticksPerInch);
             telemetry.update();
 
-            sleep(15);
+            sleep(10);
 
 
 
@@ -509,6 +514,24 @@ public class Blue2Stone_11229 extends LinearOpMode
         dRPID.reset();
         resetAngle();
 
+        RcuurentPosition = 0;
+        LcuurentPosition = 0;
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+
         dRPID.setOutputRange(minPower,maxPower);
         dLPID.setOutputRange(minPower,maxPower);
 
@@ -521,7 +544,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.07,0.07);
+        aPID.setOutputRange(-0.04,0.04);
 
         RcuurentPosition = (rDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (lDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -531,6 +554,9 @@ public class Blue2Stone_11229 extends LinearOpMode
 
         dRPID.calculate();
         dLPID.calculate();
+
+
+
 
 
 
@@ -547,12 +573,8 @@ public class Blue2Stone_11229 extends LinearOpMode
 
             d_Lpower = dLPID.calculate();
 
-            aPID.setSensorValue(getAngle());
+            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
             coraction = aPID.calculate();
-
-
-
-
 
 
 
@@ -570,16 +592,16 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-            lDrive1.setPower(d_Lpower - coraction);
-            lDrive2.setPower(d_Lpower - coraction);
-            rDrive1.setPower(d_Rpower + coraction);
-            rDrive2.setPower(d_Rpower + coraction);
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
 
 
 
 
 
-            sleep(50);
+            sleep(15);
 
             telemetry.addData("left position", lDrive2.getCurrentPosition());
             telemetry.addData("right position", rDrive2.getCurrentPosition());
@@ -618,6 +640,8 @@ public class Blue2Stone_11229 extends LinearOpMode
         sPID.reset();
         ScPID.reset();
         resetAngle();
+
+        ScurrentPosition = 0;
 
 
 
@@ -733,6 +757,8 @@ public class Blue2Stone_11229 extends LinearOpMode
         ScPID.reset();
         resetAngle();
 
+        ScurrentPosition = 0;
+
 
 
         rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -832,41 +858,37 @@ public class Blue2Stone_11229 extends LinearOpMode
 
     }
 
-    private double checkDirection(){
 
-        // The gain value determines how sensitive the correction is to direction changes.
-        // You will have to experiment with your robot to get small smooth direction changes
-        // to stay on a straight line.
-        double correction, angle, gain = 0.0035;
 
-        angle = getAngle();
 
-        if (angle == 0)
-            correction = 0;             // no adjustment.
-        else
-            correction = -angle;        // reverse sign of angle for correction.
 
-        correction = correction * gain;
 
-        if (correction > 0.07) correction = 0.07;
+    private int seeObj(List<Recognition> Recognitions){
+        int skyStoneP = 0;
+        if (Recognitions.size() == 3) skyStoneP = seeThreeObj(Recognitions);
+        else if (Recognitions.size() == 2) skyStoneP = seeTwoObj(Recognitions);
+        else {
+            skyStoneP = 2;
+        }
 
-        if (correction < -0.07) correction = -0.07;
-
-        return correction;
+        return skyStoneP;
     }
 
+    private int seeTwoObj(List<Recognition> Recognitions3){
+
+        int skyStoneP = 0;
+
+        double skyStoneX = 0;
+        double Stone1X = 0;
+        double Stone2X = 0;
 
 
-
-
-    private int seeTwoObj(List<Recognition> Recognitions){
-
-        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(0).getLeft();
-            Stone1X = Recognitions.get(1).getLeft();
-        }else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions.get(0).getLeft();
-            skyStoneX = Recognitions.get(1).getLeft();
+        if (Recognitions3.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions3.get(0).getLeft();
+            Stone1X = Recognitions3.get(1).getLeft();
+        }else if (Recognitions3.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone1X = Recognitions3.get(0).getLeft();
+            skyStoneX = Recognitions3.get(1).getLeft();
         }
 
 
@@ -874,57 +896,65 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
         if (skyStoneX < Stone1X){
-            skystonePostion = 1;
+            skyStoneP = 1;
         }else if (skyStoneX > Stone1X) {
-            skystonePostion = 3;
+            skyStoneP = 3;
         }
 
 
-        return skystonePostion;
+        return skyStoneP;
     }
 
-    private int seeThreeObj(List<Recognition> Recognitions){
+    private int seeThreeObj(List<Recognition> Recognitions2){
 
-        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(0).getLeft();
-        }else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions.get(0).getLeft();
+        int skyStoneP = 0;
+
+        double skyStoneX = 0;
+        double Stone1X = 0;
+        double Stone2X = 0;
+
+        if (Recognitions2.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(0).getLeft();
+        }else if (Recognitions2.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone1X = Recognitions2.get(0).getLeft();
         }
 
 
-        if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(1).getLeft();
+        if (Recognitions2.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(1).getLeft();
 
-        }else if (Recognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
+        }else if (Recognitions2.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
 
             if (Stone1X != 0) {
 
-                Stone2X = Recognitions.get(1).getLeft();
+                Stone2X = Recognitions2.get(1).getLeft();
             } else if (Stone1X == 0) {
-                Stone1X = Recognitions.get(1).getLeft();
+                Stone1X = Recognitions2.get(1).getLeft();
             }
         }
 
-        if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(2).getLeft();
-        }else if (Recognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone2X = Recognitions.get(2).getLeft();
+        if (Recognitions2.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(2).getLeft();
+        }else if (Recognitions2.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone2X = Recognitions2.get(2).getLeft();
         }
 
 
         if (skyStoneX < Stone1X && skyStoneX < Stone2X){
-            skystonePostion = 1;
+            skyStoneP = 1;
         }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
-            skystonePostion = 3;
+            skyStoneP = 3;
         }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
-            skystonePostion = 2;
+            skyStoneP = 2;
         }
 
-        return skystonePostion;
+        return skyStoneP;
     }
 
 
 
+
+    //init Vuforia
     private void initVuforia() {
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -950,6 +980,136 @@ public class Blue2Stone_11229 extends LinearOpMode
     }
 
 
+    private void goToSkyStone(int SSP){
+        if (SSP == 1) adjusteSS1();
+        else if (SSP == 2) adjusteSS2();
+        else if (SSP == 3) adjusteSS3();
+
+    }
+
+    private void adjusteSS1(){
+        driveInches(7,0.03,0.3);
+    }
+
+    private void adjusteSS2(){
+
+    }
+
+    private void adjusteSS3(){
+        driveInches(-7,-0.03,-0.3);
+    }
+
+    private void moveStone(int SP , boolean where){
+        if (where){
+
+            if (SP == 1) driveInches(56,0.03,0.35);
+            else if (SP == 2) driveInches(49,0.03,0.35);
+            else if (SP == 3) driveInches(42,0.03,0.35);
+
+        }
+        else if (!where){
+
+            if (SP == 1) driveInches(-56,0-.03,-0.35);
+            else if (SP == 2) driveInches(-49,-0.03,-0.35);
+            else if (SP == 3) driveInches(-42,-0.03,-0.35);
+
+        }
+    }
+
+    private void takeStone(){
+        slideInches(14,0.03,0.3);
+        bazim.setPosition(0.8);
+        sleep(300);
+        slideInches(-15,0.03,0.3);
+    }
+
+    private void stopDcMotors(){
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        slide1.setPower(0);
+        sleep(10);
+    }
+
+
+
+    private void caseSSP1(){
+        adjusteSS1();
+        slideInches(29,0.03,0.4);
+        stopDcMotors();
+        bazim.setPosition(0.85);
+        slideInches(-6,-0.03,0.3);
+        stopDcMotors();
+        moveStone(1,false);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(2,true);
+        stopDcMotors();
+        takeStone();
+        moveStone(2,false);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(3,true);
+        stopDcMotors();
+        takeStone();
+        stopDcMotors();
+        moveStone(3,false);
+        driveInches(-6,-0.03,-0.5);
+        stopDcMotors();
+    }
+
+
+    private void caseSSP2(){
+        adjusteSS2();
+        slideInches(29,0.03,0.4);
+        stopDcMotors();
+        bazim.setPosition(0.85);
+        slideInches(-6,-0.03,0.3);
+        stopDcMotors();
+        moveStone(2,false);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(3,true);
+        stopDcMotors();
+        takeStone();
+        moveStone(3,false);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(1,true);
+        stopDcMotors();
+        takeStone();
+        stopDcMotors();
+        moveStone(1,false);
+        driveInches(-6,-0.03,-0.5);
+        stopDcMotors();
+    }
+
+
+    private void caseSSP3(){
+        adjusteSS3();
+        slideInches(29,0.03,0.4);
+        stopDcMotors();
+        bazim.setPosition(0.85);
+        slideInches(-6,-0.03,0.3);
+        stopDcMotors();
+        moveStone(1,false);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(3,true);
+        stopDcMotors();
+        takeStone();
+        moveStone(3,false);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(2,true);
+        stopDcMotors();
+        takeStone();
+        stopDcMotors();
+        moveStone(2,false);
+        driveInches(-6,-0.03,-0.5);
+        stopDcMotors();
+    }
 
 
 }

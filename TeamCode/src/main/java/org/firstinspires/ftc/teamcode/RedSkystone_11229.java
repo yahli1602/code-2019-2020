@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
+@Disabled
 @Autonomous(name="Drive 11229", group="Skystone")
 
 public class RedSkystone_11229 extends LinearOpMode

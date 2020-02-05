@@ -20,7 +20,7 @@ import java.util.List;
 
 @Autonomous(name="RedStone 11229 3", group="Stone")
 
-public class Red2Stone_11229 extends LinearOpMode
+public class Red2Stone_11229_stateMachine<x> extends LinearOpMode
 {
     DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
     BNO055IMU               imu;
@@ -71,10 +71,22 @@ public class Red2Stone_11229 extends LinearOpMode
     double  d_Rpower = 0;
     double  d_Lpower = 0;
 
+
+
+
+
+
+
+
+    String state = "";
+
+    double v = 0.2;
     int h = 0;
     int f = 0;
-    double integral = 0;
-    double derivative = 0;
+
+
+
+
 
     private final double perimeter = 4 * Math.PI;
     private final double ticksPerRevolution = 28;
@@ -241,6 +253,11 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
             caseSSP2();
+
+            switch (state){
+                case "driveForward":
+
+            }
 
             f++;
 

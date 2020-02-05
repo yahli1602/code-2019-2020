@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-@Autonomous(name="RedStone 11229", group="Stone")
+@Autonomous(name="RedStone 11229 5", group="Stone")
 
 public class Red2Stone_11229_2 extends LinearOpMode
 {
@@ -239,32 +239,23 @@ public class Red2Stone_11229_2 extends LinearOpMode
         while (opModeIsActive() && f == 0)
 
         {
-            slideInches(30,0.03,0.2);
-            bazim.setPosition(60);
-            sleep(400);
-            slide1.setPower(-1);
-            sleep(500);
-            slide1.setPower(0);
-            rotate(-90,0.2,true);
-            slideInches(60,0,0.5);
+            slideInches(28,0.03,0.4);
+            bazim.setPosition(0.65);
+            slideInches(-10,-0.03,0.3);
+            moveStone(2,"forward");
             bazim.setPosition(0);
-            slide1.setPower(-1);
-            sleep(950);
-            slide1.setPower(0);
-            lDrive1.setPower(0.6);
-            lDrive2.setPower(0.6);
-            rDrive1.setPower(0.6);
-            rDrive2.setPower(0.6);
-            sleep(600);
-            lDrive1.setPower(0);
-            lDrive2.setPower(0);
-            rDrive1.setPower(0);
-            rDrive2.setPower(0);
-            elevator.setPower(1);
-            sleep(400);
-            elevator.setPower(-1);
-            sleep(100);
-            elevator.setPower(0);
+            moveStone(3,"backwards");
+            takeStone();
+            moveStone(3,"forward");
+            bazim.setPosition(0);
+            slideInches(-6,-0.03,0.5);
+
+
+
+
+
+
+
 
 
 
@@ -428,8 +419,8 @@ public class Red2Stone_11229_2 extends LinearOpMode
         dLPID.setSetPoint(inches);
         dLPID.setOutputRange(minimumP , maximumP);
 
-        //aPID.setSetPoint(0);
-        //aPID.setOutputRange(-0.07,0.07);
+        aPID.setSetPoint(0);
+        aPID.setOutputRange(-0.07,0.07);
 
 
         d_RstartPoint = rDrive1.getCurrentPosition();
@@ -461,30 +452,33 @@ public class Red2Stone_11229_2 extends LinearOpMode
             dLPID.setSensorValue(LcuurentPosition);
             d_Lpower = dLPID.calculate();
 
-            //aPID.setSensorValue(getAngle());
-            coraction = checkDirection() ;//aPID.calculate();
 
 
+            telemetry.addData("first coraction",coraction);
+            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            coraction = aPID.calculate();
 
-            telemetry.update();
+
+            telemetry.addData("second coraction",coraction);
+            telemetry.addData("lpower",d_Lpower);
+            telemetry.addData("rdrive",d_Rpower);
+
 
             // set power levels.`
-            lDrive1.setPower(d_Lpower - coraction);
-            lDrive2.setPower(d_Lpower - coraction);
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
 
-            rDrive1.setPower(d_Rpower + coraction);
-            rDrive2.setPower(d_Rpower + coraction);
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
 
 
-            telemetry.addData("left power", lDrive2.getPower());
-            telemetry.addData("right power", rDrive2.getPower());
-            telemetry.addData("RError",dRPID.getError());
-            telemetry.addData("LError",dLPID.getError());
-            telemetry.addData("RcurrentP", RcuurentPosition);
-            telemetry.addData("LcurrentP", LcuurentPosition);
+            telemetry.addData("right drive P",rDrive1.getPower());
+            telemetry.addData("right current position",RcuurentPosition);
+            telemetry.addData("left drive P",lDrive1.getPower());
+            telemetry.addData("left current position",LcuurentPosition);
             telemetry.update();
 
-            sleep(15);
+            sleep(10);
 
 
 
@@ -547,12 +541,8 @@ public class Red2Stone_11229_2 extends LinearOpMode
 
             d_Lpower = dLPID.calculate();
 
-            aPID.setSensorValue(getAngle());
+            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
             coraction = aPID.calculate();
-
-
-
-
 
 
 
@@ -570,16 +560,16 @@ public class Red2Stone_11229_2 extends LinearOpMode
 
 
 
-            lDrive1.setPower(d_Lpower - coraction);
-            lDrive2.setPower(d_Lpower - coraction);
-            rDrive1.setPower(d_Rpower + coraction);
-            rDrive2.setPower(d_Rpower + coraction);
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
 
 
 
 
 
-            sleep(50);
+            sleep(10);
 
             telemetry.addData("left position", lDrive2.getCurrentPosition());
             telemetry.addData("right position", rDrive2.getCurrentPosition());
@@ -832,41 +822,26 @@ public class Red2Stone_11229_2 extends LinearOpMode
 
     }
 
-    private double checkDirection(){
 
-        // The gain value determines how sensitive the correction is to direction changes.
-        // You will have to experiment with your robot to get small smooth direction changes
-        // to stay on a straight line.
-        double correction, angle, gain = 0.0035;
 
-        angle = getAngle();
 
-        if (angle == 0)
-            correction = 0;             // no adjustment.
-        else
-            correction = -angle;        // reverse sign of angle for correction.
 
-        correction = correction * gain;
 
-        if (correction > 0.07) correction = 0.07;
+    private int seeObj(List<Recognition> Recognitions){
+        if (Recognitions.size() == 3) skystonePostion = seeThreeObj(Recognitions);
+        else if (Recognitions.size() == 2) skystonePostion = seeTwoObj(Recognitions);
 
-        if (correction < -0.07) correction = -0.07;
-
-        return correction;
+        return skystonePostion;
     }
 
+    private int seeTwoObj(List<Recognition> Recognitions3){
 
-
-
-
-    private int seeTwoObj(List<Recognition> Recognitions){
-
-        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(0).getLeft();
-            Stone1X = Recognitions.get(1).getLeft();
-        }else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions.get(0).getLeft();
-            skyStoneX = Recognitions.get(1).getLeft();
+        if (Recognitions3.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions3.get(0).getLeft();
+            Stone1X = Recognitions3.get(1).getLeft();
+        }else if (Recognitions3.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone1X = Recognitions3.get(0).getLeft();
+            skyStoneX = Recognitions3.get(1).getLeft();
         }
 
 
@@ -883,32 +858,32 @@ public class Red2Stone_11229_2 extends LinearOpMode
         return skystonePostion;
     }
 
-    private int seeThreeObj(List<Recognition> Recognitions){
+    private int seeThreeObj(List<Recognition> Recognitions2){
 
-        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(0).getLeft();
-        }else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions.get(0).getLeft();
+        if (Recognitions2.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(0).getLeft();
+        }else if (Recognitions2.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone1X = Recognitions2.get(0).getLeft();
         }
 
 
-        if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(1).getLeft();
+        if (Recognitions2.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(1).getLeft();
 
-        }else if (Recognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
+        }else if (Recognitions2.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
 
             if (Stone1X != 0) {
 
-                Stone2X = Recognitions.get(1).getLeft();
+                Stone2X = Recognitions2.get(1).getLeft();
             } else if (Stone1X == 0) {
-                Stone1X = Recognitions.get(1).getLeft();
+                Stone1X = Recognitions2.get(1).getLeft();
             }
         }
 
-        if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(2).getLeft();
-        }else if (Recognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone2X = Recognitions.get(2).getLeft();
+        if (Recognitions2.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(2).getLeft();
+        }else if (Recognitions2.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone2X = Recognitions2.get(2).getLeft();
         }
 
 
@@ -924,7 +899,7 @@ public class Red2Stone_11229_2 extends LinearOpMode
     }
 
 
-
+    //init Vuforia
     private void initVuforia() {
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -947,6 +922,50 @@ public class Red2Stone_11229_2 extends LinearOpMode
         tfodParameters.minimumConfidence = 0.45;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+    }
+
+
+    private void goToSkyStone(int SSP){
+        if (SSP == 1) caseSS1();
+        else if (SSP == 2) caseSS2();
+        else if (SSP == 3) caseSS3();
+
+    }
+
+    private void caseSS1(){
+        driveInches(7,0.03,0.3);
+    }
+
+    private void caseSS2(){
+
+    }
+
+    private void caseSS3(){
+        driveInches(-7,-0.03,-0.3);
+    }
+
+    private void moveStone(int SP , String where){
+        if (where == "forward"){
+
+            if (SP == 1) driveInches(42,0.03,0.5);
+            else if (SP == 2) driveInches(49,0.03,0.5);
+            else if (SP == 3) driveInches(56,0.03,0.5);
+
+        }
+        else if (where == "backwards"){
+
+            if (SP == 1) driveInches(-42,0-.03,-0.5);
+            else if (SP == 2) driveInches(-49,-0.03,-0.5);
+            else if (SP == 3) driveInches(-56,-0.03,-0.5);
+
+        }
+    }
+
+    private void takeStone(){
+        slideInches(10,0.03,0.3);
+        bazim.setPosition(0.56);
+        sleep(300);
+        slideInches(-10,0.03,0.3);
     }
 
 

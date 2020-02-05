@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -159,7 +160,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
 
             if (gamepad2.x){
-                bazim.setPosition(0.5);
+                bazim.setPosition(0.75);
             }else if (gamepad2.b){
                 bazim.setPosition(0);
             }
@@ -171,6 +172,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
 
             telemetry.addData("SP",slide.getPower());
             telemetry.addData("elevator ticks",elevator.getCurrentPosition());
+            telemetry.addData("slide ticks",slide.getCurrentPosition());
             telemetry.update();
 
 

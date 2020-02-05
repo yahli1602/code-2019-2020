@@ -1,136 +1,146 @@
-// Simple autonomous program that drives bot forward until end of period
-// or touch sensor is hit. If touched, backs up a bit and turns 90 degrees
-// right and keeps going. Demonstrates obstacle avoidance and use of the
-// REV Hub's built in IMU in place of a gyro. Also uses gamepad1 buttons to
-// simulate touch sensor press and supports left as well as right turn.
-//
-// Also uses PID controller to drive in a straight line when not
-// avoiding an obstacle.
-//
-// Use PID controller to manage motor power during 90 degree turn to reduce
-// overshoot.
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-@Disabled
-@Autonomous(name = "PID drive 11226", group = "PID")
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-public class PIDdrive_11226 extends LinearOpMode {
-    DcMotor ldrive1, ldrive2, rdrive1, rdrive2, slide1, elevator;
-    CRServo hold;
-    BNO055IMU imu;
-    Orientation lastAngles = new Orientation();
-    double globalAngle, power = .07, rotation;
-    boolean aButton, bButton, touched;
+import java.util.List;
+
+@Autonomous(name="RedStone 11226 3", group="Stone")
+
+public class PIDdrive_11226 extends LinearOpMode
+{
+    DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
+    BNO055IMU               imu;
+    Servo                   bazim;
+
+    Orientation             lastAngles = new Orientation();
+    double                  globalAngle, correction, rotation;
+    boolean                 aButton, bButton, touched;
+
+    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Stone";
+    private static final String LABEL_SECOND_ELEMENT = "Skystone";
+
+
     PIDcon dRPID = new PIDcon();
     PIDcon dLPID = new PIDcon();
+    PIDcon RLCPID = new PIDcon();
     PIDcon pidRotate = new PIDcon();
     PIDcon aPID = new PIDcon();
     PIDcon SaPID = new PIDcon();
-    PIDcon ePID = new PIDcon();
     PIDcon sPID = new PIDcon();
     PIDcon ScPID = new PIDcon();
+
+    TensorFlow TF = new TensorFlow();
+
+    PIDcon a_pidDrive = new PIDcon();
     double d_error = 0;
-    double s_startPoint = 0;
-    double sc_startPoint = 0;
-    double Scoraction;
-    double ScurrentPosition = 0;
-    double RcuurentPosition = 0;
-    double LcuurentPosition = 0;
     double d_prevError = 0;
     double d_RstartPoint = 0;
     double d_LstartPoint = 0;
+    double a_startPoint = 0;
+    double s_startPoint = 0;
+    double sc_startPoint = 0;
+    double coraction;
+    double Scoraction;
+    double RcuurentPosition = 0;
+    double LcuurentPosition = 0;
+    double ScurrentPosition = 0;
 
 
+    int skystonePostion;
+    int Stone1Postion;
+    int Stone2Postion;
+    int seeSkystone = 0;
+    int seeStone1 = 0;
+    int seeStone2 = 0;
+    boolean canSeeSkystone = false;
+
+    double  d_Rpower = 0;
+    double  d_Lpower = 0;
+
+    int h = 0;
+    int f = 0;
     double integral = 0;
     double derivative = 0;
-    double d_Rpower = 0;
-    double d_Lpower = 0;
-    double d_Spower = 0;
-    double coraction = 0;
-    double SAcorraction = 0;
-
-
-    double d_kP = 0.1;
-    double d_kI = 0;
-    double d_kD = 0;
-
-    boolean Con = true;
-
-    /*private final double perimeter = 4 * Math.PI;
-    private final double ticksPerRevolution = 1120;
-    private final double inchesPerTick = perimeter / ticksPerRevolution;
-    private final double ticksPerSpin = ticksPerRevolution * 40;
-    private final double ticksPerInch = 1 / inchesPerTick;*/
 
     private final double perimeter = 4 * Math.PI;
     private final double ticksPerRevolution = 28;
-    private final double inchesPerTick = perimeter / ticksPerRevolution;
-    private final double ticksPerSpin = ticksPerRevolution * 25;
-    private final double ticksPerInch = 1 / perimeter * ticksPerSpin;
+    private final double ticksPerSpin = ticksPerRevolution * 20;
+    private final double ticksPerInch = 1 / perimeter* ticksPerSpin;
 
-    private final double SticksPerSpin = ticksPerRevolution * 36;
-    private final double SticksPerInch = 1 / perimeter * SticksPerSpin;
-
+    private final double SticksPerSpin = ticksPerRevolution * 35;
+    private final double SticksPerInch = 1 / perimeter* SticksPerSpin;
 
     // called when init button is  pressed.
+
+
+
+    private static final String VUFORIA_KEY =
+            "AVHZDTL/////AAABmQcZurBiA01smn3EpdcPCJpZqB8HZL60ujXKBU3ejemhikdsno1L3+7QKhYWSXEfUl5uWZxBqPJXl6Qj0AG3XKuq/jLKmyLJ67xHlYM/LoVKbxhjxGJJ5stO+21qtYET0KberI6XObNkTmskQ8kLQX7QwLhmllfyhu25bPFWwmVdnGq3jRAxoCNKP9ktqKkqp62Fl39qcvOwCOBPqG0uFMFHwVaNavRHS1f4fnuZXk4QqEDo5e2K9J/sCR/2BvvzdPV3QfTkUPNm/8dfW2nsxCM2E9rpj67CFq9fOAHjY+7tp4o2U/yJbxc5RBr5mZ9/CeQk7zfl9rQv7WrVWevfvHqvb2xMsoqVJGze9rE62AmI";
+
+    private VuforiaLocalizer vuforia;
+
+
+    private TFObjectDetector tfod;
+
+
     @Override
-    public void runOpMode() throws InterruptedException {
-        rdrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
-        rdrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
-        ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
-        ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
+    public void runOpMode() throws InterruptedException
+    {
+
+
+        rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
+        rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
+        lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
+        lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-
-        hold = hardwareMap.get(CRServo.class, "hold");
-
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        /*collectRight = hardwareMap.get(Servo.class, "collect right");
-        collectLeft = hardwareMap.get(Servo.class, "collect left");
-        cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
+        bazim = hardwareMap.get(Servo.class, "bazim");
 
-        ePID.PIDcon(0.1, 0, 0);
 
-        rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ldrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ldrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setDirection(DcMotor.Direction.FORWARD);
+        rDrive2.setDirection(DcMotor.Direction.FORWARD);
+        lDrive1.setDirection(DcMotor.Direction.REVERSE);
+        lDrive2.setDirection(DcMotor.Direction.REVERSE);
+        slide1.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.FORWARD);
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        rdrive1.setDirection(DcMotor.Direction.REVERSE);
-        rdrive2.setDirection(DcMotor.Direction.REVERSE);
-        ldrive1.setDirection(DcMotor.Direction.FORWARD);
-        ldrive2.setDirection(DcMotor.Direction.FORWARD);
-        slide1.setDirection(DcMotor.Direction.FORWARD);
-
-        elevator.setDirection(DcMotor.Direction.REVERSE);
-
-        rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ldrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ldrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rdrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rdrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        ldrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        ldrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -139,42 +149,54 @@ public class PIDdrive_11226 extends LinearOpMode {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
-        parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled = false;
+        parameters.mode                = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
 
-        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C 0port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
         imu.initialize(parameters);
 
+
+
+        if (tfod != null) {
+            tfod.activate();
+        }
+
+
+
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0, 0, 0);
+        pidRotate.PIDcon(0.01,0.0018,0.135);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
 
 
-        dRPID.PIDcon(0.07, 0, 0.03);
-        dLPID.PIDcon(0.07, 0, 0.2);
+        dRPID.PIDcon(0.05,0,0);
+        dLPID.PIDcon(0.05,0,0);
 
-        aPID.PIDcon(0.2, 0, 0.7);
+        RLCPID.PIDcon(0.02,0,0);
 
-        SaPID.PIDcon(0.2, 0, 0.1);
+        sPID.PIDcon(0.005,0.0009,0.1);
+        ScPID.PIDcon(0.02,0,0.07);
+        SaPID.PIDcon(0.025,0,0);
 
-        sPID.PIDcon(0.5, 0.4, 0.15);
-        ScPID.PIDcon(0, 0, 0);
+        aPID.PIDcon(0.04,0,0);
+
+
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
 
         // make sure the imu gyro is calibrated before continuing.
-        while (!isStopRequested() && !imu.isGyroCalibrated()) {
+        while (!isStopRequested() && !imu.isGyroCalibrated())
+        {
             sleep(50);
             idle();
         }
@@ -183,8 +205,21 @@ public class PIDdrive_11226 extends LinearOpMode {
         telemetry.addData("imu calib status", imu.getCalibrationStatus().toString());
         telemetry.update();
 
-
         // wait for start button.
+
+        initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+
+        if (tfod != null) {
+            tfod.activate();
+
+        }
+
 
         waitForStart();
 
@@ -196,19 +231,32 @@ public class PIDdrive_11226 extends LinearOpMode {
         // Set up parameters for driving in a straight line.
 
 
+
+
+
         // drive until end of period.
-        int q = 0;
-        while (opModeIsActive() && q == 0) {
 
+        f = 0;
+        while (opModeIsActive() && f == 0)
 
-            driveInches(48, -0.7, 0.7);
+        {
 
-            telemetry.addData("angle",getAngle());
-            telemetry.update();
-            sleep(2000);
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-            q++;
+            if (updatedRecognitions.size() > 0){
+                skystonePostion = seeObj(updatedRecognitions);
+            }
 
+            if (skystonePostion == 1) caseSSP1();
+            else if (skystonePostion == 2) caseSSP2();
+            else if (skystonePostion == 3) caseSSP3();
+
+            f++;
+
+        }
+
+        if (tfod != null) {
+            tfod.shutdown();
         }
         // Use PID with imu input to drive in a straight line.
 
@@ -217,7 +265,8 @@ public class PIDdrive_11226 extends LinearOpMode {
     /**
      * Resets the cumulative angle tracking to zero.
      */
-    private void resetAngle() {
+    private void resetAngle()
+    {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         globalAngle = 0;
@@ -225,10 +274,10 @@ public class PIDdrive_11226 extends LinearOpMode {
 
     /**
      * Get current cumulative angle rotation from last reset.
-     *
      * @return Angle in degrees. + = left, - = right from zero point.
      */
-    private double getAngle() {
+    private double getAngle()
+    {
         // We experimentally determined the Z axis is the axis we want to use for heading angle.
         // We have to process the angle because the imu works in euler angles so the Z axis is
         // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
@@ -250,14 +299,13 @@ public class PIDdrive_11226 extends LinearOpMode {
         return globalAngle;
     }
 
-    /**
-     * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
-     *
-     * @param degrees Degrees to turn, + is left - is right
-     */
-    private void rotate(int degrees, double power) {
+
+    private void rotate(int degrees, double power,boolean reset) {
         // restart imu angle tracking.
-        resetAngle();
+        if (reset){
+            resetAngle();
+        }
+
 
         // if degrees > 359 we cap at 359 with same sign as original degrees.
         if (Math.abs(degrees) > 359) degrees = (int) Math.copySign(359, degrees);
@@ -272,205 +320,187 @@ public class PIDdrive_11226 extends LinearOpMode {
         // turning the robot back toward the setpoint value.
 
         pidRotate.reset();
-
+        pidRotate.setSetPoint(degrees);
         pidRotate.setOutputRange(0, power);
 
 
-        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
-        // clockwise (right).
 
-        // rotate until turn is completed.
+        pidRotate.setSensorValue(getAngle());
+        pidRotate.calculate();
 
         if (degrees < 0) {
-            // On right turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() == 0) {
-                ldrive1.setPower(power);
-                ldrive2.setPower(power);
-                rdrive1.setPower(-power);
-                rdrive2.setPower(-power);
-                sleep(100);
-            }
 
             do {
-                power = pidRotate.calculate(); // power will be - on right turn.
-                ldrive1.setPower(-power);
-                ldrive2.setPower(-power);
-                rdrive1.setPower(power);
-                rdrive2.setPower(power);
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                lDrive1.setPower(-power);
+                lDrive2.setPower(-power);
+                rDrive1.setPower(power);
+                rDrive2.setPower(power);
 
-            } while (opModeIsActive());
-        } else    // left turn.
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (Math.abs(degrees) - 3 )));
+        } else
             do {
-                power = pidRotate.calculate(); // power will be + on left turn.
-                ldrive1.setPower(-power);
-                ldrive2.setPower(-power);
-                rdrive1.setPower(power);
-                rdrive2.setPower(power);
-            } while (opModeIsActive());
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                lDrive1.setPower(-power);
+                lDrive2.setPower(-power);
+                rDrive1.setPower(power);
+                rDrive2.setPower(power);
 
-        // turn the motors off.
-        rdrive1.setPower(0);
-        rdrive2.setPower(0);
-        ldrive1.setPower(0);
-        ldrive2.setPower(0);
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (Math.abs(degrees) - 3 )));
+
+
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
 
 
         rotation = getAngle();
 
-        // wait for rotation to stop.
+
         sleep(500);
 
-        // reset angle tracking on new heading.
+
         resetAngle();
     }
 
-    private void driveInches(double inches, double minPower, double maxPower) {
+    private void driveInches(double inches ,double minimumP ,double maximumP){
+        if (inches > 0){
+            forwardInches(inches,minimumP,maximumP);
+        }else if (inches < 0){
+            backInches(inches,minimumP,maximumP);
+        }
+    }
 
-        d_Rpower = 0;
-        d_Lpower = 0;
+    private void forwardInches(double inches ,double minimumP ,double maximumP) {
 
-        dRPID.reset();
+        double d_Rpower = 0;
+        double d_Lpower = 0;
+        double Spower = 0;
+
         dLPID.reset();
-        aPID.reset();
+        dRPID.reset();
+        RLCPID.reset();
+        resetAngle();
 
-        double Raccelerate = 0.05;
-        double Laccelerate = 0.05;
+        double exelerate = 0.05;
 
-        dRPID.setOutputRange(minPower, maxPower);
-        dLPID.setOutputRange(minPower, maxPower);
+
+        RcuurentPosition = 0;
+        LcuurentPosition = 0;
+
+        h = 0;
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         dRPID.setSetPoint(inches);
+        dRPID.setOutputRange(minimumP , maximumP);
+
         dLPID.setSetPoint(inches);
-
-
-        d_RstartPoint = rdrive1.getCurrentPosition();
-        d_LstartPoint = ldrive1.getCurrentPosition();
-
+        dLPID.setOutputRange(minimumP , maximumP);
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.01, 0.01);
+        aPID.setOutputRange(-0.04,0.04);
 
-        SaPID.setSetPoint(0);
-        SaPID.setOutputRange(-0.7, 0.7);
+        RLCPID.setSetPoint(0);
+        RLCPID.setOutputRange(-0.2,0.2);
+
+
+        d_RstartPoint = rDrive1.getCurrentPosition();
+
+        d_LstartPoint = lDrive1.getCurrentPosition();
+
+        a_startPoint = getAngle();
 
 
 
-        RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
-        LcuurentPosition = (ldrive1.getCurrentPosition() - d_LstartPoint) / ticksPerInch;
-
+        RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
         dRPID.setSensorValue(RcuurentPosition);
-        dLPID.setSensorValue(LcuurentPosition);
-
         dRPID.calculate();
+
+        LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
+        dLPID.setSensorValue(LcuurentPosition);
         dLPID.calculate();
 
 
+        while (dRPID.getError() > 0  && dLPID.getError() > 0 && opModeIsActive()) {
 
 
-        int n = 1;
 
-
-        while (dRPID.getError() > 0 && dLPID.getError() > 0 && opModeIsActive()) {
-
-
-            RcuurentPosition = (rdrive1.getCurrentPosition()) / ticksPerInch;
+            RcuurentPosition = (rDrive1.getCurrentPosition() / ticksPerInch);
             dRPID.setSensorValue(RcuurentPosition);
-
-            LcuurentPosition = (ldrive1.getCurrentPosition()) / ticksPerInch;
-            dLPID.setSensorValue(LcuurentPosition);
-
-            aPID.setSensorValue(getAngle());
-
-
-
-            d_Lpower = dLPID.calculate();
             d_Rpower = dRPID.calculate();
-            coraction = aPID.calculate();// + 0.04 * (LcuurentPosition - RcuurentPosition);
+
+            LcuurentPosition = (lDrive1.getCurrentPosition()/ ticksPerInch);
+            dLPID.setSensorValue(LcuurentPosition);
+            d_Lpower = dLPID.calculate();
 
 
-            if(d_Rpower == maxPower && Raccelerate < maxPower){
-                d_Rpower = Raccelerate + coraction;
-                Raccelerate += 0.05;
+
+            telemetry.addData("first coraction",coraction);
+            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            coraction = aPID.calculate();
+
+            RLCPID.setSensorValue(-slide1.getCurrentPosition()/ SticksPerInch);
+            Spower = RLCPID.calculate();
+
+
+            telemetry.addData("second coraction",coraction);
+            telemetry.addData("lpower",d_Lpower);
+            telemetry.addData("rdrive",d_Rpower);
+
+
+            // set power levels.`
+
+            if (exelerate < maximumP && opModeIsActive()){
+                d_Lpower = exelerate;
+                d_Rpower = exelerate;
+                exelerate = exelerate + 0.05;
             }
-            if(d_Lpower == maxPower && Laccelerate < maxPower){
-                d_Lpower = Laccelerate - coraction;
-                Laccelerate += 0.05;
-            }
 
-            /*if(d_Rpower < 0.0001 && d_error < inches){
-                coraction = 0;
-            }*/
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
 
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
+            if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
+
+            //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
+
+
+
+            telemetry.addData("Spower",Spower);
+            telemetry.addData("Slide power",slide1.getPower());
+            telemetry.addData("R CP",rDrive1.getCurrentPosition()/ ticksPerInch);
             telemetry.update();
 
-            // set power levels.
+            sleep(10);
 
 
-            if (RcuurentPosition <= (inches * 0.05) && LcuurentPosition <= (inches * 0.05)) {
-                ldrive1.setPower(d_Lpower);// / n));
-                ldrive2.setPower(d_Lpower);// / n));
-                rdrive1.setPower(d_Rpower);// / n));
-                rdrive2.setPower(d_Rpower);// / n));
-                Con = false;
-            }else {
-
-
-            /*if ((d_error / 9 / 16) % 1 == 0) {
-                n++;
-            }*/
-                if (RcuurentPosition >= (inches * 0.9) && LcuurentPosition >= (inches * 0.9)) {
-                    ldrive1.setPower(d_Lpower);// / n));
-                    ldrive2.setPower(d_Lpower);// / n));
-                    rdrive1.setPower(d_Rpower);// / n));
-                    rdrive2.setPower(d_Rpower);// / n));
-                    Con = false;
-                } else {
-                    ldrive1.setPower(d_Lpower - coraction);// / n));
-                    ldrive2.setPower(d_Lpower - coraction);// / n));
-                    rdrive1.setPower(d_Rpower + coraction);// / n));
-                    rdrive2.setPower(d_Rpower + coraction);// / n));
-                    Con = true;
-                }
-            }
-
-
-            //ldrive1.setPower(d_Lpower - coraction);// / n));
-            //ldrive2.setPower(d_Lpower - coraction);// / n));
-            //rdrive1.setPower(d_Rpower + coraction);// / n));
-            //rdrive2.setPower(d_Rpower + coraction);// / n));
-
-            //if ((d_error / 9 / 16) % 1 == 0) {
-            //    n++;
-            //}
-            /*if (d_Rpower <0.06 && opModeIsActive()){
-                dRPID.setSensorValue(inches);
-                dRPID.calculate();
-            }
-            if (d_Lpower <0.06 && opModeIsActive()){
-                dLPID.setSensorValue(inches);
-                dLPID.calculate();
-            }*/
-
-
-            telemetry.addData("left position", ldrive2.getCurrentPosition());
-            telemetry.addData("right position", rdrive2.getCurrentPosition());
-            telemetry.addData("left power", ldrive2.getPower());
-            telemetry.addData("right power", rdrive2.getPower());
-            telemetry.addData("coraction", coraction);
-            telemetry.addData("d_rpower", d_Rpower);
-            telemetry.addData("d_lpower", d_Lpower);
-            telemetry.addData("angle", getAngle());
-            telemetry.addData("angle",getAngle());
-            telemetry.update();
-            sleep(15);
 
         }
 
 
-        ldrive1.setPower(0);
-        ldrive2.setPower(0);
-        rdrive1.setPower(0);
-        rdrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+        telemetry.addData("motors","off");
 
 
     }
@@ -480,24 +510,44 @@ public class PIDdrive_11226 extends LinearOpMode {
         d_Rpower = 0;
         d_Lpower = 0;
 
-        double accelerate = -0.05;
+        dLPID.reset();
+        dRPID.reset();
+        resetAngle();
 
-        dRPID.setOutputRange(minPower, maxPower);
-        dLPID.setOutputRange(minPower, maxPower);
+        RcuurentPosition = 0;
+        LcuurentPosition = 0;
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+
+        dRPID.setOutputRange(minPower,maxPower);
+        dLPID.setOutputRange(minPower,maxPower);
 
         dRPID.setSetPoint(inches);
         dLPID.setSetPoint(inches);
 
 
-        d_RstartPoint = rdrive1.getCurrentPosition();
-        d_LstartPoint = ldrive1.getCurrentPosition();
+        d_RstartPoint = rDrive1.getCurrentPosition();
+        d_LstartPoint = lDrive1.getCurrentPosition();
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.07, 0.07);
+        aPID.setOutputRange(-0.04,0.04);
 
-        RcuurentPosition = (rdrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
-        LcuurentPosition = (ldrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
+        RcuurentPosition = (rDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
+        LcuurentPosition = (lDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
 
         dRPID.setSensorValue(RcuurentPosition);
         dLPID.setSensorValue(LcuurentPosition);
@@ -505,164 +555,560 @@ public class PIDdrive_11226 extends LinearOpMode {
         dRPID.calculate();
         dLPID.calculate();
 
-        if(dRPID.calculate() == minPower && accelerate > dRPID.calculate()){
-            d_Rpower = accelerate;
-            accelerate -= 0.05;
-        }
-        if(dLPID.calculate() == minPower && accelerate > dLPID.calculate()){
-            d_Lpower = accelerate;
-            accelerate -= 0.05;
-        }
+
+
+
 
 
         while (dRPID.getError() < 0 && dLPID.getError() < 0 && opModeIsActive()) {
 
-            RcuurentPosition = (rdrive1.getCurrentPosition()) / ticksPerInch;
+            RcuurentPosition = (rDrive1.getCurrentPosition()) / ticksPerInch;
             dRPID.setSensorValue(RcuurentPosition);
 
             d_Rpower = dRPID.calculate();
 
 
-            LcuurentPosition = (ldrive1.getCurrentPosition()) / ticksPerInch;
+            LcuurentPosition = (lDrive1.getCurrentPosition()) / ticksPerInch;
             dLPID.setSensorValue(LcuurentPosition);
 
             d_Lpower = dLPID.calculate();
 
-            aPID.setSensorValue(getAngle());
+            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
             coraction = aPID.calculate();
 
-            if(dRPID.calculate() == maxPower && accelerate < dRPID.calculate()){
-                d_Rpower = accelerate;
-                accelerate += 0.05;
-            }
-            if(dLPID.calculate() == maxPower && accelerate < dLPID.calculate()){
-                d_Lpower = accelerate;
-                accelerate += 0.05;
-            }
+
+
+
+
 
             telemetry.update();
 
             // set power levels.
 
 
-            ldrive1.setPower(d_Lpower - coraction);
-            ldrive2.setPower(d_Lpower - coraction);
-            rdrive1.setPower(d_Rpower + coraction);
-            rdrive2.setPower(d_Rpower + coraction);
+
+
+
+
+
+
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
+
+
+
+
 
             sleep(15);
 
-            telemetry.addData("left position", ldrive2.getCurrentPosition());
-            telemetry.addData("right position", rdrive2.getCurrentPosition());
-            telemetry.addData("left power", ldrive2.getPower());
-            telemetry.addData("right power", rdrive2.getPower());
+            telemetry.addData("left position", lDrive2.getCurrentPosition());
+            telemetry.addData("right position", rDrive2.getCurrentPosition());
+            telemetry.addData("left power", lDrive2.getPower());
+            telemetry.addData("right power", rDrive2.getPower());
         }
 
 
-        ldrive1.setPower(0);
-        ldrive2.setPower(0);
-        rdrive1.setPower(0);
-        rdrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
 
 
     }
 
-    private void slideInches(double inches, double minPower, double maxPower) {
 
 
-        sPID.setOutputRange(minPower, maxPower);
+    private void slideInches(double inches ,double minimumPs ,double maximumPs){
+        if (inches > 0){
+            forwardSlideInches(inches,minimumPs,maximumPs);
+        }else if (inches < 0){
+            backSlideInches(inches,minimumPs,maximumPs);
+        }
+    }
+
+    private void forwardSlideInches(double inches ,double minimumPs ,double maximumPs) {
+
+        double d_Spower = 0;
+        double Rpower = 0;
+        double Lpower = 0;
+
+
+        h = 0;
+
+        sPID.reset();
+        ScPID.reset();
+        resetAngle();
+
+        ScurrentPosition = 0;
+
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         sPID.setSetPoint(inches);
+        sPID.setOutputRange(minimumPs,maximumPs);
+
+
+
+        ScPID.setSetPoint(0);
+        ScPID.setOutputRange(-0.02,0.02);
+
+        SaPID.setSetPoint(0);
+        SaPID.setOutputRange(-0.04,0.04);
+
+
+
 
 
         s_startPoint = slide1.getCurrentPosition();
 
-
-        ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.07, 0.07);
-
-        ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / SticksPerInch;
+        sc_startPoint = getAngle();
 
 
+
+        ScurrentPosition = -slide1.getCurrentPosition()/ SticksPerInch;
         sPID.setSensorValue(ScurrentPosition);
-
-
         sPID.calculate();
+
+
 
 
         while (sPID.getError() > 0 && opModeIsActive()) {
 
-            ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / SticksPerInch;
-            sPID.setSensorValue(ScurrentPosition);
 
+
+            ScurrentPosition = (-slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
+            sPID.setSensorValue(ScurrentPosition);
             d_Spower = sPID.calculate();
+
+            RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
+            SaPID.setSensorValue(RcuurentPosition);
+            Rpower = SaPID.calculate();
+
+            LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
+            SaPID.setSensorValue(LcuurentPosition);
+            Lpower = SaPID.calculate();
 
 
             ScPID.setSensorValue(getAngle());
             Scoraction = ScPID.calculate();
 
 
-            telemetry.update();
-
-            // set power levels.
 
 
+            // set power levels.`
             slide1.setPower(d_Spower);
+            lDrive1.setPower(Lpower - Scoraction);
+            lDrive2.setPower(Lpower - Scoraction);
+            rDrive1.setPower(Rpower + Scoraction);
+            rDrive2.setPower(Rpower + Scoraction);
 
-            ldrive1.setPower(-coraction);
-            ldrive2.setPower(-coraction);
-            rdrive1.setPower(coraction);
-            rdrive2.setPower(coraction);
 
 
-            /*if (d_Rpower <0.06 && opModeIsActive()){
-                dRPID.setSensorValue(inches);
-                dRPID.calculate();
-            }
-            if (d_Lpower <0.06 && opModeIsActive()){
-                dLPID.setSensorValue(inches);
-                dLPID.calculate();
-            }*/
 
+            telemetry.addData("slide error", sPID.getError());
+            telemetry.addData("slide CP", ScurrentPosition);
+            telemetry.addData("slide pow", slide1.getPower());
+
+            telemetry.update();
 
             sleep(15);
 
-            telemetry.addData("left position", ldrive2.getCurrentPosition());
-            telemetry.addData("right position", rdrive2.getCurrentPosition());
-            telemetry.addData("left power", ldrive2.getPower());
-            telemetry.addData("right power", rdrive2.getPower());
+
+
+
         }
 
 
         slide1.setPower(0);
-        ldrive1.setPower(0);
-        ldrive2.setPower(0);
-        rdrive1.setPower(0);
-        rdrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+
+        telemetry.addData("motors","off");
 
 
     }
 
-    private void elevatorHight(double ticks) {
-        ePID.setSensorValue(elevator.getCurrentPosition());
-        ePID.setSetPoint(ticks);
-        ePID.setOutputRange(-0.7, 0.7);
-        while (ePID.getError() != 0) {
-            elevator.setPower(ePID.calculate());
+    private void backSlideInches(double inches ,double minimumPs ,double maximumPs) {
+
+        double d_Spower = 0;
+        double Rpower = 0;
+        double Lpower = 0;
+
+
+        h = 0;
+
+        sPID.reset();
+        ScPID.reset();
+        resetAngle();
+
+        ScurrentPosition = 0;
+
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        sPID.setSetPoint(inches);
+        sPID.setOutputRange(minimumPs,maximumPs);
+
+
+        ScPID.setSetPoint(0);
+        ScPID.setOutputRange(-0.02,0.02);
+
+        SaPID.setSetPoint(0);
+        SaPID.setOutputRange(-0.04,0.04);
+
+
+
+        s_startPoint = -slide1.getCurrentPosition();
+
+        sc_startPoint = getAngle();
+
+
+
+        ScurrentPosition = -slide1.getCurrentPosition()/ SticksPerInch;
+        sPID.setSensorValue(ScurrentPosition);
+        sPID.calculate();
+
+
+
+
+        while (sPID.getError() < 0 && opModeIsActive()) {
+
+
+
+            ScurrentPosition = (-slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
+            sPID.setSensorValue(ScurrentPosition);
+            d_Spower = sPID.calculate();
+
+            RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
+            SaPID.setSensorValue(RcuurentPosition);
+            Rpower = SaPID.calculate();
+
+            LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
+            SaPID.setSensorValue(LcuurentPosition);
+            Lpower = SaPID.calculate();
+
+
+            ScPID.setSensorValue(getAngle());
+            Scoraction = ScPID.calculate();
+
+
+
+
+            // set power levels.`
+            slide1.setPower(d_Spower);
+            lDrive1.setPower(Lpower - Scoraction);
+            lDrive2.setPower(Lpower - Scoraction);
+            rDrive1.setPower(Rpower + Scoraction);
+            rDrive2.setPower(Rpower + Scoraction);
+
+
+
+
+
+            telemetry.addData("slide error", sPID.getError());
+            telemetry.addData("slide CP", ScurrentPosition);
+            telemetry.addData("slide pow", slide1.getPower());
+
+            telemetry.update();
+
+            sleep(50);
+
+
+
+
+        }
+
+
+        slide1.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+
+        telemetry.addData("motors","off");
+
+
+    }
+
+
+
+
+
+
+    private int seeObj(List<Recognition> Recognitions){
+        int skyStoneP = 0;
+        if (Recognitions.size() == 3) skyStoneP = seeThreeObj(Recognitions);
+        else if (Recognitions.size() == 2) skyStoneP = seeTwoObj(Recognitions);
+        else {
+            skyStoneP = 2;
+        }
+
+        return skyStoneP;
+    }
+
+    private int seeTwoObj(List<Recognition> Recognitions3){
+
+        int skyStoneP = 0;
+
+        double skyStoneX = 0;
+        double Stone1X = 0;
+        double Stone2X = 0;
+
+
+        if (Recognitions3.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions3.get(0).getLeft();
+            Stone1X = Recognitions3.get(1).getLeft();
+        }else if (Recognitions3.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone1X = Recognitions3.get(0).getLeft();
+            skyStoneX = Recognitions3.get(1).getLeft();
+        }
+
+
+
+
+
+        if (skyStoneX < Stone1X){
+            skyStoneP = 1;
+        }else if (skyStoneX > Stone1X) {
+            skyStoneP = 3;
+        }
+
+
+        return skyStoneP;
+    }
+
+    private int seeThreeObj(List<Recognition> Recognitions2){
+
+        int skyStoneP = 0;
+
+        double skyStoneX = 0;
+        double Stone1X = 0;
+        double Stone2X = 0;
+
+        if (Recognitions2.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(0).getLeft();
+        }else if (Recognitions2.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone1X = Recognitions2.get(0).getLeft();
+        }
+
+
+        if (Recognitions2.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(1).getLeft();
+
+        }else if (Recognitions2.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
+
+            if (Stone1X != 0) {
+
+                Stone2X = Recognitions2.get(1).getLeft();
+            } else if (Stone1X == 0) {
+                Stone1X = Recognitions2.get(1).getLeft();
+            }
+        }
+
+        if (Recognitions2.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+            skyStoneX = Recognitions2.get(2).getLeft();
+        }else if (Recognitions2.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
+            Stone2X = Recognitions2.get(2).getLeft();
+        }
+
+
+        if (skyStoneX < Stone1X && skyStoneX < Stone2X){
+            skyStoneP = 1;
+        }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+            skyStoneP = 3;
+        }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
+            skyStoneP = 2;
+        }
+
+        return skyStoneP;
+    }
+
+
+
+
+    //init Vuforia
+    private void initVuforia() {
+
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+
+    }
+
+
+    //init the TensorFlow
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minimumConfidence = 0.45;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+    }
+
+
+    private void goToSkyStone(int SSP){
+        if (SSP == 1) adjusteSS1();
+        else if (SSP == 2) adjusteSS2();
+        else if (SSP == 3) adjusteSS3();
+
+    }
+
+    private void adjusteSS1(){
+        driveInches(-7,0.03,0.3);
+    }
+
+    private void adjusteSS2(){
+
+    }
+
+    private void adjusteSS3(){
+        driveInches(7,-0.03,-0.3);
+    }
+
+    private void moveStone(int SP , boolean where){
+        if (where){
+
+            if (SP == 1) driveInches(56,0.03,0.35);
+            else if (SP == 2) driveInches(49,0.03,0.35);
+            else if (SP == 3) driveInches(42,0.03,0.35);
+
+        }
+        else if (!where){
+
+            if (SP == 1) driveInches(-56,0-.03,-0.35);
+            else if (SP == 2) driveInches(-49,-0.03,-0.35);
+            else if (SP == 3) driveInches(-42,-0.03,-0.35);
+
         }
     }
 
-    private void setElevatorPosition(int ep) {
-        double ticks;
+    private void takeStone(){
+        slideInches(14,0.03,0.3);
+        bazim.setPosition(0.8);
+        sleep(300);
+        slideInches(-15,0.03,0.3);
+    }
 
-        if (ep == 1) ticks = 0;
-        else if (ep == 2) ticks = -1542;
-        else if (ep == 3) ticks = -2717;
-        else if (ep == 4) ticks = -4335;
-        else ticks = 0;
+    private void stopDcMotors(){
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        slide1.setPower(0);
+        sleep(10);
+    }
 
-        elevatorHight(ticks);
+
+
+    private void caseSSP1(){
+        adjusteSS1();
+        slideInches(29,0.03,0.4);
+        stopDcMotors();
+        bazim.setPosition(0.85);
+        slideInches(-6,-0.03,0.3);
+        stopDcMotors();
+        moveStone(1,true);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(2,false);
+        stopDcMotors();
+        takeStone();
+        moveStone(2,true);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(3,false);
+        stopDcMotors();
+        takeStone();
+        stopDcMotors();
+        moveStone(3,true);
+        driveInches(-6,-0.03,-0.5);
+        stopDcMotors();
+    }
+
+
+    private void caseSSP2(){
+        adjusteSS2();
+        slideInches(29,0.03,0.4);
+        stopDcMotors();
+        bazim.setPosition(0.85);
+        slideInches(-6,-0.03,0.3);
+        stopDcMotors();
+        moveStone(2,true);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(3,false);
+        stopDcMotors();
+        takeStone();
+        moveStone(3,true);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(1,false);
+        stopDcMotors();
+        takeStone();
+        stopDcMotors();
+        moveStone(1,true);
+        driveInches(-6,-0.03,-0.5);
+        stopDcMotors();
+    }
+
+
+    private void caseSSP3(){
+        adjusteSS3();
+        slideInches(29,0.03,0.4);
+        stopDcMotors();
+        bazim.setPosition(0.85);
+        slideInches(-6,-0.03,0.3);
+        stopDcMotors();
+        moveStone(1,true);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(3,false);
+        stopDcMotors();
+        takeStone();
+        moveStone(3,true);
+        stopDcMotors();
+        bazim.setPosition(0);
+        moveStone(2,false);
+        stopDcMotors();
+        takeStone();
+        stopDcMotors();
+        moveStone(2,true);
+        driveInches(-6,-0.03,-0.5);
+        stopDcMotors();
     }
 
 
