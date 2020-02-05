@@ -30,7 +30,8 @@ public class Teleop_11226 extends LinearOpMode {
     //collection
     private Servo collectRight = null;
     private Servo collectLeft = null;
-    private Servo push = null;
+    private Servo pushLeft = null;
+    private Servo pushRight = null;
     private CRServo hold = null;
     private CRServo turnHold = null;
     //moving Foundation
@@ -74,7 +75,8 @@ class turnHM extends TimerTask{
         elevator = hardwareMap.get(DcMotor.class, "elevator");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
-        push = hardwareMap.get(Servo.class, "push");
+        pushLeft = hardwareMap.get(Servo.class, "pushLeft");
+        pushRight = hardwareMap.get(Servo.class, "pushRight");
         hold = hardwareMap.get(CRServo.class, "hold");
         turnHold = hardwareMap.get(CRServo.class, "turnHold");
         //grabber = hardwareMap.get(Servo.class, "grabber");
@@ -85,6 +87,9 @@ class turnHM extends TimerTask{
         lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
+
+        pushLeft.setPosition(0);
+        pushRight.setPosition(0);
 
 //
         rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -215,9 +220,11 @@ class turnHM extends TimerTask{
 
             //push cube in
             if (gamepad2.dpad_right) {
-                push.setPosition(0);
+                pushLeft.setPosition(180);
+                pushRight.setPosition(180);
             } else {
-                push.setPosition(180);
+                pushLeft.setPosition(0);
+                pushRight.setPosition(0);
             }
 
 
