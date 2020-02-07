@@ -29,7 +29,7 @@ public class Auto_11229_B_Dimona_turn extends LinearOpMode {
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
 
         rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

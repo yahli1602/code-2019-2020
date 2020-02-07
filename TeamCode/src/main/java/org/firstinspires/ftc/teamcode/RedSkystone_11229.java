@@ -111,7 +111,7 @@ public class RedSkystone_11229 extends LinearOpMode
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
         bazim = hardwareMap.get(Servo.class, "bazim");
 
 
@@ -314,11 +314,11 @@ public class RedSkystone_11229 extends LinearOpMode
             lDrive2.setPower(0);
             rDrive1.setPower(0);
             rDrive2.setPower(0);
-            elevator.setPower(1);
+            teleop_11226_A.setPower(1);
             sleep(400);
-            elevator.setPower(-1);
+            teleop_11226_A.setPower(-1);
             sleep(100);
-            elevator.setPower(0);
+            teleop_11226_A.setPower(0);
 
 
 

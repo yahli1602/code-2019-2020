@@ -115,14 +115,14 @@ public class TensorFlow extends LinearOpMode {
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        teleop_11226_A = hardwareMap.get(DcMotor.class, "teleop_11226_A");
 
         rdrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rdrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ldrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+        teleop_11226_A.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
 
 
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that

@@ -96,7 +96,7 @@ public class PIDdrive_11226_2 extends LinearOpMode {
 
         hold = hardwareMap.get(CRServo.class, "hold");
 
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
         cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/

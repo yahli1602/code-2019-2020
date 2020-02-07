@@ -65,8 +65,8 @@ public class testing_motors extends LinearOpMode {
     private DcMotor slide = null;*/
     private DcMotor motor1 = null;
     //private Servo hold = null;
-    //elevator
-    /*private DcMotor elevator = null;
+    //teleop_11226_A
+    /*private DcMotor teleop_11226_A = null;
     //fold collection
     private DcMotor foldcollect = null;
     //collection
@@ -86,7 +86,7 @@ public class testing_motors extends LinearOpMode {
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        teleop_11226_A = hardwareMap.get(DcMotor.class, "teleop_11226_A");
         foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
@@ -100,7 +100,7 @@ public class testing_motors extends LinearOpMode {
         lDrive1.setDirection(DcMotor.Direction.FORWARD);
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        teleop_11226_A.setDirection(DcMotor.Direction.FORWARD);
         foldcollect.setDirection(DcMotor.Direction.FORWARD);
         grabber1.setDirection(Servo.Direction.FORWARD);
         grabber2.setDirection(Servo.Direction.REVERSE);*/
@@ -112,7 +112,7 @@ public class testing_motors extends LinearOpMode {
         lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+        teleop_11226_A.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
         motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //hold.setPosition(0);
 
@@ -145,12 +145,12 @@ public class testing_motors extends LinearOpMode {
         }
         sleep(1000);
         while (opModeIsActive() && x==4) {
-            elevator.setPower(-1);
+            teleop_11226_A.setPower(-1);
             x++;
         }
         sleep(1000);
         while (opModeIsActive() && x==5) {
-            elevator.setPower(0);
+            teleop_11226_A.setPower(0);
             collectLeft.setPosition(0.8);
             collectRight.setPosition(0.2);
             x++;

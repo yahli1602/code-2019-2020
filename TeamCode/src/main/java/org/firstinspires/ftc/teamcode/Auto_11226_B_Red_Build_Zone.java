@@ -415,7 +415,7 @@ public class Auto_11226_B_Red_Build_Zone extends LinearOpMode {
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
         hold = hardwareMap.get(Servo.class, "hold");
         turnHold = hardwareMap.get(CRServo.class, "turnHold");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");

@@ -367,7 +367,7 @@ public class Auto_11229_B extends LinearOpMode {
         //collectLeft = hardwareMap.get(Servo.class, "collect left");
         //collectRight = hardwareMap.get(Servo.class, "collect right");
         //stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
 
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

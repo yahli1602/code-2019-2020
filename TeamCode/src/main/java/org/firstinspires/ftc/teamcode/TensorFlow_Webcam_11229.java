@@ -60,8 +60,8 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
-    //elevator
-    private DcMotor elevator = null;
+    //teleop_11226_A
+    private DcMotor teleop_11226_A = null;
     //fold collection
     private DcMotor foldcollect = null;
     //collection
@@ -104,7 +104,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        teleop_11226_A = hardwareMap.get(DcMotor.class, "teleop_11226_A");
         foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
@@ -138,7 +138,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
         lDrive1.setDirection(DcMotor.Direction.FORWARD);
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        teleop_11226_A.setDirection(DcMotor.Direction.FORWARD);
         foldcollect.setDirection(DcMotor.Direction.FORWARD);
         grabber1.setDirection(Servo.Direction.FORWARD);
         grabber2.setDirection(Servo.Direction.REVERSE);
@@ -148,21 +148,21 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
         lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        teleop_11226_A.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        teleop_11226_A.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+        teleop_11226_A.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
 
 
         if (opModeIsActive()) {

@@ -96,7 +96,7 @@ public class vuforiaWebcam11229 extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
-    //elevator
+    //teleop_11226_A
     private DcMotor elevator = null;
     //fold collection
     private DcMotor foldcollect = null;
@@ -173,7 +173,7 @@ public class vuforiaWebcam11229 extends LinearOpMode {
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
         foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
@@ -485,7 +485,7 @@ public class vuforiaWebcam11229 extends LinearOpMode {
 
             telemetry.addData("drive:", rDrive1.getPower());
             telemetry.update();
-//elevator
+//teleop_11226_A
             if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
             } else {
@@ -498,7 +498,7 @@ public class vuforiaWebcam11229 extends LinearOpMode {
                 telemetry.update();
             }
 
-            telemetry.addData("elevator", elevator.getCurrentPosition());
+            telemetry.addData("teleop_11226_A", elevator.getCurrentPosition());
             telemetry.update();
 
             //collection

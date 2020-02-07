@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -9,14 +8,16 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
+import java.sql.Time;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-@TeleOp(name = "Teleop 11226", group = "Linear Opmode")
-public class Teleop_11226 extends LinearOpMode {
+@TeleOp(name = "Teleop 11226 A", group = "Linear Opmode")
+public class teleop_11226_A extends LinearOpMode {
+    private ElapsedTime time = new ElapsedTime();
+
     private boolean pinch = false;
     private boolean pushCube = false;
     //driving motors
@@ -25,15 +26,17 @@ public class Teleop_11226 extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
-    //teleop_11226_A
+    //elevator
     private DcMotor elevator = null;
     //collection
-    private Servo collectRight = null;
-    private Servo collectLeft = null;
+    private DcMotor collectRight = null;
+    private DcMotor collectLeft = null;
     private Servo pushLeft = null;
     private Servo pushRight = null;
+    //Pinch
     private CRServo hold = null;
     private CRServo turnHold = null;
+    private Servo bazim = null;
     //moving Foundation
     private Servo grabber = null;
     private TouchSensor cubeIn = null;
@@ -43,25 +46,36 @@ public class Teleop_11226 extends LinearOpMode {
     // problem fixing
     private boolean hold180 = false;
     private double fix = 0;
+    boolean pinchDown = true;
+    private boolean auto = false;
+    private boolean pinchIn = true;
+    boolean canTimerWork = true;
+    double lastEp;
+    //Time timer1 = new Time(2000);
 
-class turnHP extends TimerTask{
-    @Override
-    public void run() {
-        turnHold.setPower(1);
+
+    /*class turnHP extends TimerTask {
+        @Override
+        public void run() {
+            turnHold.setPower(1);
+        }
     }
-}
 
 
-class turnHM extends TimerTask{
-    @Override
-    public void run() {
-        turnHold.setPower(1);
+    class turnHM extends TimerTask {
+        @Override
+        public void run() {
+            turnHold.setPower(1);
+            canTimerWork = true;
+        }
     }
-}
 
 
     turnHP turnHPlus = new turnHP();
     turnHM turnHMinus = new turnHM();
+
+
+    Timer timer = new Timer();*/
 
 
     @Override
@@ -73,23 +87,37 @@ class turnHM extends TimerTask{
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
         elevator = hardwareMap.get(DcMotor.class, "elevator");
-        collectRight = hardwareMap.get(Servo.class, "collectRight");
-        collectLeft = hardwareMap.get(Servo.class, "collectLeft");
+        turnHold = hardwareMap.get(CRServo.class, "turnHold");
+        hold = hardwareMap.get(CRServo.class, "hold");
         pushLeft = hardwareMap.get(Servo.class, "pushLeft");
         pushRight = hardwareMap.get(Servo.class, "pushRight");
-        hold = hardwareMap.get(CRServo.class, "hold");
-        turnHold = hardwareMap.get(CRServo.class, "turnHold");
-        //grabber = hardwareMap.get(Servo.class, "grabber");
-        waitForStart();
+        collectRight = hardwareMap.get(DcMotor.class, "collectRight");
+        collectLeft = hardwareMap.get(DcMotor.class, "collectLeft");
+        bazim = hardwareMap.get(Servo.class, "bazim");
+
         rDrive1.setDirection(DcMotor.Direction.FORWARD);
         rDrive2.setDirection(DcMotor.Direction.FORWARD);
         lDrive1.setDirection(DcMotor.Direction.REVERSE);
         lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        elevator.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
+        pushLeft.setDirection(Servo.Direction.FORWARD);
+        pushRight.setDirection(Servo.Direction.REVERSE);
+        collectLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        collectRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        /*pushLeft.setPosition(0);
+        pushRight.setPosition(0);*/
+        bazim.setDirection(Servo.Direction.FORWARD);
 
+        bazim.setPosition(0);
         pushLeft.setPosition(0);
         pushRight.setPosition(0);
+
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        waitForStart();
+
 
 //
         rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -99,38 +127,29 @@ class turnHM extends TimerTask{
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        ePID.PIDcon(0.45,0,0);
+        ePID.PIDcon(0.0001, 0, 0);
 
         while (opModeIsActive()) {
 
-            telemetry.addData("gamepad1 at rest", gamepad1.atRest());
-            telemetry.addData("gamepad2 at rest", gamepad2.atRest());
-            telemetry.addData("y", gamepad2.y);
-            telemetry.addData("drive", gamepad1.left_stick_y);
-            telemetry.addData("teleop_11226_A ticks",elevator.getCurrentPosition());
-            telemetry.update();
-
             //drive
-            if(Fast){
+
+            if (Fast) {
                 if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                     rDrive1.setPower(gamepad1.left_stick_y - fix);
                     rDrive2.setPower(gamepad1.left_stick_y - fix);
                     lDrive1.setPower(gamepad1.left_stick_y - fix);
                     lDrive2.setPower(gamepad1.left_stick_y - fix);
-                }
-                else if (gamepad1.left_trigger > 0.2) {
+                } else if (gamepad1.left_trigger > 0.2) {
                     rDrive1.setPower(gamepad1.left_trigger - fix);
                     rDrive2.setPower(gamepad1.left_trigger - fix);
                     lDrive1.setPower(-gamepad1.left_trigger + fix);
                     lDrive2.setPower(-gamepad1.left_trigger + fix);
-                }
-                else if (gamepad1.right_trigger > 0.2) {
+                } else if (gamepad1.right_trigger > 0.2) {
                     rDrive1.setPower(-gamepad1.right_trigger + fix);
                     rDrive2.setPower(-gamepad1.right_trigger + fix);
                     lDrive1.setPower(gamepad1.right_trigger - fix);
                     lDrive2.setPower(gamepad1.right_trigger - fix);
-                }
-                else{
+                } else {
                     rDrive1.setPower(0);
                     rDrive2.setPower(0);
                     lDrive1.setPower(0);
@@ -185,6 +204,11 @@ class turnHM extends TimerTask{
                 }
             }
 
+            if (gamepad2.start){
+                bazim.setPosition(0.75);
+            }else if (gamepad2.back){
+                bazim.setPosition(0);
+            }
 
             if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
                 slide.setPower(gamepad1.right_stick_x);
@@ -192,51 +216,116 @@ class turnHM extends TimerTask{
                 slide.setPower(0);
             }
 
-
-            //elevator
-            if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
-                elevator.setPower(gamepad2.right_stick_y);
-            } else {
-                elevator.setPower(0);
-            }
-
-            //collect
-            if (gamepad2.right_trigger > 0) {
-                collectRight.setPosition(0.7);
-                collectLeft.setPosition(0.2);
-            } else if (gamepad2.left_trigger > 0) {
-                collectLeft.setPosition(0.7);
-                collectRight.setPosition(0.2);
-            } else {
-                collectRight.setPosition(0);
-                collectLeft.setPosition(0);
-            }
             if (gamepad1.a) {
                 Fast = true;
             }
             if (gamepad1.b) {
                 Fast = false;
             }
+            if (!auto) {
+                if (gamepad2.left_stick_y > 0.2) {
+                    if (pinchIn) {
+                        turnHold.setPower(-1);
+                        countTime(1800);
+                        turnHold.setPower(0);
+                    }
+                    elevator.setPower(gamepad2.left_stick_y);
+                } else if (gamepad2.left_stick_y < -0.2) {
+                    if (!pinchIn) {
+                        turnHold.setPower(1);
+                        countTime(1800);
+                        turnHold.setPower(0);
+                    }
+                } else {
+                    elevator.setPower(0);
+                }
+            } else {
+                if (gamepad2.dpad_up) {
+                    setElevatorPosition(1);
+                } else if (gamepad2.dpad_right) {
+                    setElevatorPosition(2);
+                } else if (gamepad2.dpad_down) {
+                    setElevatorPosition(3);
+                } else if (gamepad2.dpad_left) {
+                    setElevatorPosition(4);
+                }
+            }
+            telemetry.addData("teleop_11226_A ticks", elevator.getCurrentPosition());
+            telemetry.update();
 
-            //push cube in
-            if (gamepad2.dpad_right) {
+            if (gamepad2.a) {
                 pushLeft.setPosition(180);
                 pushRight.setPosition(180);
-            } else {
+            } else if (gamepad2.b) {
                 pushLeft.setPosition(0);
                 pushRight.setPosition(0);
+            } else {
+                pushRight.setPosition(0.2);
+                pushLeft.setPosition(0.2);
             }
 
-
-            //pinch
-            if(gamepad2.x) {
+            if (gamepad2.x) {
+                pinchDown = true;
+                hold.setPower(-1);
+            } else if (gamepad2.y) {
+                pinchDown = false;
+                hold.setPower(1);
+            } else if (pinchDown) {
+                hold.setPower(0);
+            } else {
                 hold.setPower(1);
             }
-            else if (gamepad2.y) {
-                hold.setPower(-1);
-            }else if (gamepad2.dpad_left){
-                hold.setPower(0);
+
+            if (auto) {
+                if (gamepad2.right_bumper) {
+                    pinchIn = true;
+                    turnHold.setPower(-1);
+                    countTime(1800);
+                    turnHold.setPower(0);
+                } else if (gamepad2.left_bumper) {
+                    pinchIn = false;
+                    turnHold.setPower(1);
+                    countTime(1800);
+                    turnHold.setPower(0);
+                }
+            } else {
+                if (gamepad2.right_stick_x > 0.2) {
+                    turnHold.setPower(1);
+                } else if (gamepad2.right_stick_x < -0.2) {
+                    turnHold.setPower(-1);
+                } else if (!gamepad2.right_bumper && !gamepad2.left_bumper) {
+                    turnHold.setPower(0);
+                }
             }
+
+
+            if (gamepad2.right_trigger > 0) {
+                collectLeft.setPower(1);
+                collectRight.setPower(1);
+            } else if (gamepad2.left_trigger > 0) {
+                collectLeft.setPower(-1);
+                collectRight.setPower(-1);
+            } else {
+                collectRight.setPower(0);
+                collectLeft.setPower(0);
+            }
+
+            if (gamepad2.right_stick_button) {
+                if (auto) {
+                    auto = false;
+                } else {
+                    auto = true;
+                }
+            }
+
+            telemetry.addData("dpad up", gamepad2.dpad_up);
+            telemetry.addData("dpad down", gamepad2.dpad_down);
+            telemetry.addData("dpad right", gamepad2.dpad_right);
+            telemetry.addData("dpad left", gamepad2.dpad_left);
+            //telemetry.addData("timer",timer1.getTime());
+            telemetry.update();
+            //drive
+
 
 
 
@@ -248,44 +337,9 @@ class turnHM extends TimerTask{
             }*/
 
             //turn collection
-            if (gamepad2.right_bumper) {
-                turnHold.setPower(1);
-            } else if (gamepad2.left_bumper) {
-                turnHold.setPower(-1);
-
-            } else {
-                turnHold.setPower(0);
-            }
-/*
-            if (gamepad2.right_bumper) {
-                Timer timer1 = new Timer();
-                timer1.schedule(turnHPlus,2000);
-                turnHold.setPower(0);
-                telemetry.addData("timer has finished", Fast);
-            } else if (gamepad2.left_bumper) {
-                Timer timer2 = new Timer();
-                timer2.schedule(turnHMinus,2000);
-                turnHold.setPower(0);
-                telemetry.addData("timer has finished", Fast);
-            }
-*/
-            if (gamepad2.dpad_up) {
-                setElevatorPosition(1);
-
-            } else if (gamepad2.dpad_right) {
-                setElevatorPosition(2);
-
-            } else if (gamepad2.dpad_down) {
-                setElevatorPosition(3);
-
-            } else if (gamepad2.dpad_left) {
-                setElevatorPosition(4);
-
-            }
 
 
             // Automations
-
 
 
         }
@@ -293,10 +347,12 @@ class turnHM extends TimerTask{
     }
 
     private void elevatorHight(double ticks) {
-        ePID.setSensorValue(elevator.getCurrentPosition());
-        ePID.setSetPoint(ticks);
+        ePID.setSensorValue(Math.round(elevator.getCurrentPosition() / 10));
+        ePID.setSetPoint(Math.round(ticks / 10));
         ePID.setOutputRange(-0.7, 0.7);
-        while (ePID.getError() != 0) {
+        ePID.calculate();
+        while (ePID.getError() != 0 && opModeIsActive()) {
+            ePID.setSensorValue(Math.round(elevator.getCurrentPosition() / 10));
             elevator.setPower(ePID.calculate());
         }
     }
@@ -304,13 +360,18 @@ class turnHM extends TimerTask{
     private void setElevatorPosition(int ep) {
         double ticks;
 
-        if (ep == 1) ticks = 0;
-        else if (ep == 2) ticks = -1542;
-        else if (ep == 3) ticks = -2717;
-        else if (ep == 4) ticks = -4335;
+        if (ep == 1) ticks = 108;
+        else if (ep == 2) ticks = -678;
+        else if (ep == 3) ticks = -1697;
+        else if (ep == 4) ticks = -2768;
         else ticks = 0;
 
         elevatorHight(ticks);
     }
 
+    private void countTime(long miliseconds) {
+        long x = (long) time.milliseconds() + miliseconds;
+        while (x - time.milliseconds() > 0 && opModeIsActive()) {
+        }
+    }
 }

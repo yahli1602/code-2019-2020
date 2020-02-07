@@ -95,7 +95,7 @@ public class vuforiaCESS extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     //private DcMotor slide = null;
-    //elevator
+    //teleop_11226_A
     private DcMotor elevator = null;
     //fold collection
     private DcMotor foldcollect = null;
@@ -173,7 +173,7 @@ public class vuforiaCESS extends LinearOpMode {
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         //slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
         foldcollect = hardwareMap.get(DcMotor.class, "foldCollect");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");

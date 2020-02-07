@@ -19,7 +19,7 @@ public class Teleop_11229_Gilad_OP extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
-    //elevator
+    //teleop_11226_A
     private DcMotor elevator = null;
 
     //collection
@@ -35,7 +35,7 @@ public class Teleop_11229_Gilad_OP extends LinearOpMode {
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
@@ -114,7 +114,7 @@ public class Teleop_11229_Gilad_OP extends LinearOpMode {
                 slide.setPower(0);
             }
 
-//elevator
+//teleop_11226_A
             if (gamepad1.dpad_up) {
                 elevator.setPower(1);
             }else if (gamepad1.dpad_down) {
