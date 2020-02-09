@@ -94,10 +94,10 @@ public class teleop_11226_A extends LinearOpMode {
         collectLeft = hardwareMap.get(DcMotor.class, "collectLeft");
         bazim = hardwareMap.get(Servo.class, "bazim");
 
-        rDrive1.setDirection(DcMotor.Direction.FORWARD);
-        rDrive2.setDirection(DcMotor.Direction.FORWARD);
-        lDrive1.setDirection(DcMotor.Direction.REVERSE);
-        lDrive2.setDirection(DcMotor.Direction.REVERSE);
+        rDrive1.setDirection(DcMotor.Direction.REVERSE);
+        rDrive2.setDirection(DcMotor.Direction.REVERSE);
+        lDrive1.setDirection(DcMotor.Direction.FORWARD);
+        lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotorSimple.Direction.FORWARD);
         pushLeft.setDirection(Servo.Direction.FORWARD);
@@ -139,15 +139,15 @@ public class teleop_11226_A extends LinearOpMode {
                     lDrive1.setPower(gamepad1.left_stick_y - fix);
                     lDrive2.setPower(gamepad1.left_stick_y - fix);
                 } else if (gamepad1.left_trigger > 0.2) {
-                    rDrive1.setPower(gamepad1.left_trigger - fix);
-                    rDrive2.setPower(gamepad1.left_trigger - fix);
-                    lDrive1.setPower(-gamepad1.left_trigger + fix);
-                    lDrive2.setPower(-gamepad1.left_trigger + fix);
+                    rDrive1.setPower(-gamepad1.left_trigger - fix);
+                    rDrive2.setPower(-gamepad1.left_trigger - fix);
+                    lDrive1.setPower(gamepad1.left_trigger + fix);
+                    lDrive2.setPower(gamepad1.left_trigger + fix);
                 } else if (gamepad1.right_trigger > 0.2) {
-                    rDrive1.setPower(-gamepad1.right_trigger + fix);
-                    rDrive2.setPower(-gamepad1.right_trigger + fix);
-                    lDrive1.setPower(gamepad1.right_trigger - fix);
-                    lDrive2.setPower(gamepad1.right_trigger - fix);
+                    rDrive1.setPower(gamepad1.right_trigger + fix);
+                    rDrive2.setPower(gamepad1.right_trigger + fix);
+                    lDrive1.setPower(-gamepad1.right_trigger - fix);
+                    lDrive2.setPower(-gamepad1.right_trigger - fix);
                 } else {
                     rDrive1.setPower(0);
                     rDrive2.setPower(0);
@@ -223,6 +223,9 @@ public class teleop_11226_A extends LinearOpMode {
             }
 
 
+            if (gamepad1.x){
+                bazim.setPosition(1);
+            }
 
 
 
@@ -241,7 +244,9 @@ public class teleop_11226_A extends LinearOpMode {
 
 
 
-            if (gamepad2.left_stick_y > 0.2 || gamepad2.left_stick_y < -0.2) {
+
+
+            if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
             }
 
@@ -249,43 +254,46 @@ public class teleop_11226_A extends LinearOpMode {
                 elevator.setPower(0);
             }
 
-            if (gamepad2.left_stick_button){
+            if (gamepad2.right_stick_button){
                 setElevatorPosition(2);
                 turnPinchIn();
                 setElevatorPosition(0);
             }
 
             if (gamepad2.dpad_up) {
-                setElevatorPosition(1);
+                setElevatorPosition(4);
                 if (pinchIn){
                     turnPinchOut();
                 }
-            } else if (gamepad2.dpad_right) {
+            }else if (gamepad2.dpad_down) {
+                setElevatorPosition(1);
+                if (pinchIn) {
+                    turnPinchOut();
+                }
+
+            }else if (gamepad2.a) {
                 setElevatorPosition(2);
                 if (pinchIn){
                     turnPinchOut();
                 }
-            } else if (gamepad2.dpad_down) {
+
+            } else if (gamepad2.b) {
                 setElevatorPosition(3);
-                if (pinchIn){
-                    turnPinchOut();
-                }
-            } else if (gamepad2.dpad_left) {
-                setElevatorPosition(4);
-                if (pinchIn){
+                if (pinchIn) {
                     turnPinchOut();
                 }
             }
 
 
-
-            if (gamepad2.a) {
+            if (gamepad2.dpad_right) {
                 pushLeft.setPosition(1);
                 pushRight.setPosition(1);
-            } else if (gamepad2.b) {
+            } else if (gamepad2.dpad_left) {
                 pushLeft.setPosition(0);
                 pushRight.setPosition(0);
-            } else {
+
+            }
+            else {
                 pushRight.setPosition(0.23);
                 pushLeft.setPosition(0.23);
             }
@@ -310,15 +318,15 @@ public class teleop_11226_A extends LinearOpMode {
                 turnPinchOut();
             }
 
-            if (gamepad2.right_stick_x > 0.2) {
+            if (gamepad2.left_stick_x > 0.2) {
                 turnHold.setPower(0.3);
-            } else if (gamepad2.right_stick_x < -0.2) {
+            } else if (gamepad2.left_stick_x < -0.2) {
                 turnHold.setPower(-0.3);
             } else{
                 turnHold.setPower(0);
             }
 
-            if (gamepad2.right_stick_button){
+            if (gamepad2.left_stick_button){
                 elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }

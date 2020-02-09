@@ -30,7 +30,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
 
     private Servo bazim = null;
 
-    private TouchSensor stoneIn = null;
+
 
     boolean fast = true;
     private PIDcon ePID = new PIDcon();
@@ -43,10 +43,9 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
-        stoneIn = hardwareMap.get(TouchSensor.class, "cubeIn");
         bazim = hardwareMap.get(Servo.class,"bazim");
 
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
@@ -128,12 +127,12 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
 
             if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
-                slide.setPower(-gamepad1.right_stick_x);
+                slide.setPower(gamepad1.right_stick_x);
             } else {
                 slide.setPower(0);
             }
 
-//teleop_11226_A
+//elevator
             if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
             } else {
@@ -141,9 +140,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
 
 
-            if (stoneIn.isPressed()) {
-                telemetry.addData("Touch sensor is pressed", "the stone is inside");
-            }
+
 
 
 

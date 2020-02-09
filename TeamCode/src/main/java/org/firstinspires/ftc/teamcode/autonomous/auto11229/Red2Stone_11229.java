@@ -79,10 +79,10 @@ public class Red2Stone_11229 extends LinearOpMode
 
     private final double perimeter = 4 * Math.PI;
     private final double ticksPerRevolution = 28;
-    private final double ticksPerSpin = ticksPerRevolution * 20;
+    private final double ticksPerSpin = ticksPerRevolution * 26.66666666666666666666666666666666666666666666666666666666666666;
     private final double ticksPerInch = 1 / perimeter* ticksPerSpin;
 
-    private final double SticksPerSpin = ticksPerRevolution * 35;
+    private final double SticksPerSpin = ticksPerRevolution * 36;
     private final double SticksPerInch = 1 / perimeter* SticksPerSpin;
 
     // called when init button is  pressed.
@@ -107,7 +107,7 @@ public class Red2Stone_11229 extends LinearOpMode
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
         bazim = hardwareMap.get(Servo.class, "bazim");
 
 
@@ -186,7 +186,7 @@ public class Red2Stone_11229 extends LinearOpMode
         ScPID.PIDcon(0.02,0,0.07);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.04,0,0);
+        aPID.PIDcon(0.1,0,0);
 
 
 
@@ -241,7 +241,10 @@ public class Red2Stone_11229 extends LinearOpMode
         {
 
 
-            caseSSP2();
+            driveInches(96,0.03,0.4);
+            while(opModeIsActive()){
+                Teleop_11229_Gilad();
+            }
 
             f++;
 
@@ -405,7 +408,7 @@ public class Red2Stone_11229 extends LinearOpMode
         dLPID.setOutputRange(minimumP , maximumP);
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.04,0.04);
+        aPID.setOutputRange(-0.08,0.08);
 
         RLCPID.setSetPoint(0);
         RLCPID.setOutputRange(-0.2,0.2);
@@ -591,7 +594,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
 
-            sleep(15);
+            sleep(5);
 
             telemetry.addData("left position", lDrive2.getCurrentPosition());
             telemetry.addData("right position", rDrive2.getCurrentPosition());
@@ -1108,6 +1111,128 @@ public class Red2Stone_11229 extends LinearOpMode
         moveStone(2,true);
         driveInches(-6,-0.03,-0.5);
         stopDcMotors();
+    }
+    public void Teleop_11229_Gilad() {
+
+        //driving motors
+        DcMotor rDrive1 = null;
+        DcMotor rDrive2 = null;
+        DcMotor lDrive1 = null;
+        DcMotor lDrive2 = null;
+        DcMotor slide = null;
+        //teleop_11226_A
+        DcMotor elevator = null;
+
+        //collection
+        Servo collectRight = null;
+        Servo collectLeft = null;
+
+
+        Servo bazim = null;
+
+
+
+        boolean fast = true;
+        PIDcon ePID = new PIDcon();
+
+
+
+
+
+
+        ePID.PIDcon(0.45,0,0);
+
+        waitForStart();
+        while (opModeIsActive()) {
+            //Drive/turn tank
+                //Drive gila
+            if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+                rDrive1.setPower(gamepad1.left_stick_y);
+                rDrive2.setPower(gamepad1.left_stick_y);
+                lDrive1.setPower(gamepad1.left_stick_y);
+                lDrive2.setPower(gamepad1.left_stick_y);
+            } else if (gamepad1.left_trigger > 0) {
+                rDrive1.setPower(-gamepad1.left_trigger * 0.7);
+                rDrive2.setPower(-gamepad1.left_trigger * 0.7);
+                lDrive1.setPower(gamepad1.left_trigger * 0.7);
+                lDrive2.setPower(gamepad1.left_trigger * 0.7);
+            } else if (gamepad1.right_trigger > 0) {
+                rDrive1.setPower(gamepad1.right_trigger * 0.7);
+                rDrive2.setPower(gamepad1.right_trigger * 0.7);
+                lDrive1.setPower(-gamepad1.right_trigger * 0.7);
+                lDrive2.setPower(-gamepad1.right_trigger * 0.7);
+            }
+                //Drop cube on plate
+            else if (gamepad2.y && gamepad1.atRest()) {
+                rDrive1.setPower(0.4);
+                rDrive2.setPower(0.4);
+                lDrive1.setPower(0.2);
+                lDrive2.setPower(0.2);
+                collectRight.setPosition(0.3);
+                collectLeft.setPosition(0.7);
+            }
+            else if (gamepad2.a && gamepad1.atRest()) {
+                rDrive1.setPower(0.2);
+                rDrive2.setPower(0.2);
+                lDrive1.setPower(0.4);
+                lDrive2.setPower(0.4);
+                collectRight.setPosition(0.3);
+                collectLeft.setPosition(0.7);
+            } else {
+                rDrive1.setPower(0);
+                rDrive2.setPower(0);
+                lDrive1.setPower(0);
+                lDrive2.setPower(0);
+            }
+            if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
+                slide.setPower(-gamepad1.right_stick_x);
+            } else {
+                slide.setPower(0);
+            }
+
+//teleop_11226_A
+            if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
+                elevator.setPower(gamepad2.right_stick_y);
+            } else {
+                elevator.setPower(0);
+            }
+
+
+
+
+
+
+                //collection
+            if (gamepad2.right_trigger > 0.2) {
+                collectRight.setPosition(0.7);
+                collectLeft.setPosition(0.2);
+            } else if (gamepad2.left_trigger > 0.2) {
+                collectLeft.setPosition(0.7);
+                collectRight.setPosition(0.2);
+            } else {
+                collectRight.setPosition(0);
+                collectLeft.setPosition(0);
+            }
+
+            if (gamepad2.x){
+                bazim.setPosition(0.75);
+            }else if (gamepad2.b){
+                bazim.setPosition(0);
+            }
+
+
+            telemetry.addData("SP",slide.getPower());
+            telemetry.addData("teleop_11226_A ticks",elevator.getCurrentPosition());
+            telemetry.addData("slide ticks",slide.getCurrentPosition());
+            telemetry.update();
+
+
+        }
+
+        //elh
+
+
+
     }
 
 

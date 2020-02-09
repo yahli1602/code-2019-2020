@@ -3,8 +3,12 @@ package org.firstinspires.ftc.teamcode.autonomous.PIDController;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -28,7 +32,7 @@ public class PIDdrive_11226 extends LinearOpMode
     Servo                   bazim;
 
     Orientation             lastAngles = new Orientation();
-    double                  globalAngle, correction, rotation;
+    double                  globalAngle, rotation;
     boolean                 aButton, bButton, touched;
 
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
@@ -55,6 +59,7 @@ public class PIDdrive_11226 extends LinearOpMode
     double a_startPoint = 0;
     double s_startPoint = 0;
     double sc_startPoint = 0;
+    int y = 0;
     double coraction;
     double Scoraction;
     double RcuurentPosition = 0;
@@ -80,10 +85,11 @@ public class PIDdrive_11226 extends LinearOpMode
 
     private final double perimeter = 4 * Math.PI;
     private final double ticksPerRevolution = 28;
+
     private final double ticksPerSpin = ticksPerRevolution * 26.6666666666666666666666666666666666666666666666666666666666666666;
     private final double ticksPerInch = 1 / perimeter* ticksPerSpin;
 
-    private final double SticksPerSpin = ticksPerRevolution * 27;
+    private final double SticksPerSpin = ticksPerRevolution * 40;
     private final double SticksPerInch = 1 / perimeter* SticksPerSpin;
 
     // called when init button is  pressed.
@@ -184,8 +190,8 @@ public class PIDdrive_11226 extends LinearOpMode
 
         RLCPID.PIDcon(0.02,0,0);
 
-        sPID.PIDcon(0.005,0.0009,0.1);
-        ScPID.PIDcon(0.02,0,0.07);
+        sPID.PIDcon(0.1,0.0009,0.1);
+        ScPID.PIDcon(0.08,0,0.9);
         SaPID.PIDcon(0.025,0,0);
 
         aPID.PIDcon(0.04,0,0);
@@ -242,7 +248,9 @@ public class PIDdrive_11226 extends LinearOpMode
 
         {
 
-            driveInches(96,0.03,0.4);
+            //caseSSP2();
+            bazim.setPosition(0.5);
+
 
             /*List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
@@ -418,7 +426,7 @@ public class PIDdrive_11226 extends LinearOpMode
         dLPID.setOutputRange(minimumP , maximumP);
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.04,0.04);
+        aPID.setOutputRange(-0.033,0.033);
 
         RLCPID.setSetPoint(0);
         RLCPID.setOutputRange(-0.2,0.2);
@@ -470,17 +478,17 @@ public class PIDdrive_11226 extends LinearOpMode
 
             // set power levels.`
 
-            /*if (exelerate < maximumP && opModeIsActive()){
+            if (exelerate < maximumP && opModeIsActive()){
                 d_Lpower = exelerate;
                 d_Rpower = exelerate;
                 exelerate = exelerate + 0.05;
-            }*/
+            }
 
-            lDrive1.setPower(d_Lpower);
-            lDrive2.setPower(d_Lpower);
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
 
-            rDrive1.setPower(d_Rpower);
-            rDrive2.setPower(d_Rpower);
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
             //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
 
             //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
@@ -493,7 +501,7 @@ public class PIDdrive_11226 extends LinearOpMode
             telemetry.addData("lPow",lDrive1.getPower());
             telemetry.update();
 
-            sleep(10);
+            sleep(5);
 
 
 
@@ -668,7 +676,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.02,0.02);
+        ScPID.setOutputRange(-0.05,0.05);
 
         SaPID.setSetPoint(0);
         SaPID.setOutputRange(-0.04,0.04);
@@ -683,7 +691,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-        ScurrentPosition = -slide1.getCurrentPosition()/ SticksPerInch;
+        ScurrentPosition = slide1.getCurrentPosition()/ SticksPerInch;
         sPID.setSensorValue(ScurrentPosition);
         sPID.calculate();
 
@@ -694,7 +702,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-            ScurrentPosition = (-slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
+            ScurrentPosition = (slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
             d_Spower = sPID.calculate();
 
@@ -715,21 +723,24 @@ public class PIDdrive_11226 extends LinearOpMode
 
             // set power levels.`
             slide1.setPower(d_Spower);
-            lDrive1.setPower(Lpower);
-            lDrive2.setPower(Lpower);
-            rDrive1.setPower(Rpower);
-            rDrive2.setPower(Rpower);
+            lDrive1.setPower(Lpower - Scoraction);
+            lDrive2.setPower(Lpower - Scoraction);
+            rDrive1.setPower(Rpower + Scoraction);
+            rDrive2.setPower(Rpower + Scoraction);
 
 
 
 
-            telemetry.addData("slide error", sPID.getError());
-            telemetry.addData("slide CP", ScurrentPosition);
-            telemetry.addData("slide pow", slide1.getPower());
+            telemetry.addData("angle",getAngle());
+            telemetry.addData("SC",Scoraction);
+            telemetry.addData("LP - RP",LcuurentPosition - RcuurentPosition );
+            telemetry.addData("rPow",rDrive1.getPower());
+            telemetry.addData("lPow",lDrive1.getPower());
+            telemetry.addData("SCP",slide1.getCurrentPosition());
 
             telemetry.update();
 
-            sleep(15);
+            sleep(5);
 
 
 
@@ -783,7 +794,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.02,0.02);
+        ScPID.setOutputRange(-0.05,0.05);
 
         SaPID.setSetPoint(0);
         SaPID.setOutputRange(-0.04,0.04);
@@ -796,7 +807,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-        ScurrentPosition = -slide1.getCurrentPosition()/ SticksPerInch;
+        ScurrentPosition = slide1.getCurrentPosition()/ SticksPerInch;
         sPID.setSensorValue(ScurrentPosition);
         sPID.calculate();
 
@@ -807,7 +818,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-            ScurrentPosition = (-slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
+            ScurrentPosition = (slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
             d_Spower = sPID.calculate();
 
@@ -843,7 +854,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
             telemetry.update();
 
-            sleep(50);
+            sleep(5);
 
 
 
@@ -1021,10 +1032,10 @@ public class PIDdrive_11226 extends LinearOpMode
     }
 
     private void takeStone(){
-        slideInches(14,0.03,0.3);
-        bazim.setPosition(0.8);
+        slideInches(-14,0.03,0.3);
+        bazim.setPosition(0.45);
         sleep(300);
-        slideInches(-15,0.03,0.3);
+        slideInches(15,0.03,0.3);
     }
 
     private void stopDcMotors(){
@@ -1040,10 +1051,10 @@ public class PIDdrive_11226 extends LinearOpMode
 
     private void caseSSP1(){
         adjusteSS1();
-        slideInches(29,0.03,0.4);
+        slideInches(29.5,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.85);
-        slideInches(-6,-0.03,0.3);
+        slideInches(-10,-0.03,0.3);
         stopDcMotors();
         moveStone(1,true);
         stopDcMotors();
@@ -1066,20 +1077,20 @@ public class PIDdrive_11226 extends LinearOpMode
 
     private void caseSSP2(){
         adjusteSS2();
-        slideInches(29,0.03,0.4);
+        slideInches(-29.5,-0.03,-0.4);
         stopDcMotors();
-        bazim.setPosition(0.85);
-        slideInches(-6,-0.03,0.3);
+        bazim.setPosition(0.45);
+        slideInches(6,0.03,0.3);
         stopDcMotors();
         moveStone(2,true);
         stopDcMotors();
-        bazim.setPosition(0);
+        bazim.setPosition(1);
         moveStone(3,false);
         stopDcMotors();
         takeStone();
         moveStone(3,true);
         stopDcMotors();
-        bazim.setPosition(0);
+        bazim.setPosition(1);
         moveStone(1,false);
         stopDcMotors();
         takeStone();
@@ -1114,6 +1125,341 @@ public class PIDdrive_11226 extends LinearOpMode
         driveInches(-6,-0.03,-0.5);
         stopDcMotors();
     }
+
+
+    public void teleop_11226_A() {
+        ElapsedTime time = new ElapsedTime();
+
+        boolean pinch = false;
+        boolean pushCube = false;
+        //driving motors
+        DcMotor rDrive1 = null;
+        DcMotor rDrive2 = null;
+        DcMotor lDrive1 = null;
+        DcMotor lDrive2 = null;
+        DcMotor slide = null;
+        //elevator
+        DcMotor elevator = null;
+        //collection
+        DcMotor collectRight = null;
+        DcMotor collectLeft = null;
+        Servo pushLeft = null;
+        Servo pushRight = null;
+        //Pinch
+        CRServo hold = null;
+        CRServo turnHold = null;
+        Servo bazim = null;
+        //moving Foundation
+        Servo grabber = null;
+        TouchSensor cubeIn = null;
+        boolean Fast = true;
+        PIDcon ePID = new PIDcon();
+        int elevatorPosition;
+        // problem fixing
+        boolean hold180 = false;
+        double fix = 0;
+        boolean pinchDown = true;
+
+        boolean canTimerWork = true;
+        double lastEp;
+
+        boolean pinchIn = true;
+        //Time timer1 = new Time(2000);
+
+
+    /*class turnHP extends TimerTask {
+        @Override
+        public void run() {
+            turnHold.setPower(1);
+        }
+    }
+
+
+    class turnHM extends TimerTask {
+        @Override
+        public void run() {
+            turnHold.setPower(1);
+            canTimerWork = true;
+        }
+    }
+
+
+    turnHP turnHPlus = new turnHP();
+    turnHM turnHMinus = new turnHM();
+
+
+    Timer timer = new Timer();*/
+
+
+
+            rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
+            rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
+            lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
+            lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
+            slide = hardwareMap.get(DcMotor.class, "slide");
+            elevator = hardwareMap.get(DcMotor.class, "elevator");
+            turnHold = hardwareMap.get(CRServo.class, "turnHold");
+            hold = hardwareMap.get(CRServo.class, "hold");
+            pushLeft = hardwareMap.get(Servo.class, "pushLeft");
+            pushRight = hardwareMap.get(Servo.class, "pushRight");
+            collectRight = hardwareMap.get(DcMotor.class, "collectRight");
+            collectLeft = hardwareMap.get(DcMotor.class, "collectLeft");
+            bazim = hardwareMap.get(Servo.class, "bazim");
+
+            rDrive1.setDirection(DcMotor.Direction.REVERSE);
+            rDrive2.setDirection(DcMotor.Direction.REVERSE);
+            lDrive1.setDirection(DcMotor.Direction.FORWARD);
+            lDrive2.setDirection(DcMotor.Direction.FORWARD);
+            slide.setDirection(DcMotor.Direction.FORWARD);
+            elevator.setDirection(DcMotorSimple.Direction.FORWARD);
+            pushLeft.setDirection(Servo.Direction.FORWARD);
+            pushRight.setDirection(Servo.Direction.REVERSE);
+            collectLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+            collectRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        /*pushLeft.setPosition(0);
+        pushRight.setPosition(0);*/
+            bazim.setDirection(Servo.Direction.FORWARD);
+
+            bazim.setPosition(0);
+            pushLeft.setPosition(0);
+            pushRight.setPosition(0);
+
+            elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            waitForStart();
+
+
+//
+            rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+            ePID.PIDcon(0.0001, 0, 0);
+
+            while (opModeIsActive()) {
+
+                //drive
+
+                if (Fast) {
+                    if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+                        rDrive1.setPower(gamepad1.left_stick_y - fix);
+                        rDrive2.setPower(gamepad1.left_stick_y - fix);
+                        lDrive1.setPower(gamepad1.left_stick_y - fix);
+                        lDrive2.setPower(gamepad1.left_stick_y - fix);
+                    } else if (gamepad1.left_trigger > 0.2) {
+                        rDrive1.setPower(-gamepad1.left_trigger - fix);
+                        rDrive2.setPower(-gamepad1.left_trigger - fix);
+                        lDrive1.setPower(gamepad1.left_trigger + fix);
+                        lDrive2.setPower(gamepad1.left_trigger + fix);
+                    } else if (gamepad1.right_trigger > 0.2) {
+                        rDrive1.setPower(gamepad1.right_trigger + fix);
+                        rDrive2.setPower(gamepad1.right_trigger + fix);
+                        lDrive1.setPower(-gamepad1.right_trigger - fix);
+                        lDrive2.setPower(-gamepad1.right_trigger - fix);
+                    } else {
+                        rDrive1.setPower(0);
+                        rDrive2.setPower(0);
+                        lDrive1.setPower(0);
+                        lDrive2.setPower(0);
+                    }
+                } else {
+                    if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+                        rDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
+                        rDrive2.setPower(gamepad1.left_stick_y / 2 - fix);
+                        lDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
+                        lDrive2.setPower(gamepad1.left_stick_y / 2 - fix);
+                    } else if (gamepad1.left_trigger > 0.2) {
+                        rDrive1.setPower(gamepad1.left_trigger / 2 - fix);
+                        rDrive2.setPower(gamepad1.left_trigger / 2 - fix);
+                        lDrive1.setPower(-gamepad1.left_trigger / 2 + fix);
+                        lDrive2.setPower(-gamepad1.left_trigger / 2 + fix);
+                    } else if (gamepad1.right_trigger > 0.2) {
+                        rDrive1.setPower(-gamepad1.right_trigger / 2 + fix);
+                        rDrive2.setPower(-gamepad1.right_trigger / 2 + fix);
+                        lDrive1.setPower(gamepad1.right_trigger / 2 - fix);
+                        lDrive2.setPower(gamepad1.right_trigger / 2 - fix);
+                    } else {
+                        rDrive1.setPower(0);
+                        rDrive2.setPower(0);
+                        lDrive1.setPower(0);
+                        lDrive2.setPower(0);
+                    }
+                }
+
+
+                while (lDrive1.isBusy()) {
+                    if (Fast) {
+                        if ((gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) && lDrive2.getPower() != gamepad1.left_stick_y) {
+                            fix = lDrive2.getPower() - gamepad1.left_stick_y;
+                        } else if (gamepad1.left_trigger > 0.2 && rDrive2.getPower() != gamepad1.left_trigger) {
+                            fix = rDrive2.getPower() - gamepad1.left_trigger;
+                        } else if (gamepad1.right_trigger > 0.2 && lDrive2.getPower() != gamepad1.right_trigger) {
+                            fix = lDrive2.getPower() - gamepad1.right_trigger;
+                        } else if (lDrive2.isBusy()) {
+                            fix = lDrive2.getPower();
+                        }
+                    } else {
+                        if ((gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) && lDrive2.getPower() * 2 != gamepad1.left_stick_y) {
+                            fix = lDrive2.getPower() - gamepad1.left_stick_y;
+                        } else if (gamepad1.left_trigger > 0.2 && rDrive2.getPower() * 2 != gamepad1.left_trigger) {
+                            fix = rDrive2.getPower() - gamepad1.left_trigger;
+                        } else if (gamepad1.right_trigger > 0.2 && lDrive2.getPower() * 2 != gamepad1.right_trigger) {
+                            fix = lDrive2.getPower() - gamepad1.right_trigger;
+                        } else if (lDrive2.isBusy()) {
+                            fix = lDrive2.getPower();
+                        }
+                    }
+                }
+
+
+
+                if (gamepad1.a) {
+                    Fast = true;
+                }
+                if (gamepad1.b) {
+                    Fast = false;
+                }
+
+
+
+
+
+                if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
+                    slide.setPower(gamepad1.right_stick_x);
+                } else {
+                    slide.setPower(0);
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                if (gamepad2.left_stick_y > 0.2 || gamepad2.left_stick_y < -0.2) {
+                    elevator.setPower(gamepad2.right_stick_y);
+                }
+
+                else {
+                    elevator.setPower(0);
+                }
+
+
+
+
+
+
+
+                if (gamepad2.a) {
+                    pushLeft.setPosition(1);
+                    pushRight.setPosition(1);
+                } else if (gamepad2.b) {
+                    pushLeft.setPosition(0);
+                    pushRight.setPosition(0);
+                } else {
+                    pushRight.setPosition(0.23);
+                    pushLeft.setPosition(0.23);
+                }
+
+
+                if (gamepad2.x) {
+                    pinchDown = true;
+                    hold.setPower(-1);
+                } else if (gamepad2.y) {
+                    pinchDown = false;
+                    hold.setPower(1);
+                } else if (pinchDown) {
+                    hold.setPower(0);
+                } else {
+                    hold.setPower(1);
+                }
+
+
+
+
+                if (gamepad2.right_stick_x > 0.2) {
+                    turnHold.setPower(0.3);
+                } else if (gamepad2.right_stick_x < -0.2) {
+                    turnHold.setPower(-0.3);
+                } else{
+                    turnHold.setPower(0);
+                }
+
+                if (gamepad2.right_stick_button){
+                    elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                }
+
+
+
+                if (gamepad2.right_trigger > 0) {
+                    collectLeft.setPower(1);
+                    collectRight.setPower(1);
+                } else if (gamepad2.left_trigger > 0) {
+                    collectLeft.setPower(-1);
+                    collectRight.setPower(-1);
+                } else {
+                    collectRight.setPower(0);
+                    collectLeft.setPower(0);
+                }
+
+                if (gamepad1.x){
+                    y++;
+                }
+
+
+
+            /*telemetry.addData("dpad up", gamepad2.dpad_up);
+            telemetry.addData("dpad down", gamepad2.dpad_down);
+            telemetry.addData("dpad right", gamepad2.dpad_right);
+            telemetry.addData("dpad left", gamepad2.dpad_left);
+            //telemetry.addData("timer",timer1.getTime());
+            telemetry.update();*/
+
+
+                telemetry.addData("elevator ticks",elevator.getCurrentPosition());
+                telemetry.update();
+
+
+
+
+            /*if(gamepad2.b){
+                setElevatorPosition(2);
+                turnHold.setPower(1);
+                sleep(2000);
+            }*/
+
+                //turn collection
+
+
+                // Automations
+
+
+            }
+
+        }
+
+
+
+
+
 
 
 }
