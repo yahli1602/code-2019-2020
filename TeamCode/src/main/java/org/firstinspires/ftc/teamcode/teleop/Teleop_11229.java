@@ -212,7 +212,7 @@ public class Teleop_11229 extends LinearOpMode {
             telemetry.addData("lticks",lDrive1.getCurrentPosition());
             telemetry.addData("rpower",rDrive1.getPower());
             telemetry.addData("lpower",lDrive1.getPower());
-
+            telemetry.addData("elevator ticks:", elevator.getCurrentPosition());
             telemetry.update();
 
 
@@ -223,10 +223,13 @@ public class Teleop_11229 extends LinearOpMode {
     private void elevatorHight(double ticks) {
         double setPoint;
 
-        ePID.setSensorValue(elevator.getCurrentPosition());
+
         ePID.setSetPoint(0);
         ePID.setOutputRange(-0.7, 0.7);
-        while (ePID.getError() != 0) {
+        ePID.setSensorValue(elevator.getCurrentPosition());
+        ePID.calculate();
+        while ((ePID.getError() <= 0 && opModeIsActive()) || (ePID.getError() >= 0 && opModeIsActive())) {
+            ePID.setSensorValue(elevator.getCurrentPosition());
             elevator.setPower(ePID.calculate());
         }
     }

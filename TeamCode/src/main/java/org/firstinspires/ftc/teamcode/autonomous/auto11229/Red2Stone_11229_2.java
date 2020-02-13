@@ -108,7 +108,7 @@ public class Red2Stone_11229_2 extends LinearOpMode {
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
         bazim = hardwareMap.get(Servo.class, "bazim");
 
 
@@ -228,16 +228,7 @@ public class Red2Stone_11229_2 extends LinearOpMode {
 
         f = 0;
         while (opModeIsActive() && f == 0) {
-            slideInches(28, 0.03, 0.4);
-            bazim.setPosition(0.65);
-            slideInches(-10, -0.03, 0.3);
-            moveStone(2, "forward");
-            bazim.setPosition(0);
-            moveStone(3, "backwards");
-            takeStone();
-            moveStone(3, "forward");
-            bazim.setPosition(0);
-            slideInches(-6, -0.03, 0.5);
+            bazim.setPosition(1);
 
 
             f++;

@@ -99,16 +99,16 @@ public class teleop_11226_A extends LinearOpMode {
         lDrive1.setDirection(DcMotor.Direction.FORWARD);
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
+        elevator.setDirection(DcMotorSimple.Direction.REVERSE);
         pushLeft.setDirection(Servo.Direction.FORWARD);
         pushRight.setDirection(Servo.Direction.REVERSE);
-        collectLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        collectRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        collectLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        collectRight.setDirection(DcMotorSimple.Direction.FORWARD);
         /*pushLeft.setPosition(0);
         pushRight.setPosition(0);*/
         bazim.setDirection(Servo.Direction.FORWARD);
 
-        bazim.setPosition(0);
+        bazim.setPosition(0.70);
         pushLeft.setPosition(0);
         pushRight.setPosition(0);
 
@@ -139,15 +139,15 @@ public class teleop_11226_A extends LinearOpMode {
                     lDrive1.setPower(gamepad1.left_stick_y - fix);
                     lDrive2.setPower(gamepad1.left_stick_y - fix);
                 } else if (gamepad1.left_trigger > 0.2) {
-                    rDrive1.setPower(-gamepad1.left_trigger - fix);
-                    rDrive2.setPower(-gamepad1.left_trigger - fix);
-                    lDrive1.setPower(gamepad1.left_trigger + fix);
-                    lDrive2.setPower(gamepad1.left_trigger + fix);
+                    rDrive1.setPower(-gamepad1.left_trigger*0.7 - fix);
+                    rDrive2.setPower(-gamepad1.left_trigger*0.7 - fix);
+                    lDrive1.setPower(gamepad1.left_trigger*0.7 + fix);
+                    lDrive2.setPower(gamepad1.left_trigger*0.7 + fix);
                 } else if (gamepad1.right_trigger > 0.2) {
-                    rDrive1.setPower(gamepad1.right_trigger + fix);
-                    rDrive2.setPower(gamepad1.right_trigger + fix);
-                    lDrive1.setPower(-gamepad1.right_trigger - fix);
-                    lDrive2.setPower(-gamepad1.right_trigger - fix);
+                    rDrive1.setPower(gamepad1.right_trigger*0.7 + fix);
+                    rDrive2.setPower(gamepad1.right_trigger*0.7 + fix);
+                    lDrive1.setPower(-gamepad1.right_trigger*0.7 - fix);
+                    lDrive2.setPower(-gamepad1.right_trigger*0.7 - fix);
                 } else {
                     rDrive1.setPower(0);
                     rDrive2.setPower(0);
@@ -161,15 +161,15 @@ public class teleop_11226_A extends LinearOpMode {
                     lDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
                     lDrive2.setPower(gamepad1.left_stick_y / 2 - fix);
                 } else if (gamepad1.left_trigger > 0.2) {
-                    rDrive1.setPower(gamepad1.left_trigger / 2 - fix);
-                    rDrive2.setPower(gamepad1.left_trigger / 2 - fix);
-                    lDrive1.setPower(-gamepad1.left_trigger / 2 + fix);
-                    lDrive2.setPower(-gamepad1.left_trigger / 2 + fix);
+                    rDrive1.setPower(-gamepad1.left_trigger / 2 - fix);
+                    rDrive2.setPower(-gamepad1.left_trigger / 2 - fix);
+                    lDrive1.setPower(gamepad1.left_trigger / 2 + fix);
+                    lDrive2.setPower(gamepad1.left_trigger / 2 + fix);
                 } else if (gamepad1.right_trigger > 0.2) {
-                    rDrive1.setPower(-gamepad1.right_trigger / 2 + fix);
-                    rDrive2.setPower(-gamepad1.right_trigger / 2 + fix);
-                    lDrive1.setPower(gamepad1.right_trigger / 2 - fix);
-                    lDrive2.setPower(gamepad1.right_trigger / 2 - fix);
+                    rDrive1.setPower(gamepad1.right_trigger / 2 + fix);
+                    rDrive2.setPower(gamepad1.right_trigger / 2 + fix);
+                    lDrive1.setPower(-gamepad1.right_trigger / 2 - fix);
+                    lDrive2.setPower(-gamepad1.right_trigger / 2 - fix);
                 } else {
                     rDrive1.setPower(0);
                     rDrive2.setPower(0);
@@ -223,9 +223,16 @@ public class teleop_11226_A extends LinearOpMode {
             }
 
 
-            if (gamepad1.x){
+            if (gamepad1.dpad_left){
                 bazim.setPosition(1);
+            }else if (gamepad1.dpad_up){
+                bazim.setPosition(0.5);
+            }else if (gamepad1.dpad_down){
+                bazim.setPosition(0.25);
+            }else if (gamepad1.dpad_right){
+                bazim.setPosition(0.75);
             }
+
 
 
 
@@ -254,7 +261,7 @@ public class teleop_11226_A extends LinearOpMode {
                 elevator.setPower(0);
             }
 
-            if (gamepad2.right_stick_button){
+            /*if (gamepad2.right_stick_button){
                 setElevatorPosition(2);
                 turnPinchIn();
                 setElevatorPosition(0);
@@ -262,27 +269,19 @@ public class teleop_11226_A extends LinearOpMode {
 
             if (gamepad2.dpad_up) {
                 setElevatorPosition(4);
-                if (pinchIn){
-                    turnPinchOut();
-                }
+
             }else if (gamepad2.dpad_down) {
                 setElevatorPosition(1);
-                if (pinchIn) {
-                    turnPinchOut();
-                }
+
 
             }else if (gamepad2.a) {
                 setElevatorPosition(2);
-                if (pinchIn){
-                    turnPinchOut();
-                }
+
 
             } else if (gamepad2.b) {
                 setElevatorPosition(3);
-                if (pinchIn) {
-                    turnPinchOut();
-                }
-            }
+
+            }*/
 
 
             if (gamepad2.dpad_right) {
@@ -294,15 +293,15 @@ public class teleop_11226_A extends LinearOpMode {
 
             }
             else {
-                pushRight.setPosition(0.23);
-                pushLeft.setPosition(0.23);
+                pushRight.setPosition(0.25);
+                pushLeft.setPosition(0.25);
             }
 
 
-            if (gamepad2.x) {
+            if (gamepad2.y) {
                 pinchDown = true;
                 hold.setPower(-1);
-            } else if (gamepad2.y) {
+            } else if (gamepad2.x) {
                 pinchDown = false;
                 hold.setPower(1);
             } else if (pinchDown) {
@@ -312,16 +311,16 @@ public class teleop_11226_A extends LinearOpMode {
             }
 
 
-            if (gamepad2.right_bumper) {
+            if (gamepad2.left_bumper) {
                 turnPinchIn();
-            } else if (gamepad2.left_bumper) {
+            } else if (gamepad2.right_bumper) {
                 turnPinchOut();
             }
 
             if (gamepad2.left_stick_x > 0.2) {
-                turnHold.setPower(0.3);
+                turnHold.setPower(1);
             } else if (gamepad2.left_stick_x < -0.2) {
-                turnHold.setPower(-0.3);
+                turnHold.setPower(-1);
             } else{
                 turnHold.setPower(0);
             }
@@ -355,6 +354,7 @@ public class teleop_11226_A extends LinearOpMode {
 
 
             telemetry.addData("elevator ticks",elevator.getCurrentPosition());
+            telemetry.addData("push P",pushLeft.getPosition());
             telemetry.update();
 
 
@@ -381,7 +381,7 @@ public class teleop_11226_A extends LinearOpMode {
         ePID.setSetPoint(ticks);
         ePID.setOutputRange(-0.7, 0.7);
         ePID.calculate();
-        while ((ePID.getError() < -5 && opModeIsActive()) || (ePID.getError() > 5 && opModeIsActive())) {
+        while ((ePID.getError() < -10 && opModeIsActive()) || (ePID.getError() > 10 && opModeIsActive())) {
             ePID.setSensorValue(elevator.getCurrentPosition());
             elevator.setPower(ePID.calculate());
         }
@@ -408,7 +408,7 @@ public class teleop_11226_A extends LinearOpMode {
 
     private void turnPinchOut(){
         turnHold.setPower(1);
-        countTime(1700);
+        countTime(1500);
         turnHold.setPower(0);
         pinchIn = true;
     }

@@ -90,13 +90,13 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 rDrive2.setPower(gamepad1.left_stick_y);
                 lDrive1.setPower(gamepad1.left_stick_y);
                 lDrive2.setPower(gamepad1.left_stick_y);
-            } else if (gamepad1.left_trigger > 0) {
+            } else if (gamepad1.left_trigger > 0.2) {
                 rDrive1.setPower(-gamepad1.left_trigger * 0.7);
                 rDrive2.setPower(-gamepad1.left_trigger * 0.7);
                 lDrive1.setPower(gamepad1.left_trigger * 0.7);
                 lDrive2.setPower(gamepad1.left_trigger * 0.7);
 
-            } else if (gamepad1.right_trigger > 0) {
+            } else if (gamepad1.right_trigger > 0.2) {
                 rDrive1.setPower(gamepad1.right_trigger * 0.7);
                 rDrive2.setPower(gamepad1.right_trigger * 0.7);
                 lDrive1.setPower(-gamepad1.right_trigger * 0.7);
@@ -105,20 +105,20 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
             //Drop cube on plate
             else if (gamepad2.y && gamepad1.atRest()) {
-                rDrive1.setPower(0.4);
-                rDrive2.setPower(0.4);
-                lDrive1.setPower(0.2);
-                lDrive2.setPower(0.2);
+                rDrive1.setPower(0.5);
+                rDrive2.setPower(0.5);
+                lDrive1.setPower(0.5);
+                lDrive2.setPower(0.5);
                 collectRight.setPosition(0.3);
                 collectLeft.setPosition(0.7);
             }
             else if (gamepad2.a && gamepad1.atRest()) {
-                rDrive1.setPower(0.2);
-                rDrive2.setPower(0.2);
-                lDrive1.setPower(0.4);
-                lDrive2.setPower(0.4);
-                collectRight.setPosition(0.3);
-                collectLeft.setPosition(0.7);
+                rDrive1.setPower(0.5);
+                rDrive2.setPower(0.5);
+                lDrive1.setPower(0.5);
+                lDrive2.setPower(0.5);
+                collectRight.setPosition(0.2);
+                collectLeft.setPosition(0.8);
             } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
@@ -133,9 +133,11 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
 
 //elevator
+
             if (gamepad2.right_stick_y > 0.2 || gamepad2.right_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
-            } else {
+            }
+            else {
                 elevator.setPower(0);
             }
 
@@ -171,6 +173,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             telemetry.addData("SP",slide.getPower());
             telemetry.addData("teleop_11226_A ticks",elevator.getCurrentPosition());
             telemetry.addData("slide ticks",slide.getCurrentPosition());
+            telemetry.addData("elevator ticks:", elevator.getCurrentPosition());
             telemetry.update();
 
 
@@ -184,7 +187,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
 
         ePID.setSensorValue(ticks);
         ePID.calculate();
-        while (ePID.getError() != 0 && elevator.getCurrentPosition() < 0) {
+        while ((ePID.getError() < -10 && opModeIsActive()) || (ePID.getError() > 10 && opModeIsActive())) {
             ePID.setSensorValue(elevator.getCurrentPosition());
             elevator.setPower(ePID.calculate());
         }
