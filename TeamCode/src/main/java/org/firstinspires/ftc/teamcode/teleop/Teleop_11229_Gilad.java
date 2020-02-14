@@ -54,6 +54,8 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
+        collectLeft.setDirection(Servo.Direction.REVERSE);
+        collectRight.setDirection(Servo.Direction.FORWARD);
 
 
         rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -105,20 +107,21 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
             //Drop cube on plate
             else if (gamepad2.y && gamepad1.atRest()) {
+                collectRight.setPosition(0.8);
+                collectLeft.setPosition(0.6);
                 rDrive1.setPower(0.5);
                 rDrive2.setPower(0.5);
                 lDrive1.setPower(0.5);
                 lDrive2.setPower(0.5);
-                collectRight.setPosition(0.3);
-                collectLeft.setPosition(0.7);
+
             }
             else if (gamepad2.a && gamepad1.atRest()) {
-                rDrive1.setPower(0.5);
-                rDrive2.setPower(0.5);
-                lDrive1.setPower(0.5);
-                lDrive2.setPower(0.5);
-                collectRight.setPosition(0.2);
-                collectLeft.setPosition(0.8);
+                collectRight.setPosition(0.8);
+                collectLeft.setPosition(0.6);
+                rDrive1.setPower(0.45);
+                rDrive2.setPower(0.45);
+                lDrive1.setPower(0.45);
+                lDrive2.setPower(0.45);
             } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
@@ -148,11 +151,11 @@ public class Teleop_11229_Gilad extends LinearOpMode {
 
             //collection
             if (gamepad2.right_trigger > 0.2) {
-                collectRight.setPosition(0.7);
+                collectRight.setPosition(0.2);
                 collectLeft.setPosition(0.2);
             } else if (gamepad2.left_trigger > 0.2) {
-                collectLeft.setPosition(0.7);
-                collectRight.setPosition(0.2);
+                collectLeft.setPosition(0.6);
+                collectRight.setPosition(0.8);
 
             } else {
                 collectRight.setPosition(0);
