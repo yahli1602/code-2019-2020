@@ -200,7 +200,7 @@ public class Red2Stone_11229 extends LinearOpMode
         RLCPID.PIDcon(0.02,0,0);
 
         sPID.PIDcon(0.14,0,0.15);
-        ScPID.PIDcon(0.001,0,0);
+        ScPID.PIDcon(0.01,0,0.1);
         SaPID.PIDcon(0.025,0,0);
 
         aPID.PIDcon(0.04,0,0.15);
@@ -257,11 +257,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
         {
 
-            slideInches(72,0.03,0.6);
-            telemetry.addData("angle",getAngle());
-            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-            telemetry.update();
-            sleep(7000);
+
 
 
 
