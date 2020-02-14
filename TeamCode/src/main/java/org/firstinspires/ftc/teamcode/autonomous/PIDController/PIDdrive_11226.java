@@ -261,6 +261,8 @@ public class PIDdrive_11226 extends LinearOpMode
         {
 
 
+
+            /*
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
             if (updatedRecognitions.size() > 0){
@@ -270,6 +272,8 @@ public class PIDdrive_11226 extends LinearOpMode
             if (skystonePostion == 1) caseSSP1();
             else if (skystonePostion == 2) caseSSP2();
             else if (skystonePostion == 3) caseSSP3();
+
+             */
 
             f++;
 
@@ -370,6 +374,73 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
             } while (opModeIsActive() && (Math.abs(getAngle()) < (Math.abs(degrees) - 3 )));
+
+
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+
+
+        rotation = getAngle();
+
+
+        sleep(500);
+
+
+        resetAngle();
+    }
+
+
+
+    private void zRotate(double power) {
+        // restart imu angle tracking.
+
+
+
+        // if degrees > 359 we cap at 359 with same sign as original degrees.
+
+
+        // start pid controller. PID controller will monitor the turn angle with respect to the
+        // target angle and reduce power as we approach the target angle. This is to prevent the
+        // robots momentum from overshooting the turn after we turn off the power. The PID controller
+        // reports onTarget() = true when the difference between turn angle and target angle is within
+        // 1% of target (tolerance) which is about 1 degree. This helps prevent overshoot. Overshoot is
+        // dependant on the motor and gearing configuration, starting power, weight of the robot and the
+        // on target tolerance. If the controller overshoots, it will reverse the sign of the output
+        // turning the robot back toward the setpoint value.
+
+        pidRotate.reset();
+        pidRotate.setSetPoint(0);
+        pidRotate.setOutputRange(0, power);
+
+
+
+        pidRotate.setSensorValue(getAngle());
+        pidRotate.calculate();
+
+        if (getAngle() < 0) {
+
+            do {
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                lDrive1.setPower(-power);
+                lDrive2.setPower(-power);
+                rDrive1.setPower(power);
+                rDrive2.setPower(power);
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
+        } else
+            do {
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                lDrive1.setPower(-power);
+                lDrive2.setPower(-power);
+                rDrive1.setPower(power);
+                rDrive2.setPower(power);
+
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
 
 
         rDrive1.setPower(0);
@@ -565,7 +636,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.04,0.04);
+        aPID.setOutputRange(-0.08,0.08);
 
         RcuurentPosition = (rDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (lDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -1637,7 +1708,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
     private void correctAngle(){
-        rotate((-(int) getAngle()),0.3,true);
+        zRotate(0.3);
 
     }
 

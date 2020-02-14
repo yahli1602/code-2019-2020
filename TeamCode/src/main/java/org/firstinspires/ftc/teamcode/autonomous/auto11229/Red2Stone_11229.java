@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.autonomous.imageProsessing.TensorFlow;
 
 import java.util.List;
 
-@Autonomous(name="RedStone 11229", group="11229 Stone")
+@Autonomous(name="RedStone 11229 1", group="11229 Stone")
 
 public class Red2Stone_11229 extends LinearOpMode
 {
@@ -173,9 +173,9 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
 
-        if (tfod != null) {
-            tfod.activate();
-        }
+        //if (tfod != null) {
+          //  tfod.activate();
+        //}
 
 
 
@@ -193,11 +193,11 @@ public class Red2Stone_11229 extends LinearOpMode
 
         RLCPID.PIDcon(0.02,0,0);
 
-        sPID.PIDcon(0.1,0.0009,0.1);
-        ScPID.PIDcon(0.08,0,0.9);
+        sPID.PIDcon(0.14,0,0.15);
+        ScPID.PIDcon(0.001,0,0);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.04,0,0);
+        aPID.PIDcon(0.04,0,0.15);
 
 
 
@@ -217,18 +217,18 @@ public class Red2Stone_11229 extends LinearOpMode
 
         // wait for start button.
 
-        initVuforia();
+        //initVuforia();
 
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
+        //if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+          //  initTfod();
+        //} else {
+          //  telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        //}
 
-        if (tfod != null) {
-            tfod.activate();
+        //if (tfod != null) {
+          //  tfod.activate();
 
-        }
+        //}
 
 
         waitForStart();
@@ -246,11 +246,15 @@ public class Red2Stone_11229 extends LinearOpMode
         // drive until end of period.
 
         f = 0;
+        int t = 0;
         while (opModeIsActive() && f == 0)
 
         {
 
-            driveInches(72,0.03,0.4);
+            slideInches(72,0.03,0.6);
+            telemetry.addData("angle",getAngle());
+            telemetry.update();
+            sleep(7000);
 
 
 
@@ -268,9 +272,9 @@ public class Red2Stone_11229 extends LinearOpMode
 
         }
 
-        if (tfod != null) {
-            tfod.shutdown();
-        }
+        //if (tfod != null) {
+          //  tfod.shutdown();
+        //}
         // Use PID with imu input to drive in a straight line.
 
     }
@@ -380,6 +384,71 @@ public class Red2Stone_11229 extends LinearOpMode
         resetAngle();
     }
 
+    private void zRotate(double power) {
+        // restart imu angle tracking.
+
+
+
+        // if degrees > 359 we cap at 359 with same sign as original degrees.
+
+
+        // start pid controller. PID controller will monitor the turn angle with respect to the
+        // target angle and reduce power as we approach the target angle. This is to prevent the
+        // robots momentum from overshooting the turn after we turn off the power. The PID controller
+        // reports onTarget() = true when the difference between turn angle and target angle is within
+        // 1% of target (tolerance) which is about 1 degree. This helps prevent overshoot. Overshoot is
+        // dependant on the motor and gearing configuration, starting power, weight of the robot and the
+        // on target tolerance. If the controller overshoots, it will reverse the sign of the output
+        // turning the robot back toward the setpoint value.
+
+        pidRotate.reset();
+        pidRotate.setSetPoint(0);
+        pidRotate.setOutputRange(0, power);
+
+
+
+        pidRotate.setSensorValue(getAngle());
+        pidRotate.calculate();
+
+        if (getAngle() < 0) {
+
+            do {
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                lDrive1.setPower(-power);
+                lDrive2.setPower(-power);
+                rDrive1.setPower(power);
+                rDrive2.setPower(power);
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
+        } else
+            do {
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                lDrive1.setPower(-power);
+                lDrive2.setPower(-power);
+                rDrive1.setPower(power);
+                rDrive2.setPower(power);
+
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
+
+
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+
+
+        rotation = getAngle();
+
+
+        sleep(500);
+
+
+        resetAngle();
+    }
+
     private void driveInches(double inches ,double minimumP ,double maximumP){
         if (inches > 0){
             forwardInches(inches,minimumP,maximumP);
@@ -466,7 +535,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
             telemetry.addData("first coraction",coraction);
-            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
             RLCPID.setSensorValue(-slide1.getCurrentPosition()/ SticksPerInch);
@@ -486,11 +555,11 @@ public class Red2Stone_11229 extends LinearOpMode
                 exelerate = exelerate + 0.05;
             }
 
-            lDrive1.setPower(d_Lpower + coraction);
-            lDrive2.setPower(d_Lpower + coraction);
+            lDrive1.setPower(d_Lpower - coraction);
+            lDrive2.setPower(d_Lpower - coraction);
 
-            rDrive1.setPower(d_Rpower - coraction);
-            rDrive2.setPower(d_Rpower - coraction);
+            rDrive1.setPower(d_Rpower + coraction);
+            rDrive2.setPower(d_Rpower + coraction);
             //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
 
             //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
@@ -558,7 +627,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.04,0.04);
+        aPID.setOutputRange(-0.08,0.08);
 
         RcuurentPosition = (rDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (lDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -587,7 +656,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
             d_Lpower = dLPID.calculate();
 
-            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
 
@@ -606,10 +675,10 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
 
-            lDrive1.setPower(d_Lpower + coraction);
-            lDrive2.setPower(d_Lpower + coraction);
-            rDrive1.setPower(d_Rpower - coraction);
-            rDrive2.setPower(d_Rpower - coraction);
+            lDrive1.setPower(d_Lpower - coraction);
+            lDrive2.setPower(d_Lpower - coraction);
+            rDrive1.setPower(d_Rpower + coraction);
+            rDrive2.setPower(d_Rpower + coraction);
 
 
 
@@ -653,6 +722,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
         sPID.reset();
         ScPID.reset();
+        SaPID.reset();
 
 
         ScurrentPosition = 0;
@@ -678,7 +748,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.05,0.05);
+        ScPID.setOutputRange(-0.08,0.08);
 
         SaPID.setSetPoint(0);
         SaPID.setOutputRange(-0.04,0.04);
@@ -704,13 +774,14 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
 
-            ScurrentPosition = (slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
+            ScurrentPosition = (slide1.getCurrentPosition())/ SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
             d_Spower = sPID.calculate();
 
             RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
             SaPID.setSensorValue(RcuurentPosition);
             Rpower = SaPID.calculate();
+            h++;
 
             LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
             SaPID.setSensorValue(LcuurentPosition);
@@ -733,12 +804,10 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
 
-            telemetry.addData("angle",getAngle());
-            telemetry.addData("SC",Scoraction);
-            telemetry.addData("LP - RP",LcuurentPosition - RcuurentPosition );
-            telemetry.addData("rPow",rDrive1.getPower());
-            telemetry.addData("lPow",lDrive1.getPower());
-            telemetry.addData("SCP",slide1.getCurrentPosition());
+            telemetry.addData("sError",sPID.getError());
+            telemetry.addData("Sc",slide1.getCurrentPosition());
+
+
 
             telemetry.update();
 
