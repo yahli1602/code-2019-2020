@@ -1,12 +1,19 @@
 package org.firstinspires.ftc.teamcode.autonomous.auto11229;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -15,21 +22,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.teamcode.autonomous.PIDController.PIDcon;
 import org.firstinspires.ftc.teamcode.autonomous.imageProsessing.TensorFlow;
 
 import java.util.List;
 
-@Autonomous(name="BlueStone 11229 3", group="Stone")
+@Autonomous(name="BlueStone 11229 1", group="11229 Stone")
 
 public class Blue2Stone_11229 extends LinearOpMode
 {
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
     DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
     BNO055IMU               imu;
     Servo                   bazim;
 
+
+
     Orientation             lastAngles = new Orientation();
-    double                  globalAngle, correction, rotation;
+    double                  globalAngle, rotation;
     boolean                 aButton, bButton, touched;
 
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
@@ -56,6 +67,7 @@ public class Blue2Stone_11229 extends LinearOpMode
     double a_startPoint = 0;
     double s_startPoint = 0;
     double sc_startPoint = 0;
+    int y = 0;
     double coraction;
     double Scoraction;
     double RcuurentPosition = 0;
@@ -81,10 +93,11 @@ public class Blue2Stone_11229 extends LinearOpMode
 
     private final double perimeter = 4 * Math.PI;
     private final double ticksPerRevolution = 28;
-    private final double ticksPerSpin = ticksPerRevolution * 20;
+
+    private final double ticksPerSpin = ticksPerRevolution * 26.6666666666666666666666666666666666666666666666666666666666666666;
     private final double ticksPerInch = 1 / perimeter* ticksPerSpin;
 
-    private final double SticksPerSpin = ticksPerRevolution * 35;
+    private final double SticksPerSpin = ticksPerRevolution * 40;
     private final double SticksPerInch = 1 / perimeter* SticksPerSpin;
 
     // called when init button is  pressed.
@@ -93,7 +106,6 @@ public class Blue2Stone_11229 extends LinearOpMode
 
     private static final String VUFORIA_KEY =
             "AVHZDTL/////AAABmQcZurBiA01smn3EpdcPCJpZqB8HZL60ujXKBU3ejemhikdsno1L3+7QKhYWSXEfUl5uWZxBqPJXl6Qj0AG3XKuq/jLKmyLJ67xHlYM/LoVKbxhjxGJJ5stO+21qtYET0KberI6XObNkTmskQ8kLQX7QwLhmllfyhu25bPFWwmVdnGq3jRAxoCNKP9ktqKkqp62Fl39qcvOwCOBPqG0uFMFHwVaNavRHS1f4fnuZXk4QqEDo5e2K9J/sCR/2BvvzdPV3QfTkUPNm/8dfW2nsxCM2E9rpj67CFq9fOAHjY+7tp4o2U/yJbxc5RBr5mZ9/CeQk7zfl9rQv7WrVWevfvHqvb2xMsoqVJGze9rE62AmI";
-
     private VuforiaLocalizer vuforia;
 
 
@@ -110,7 +122,8 @@ public class Blue2Stone_11229 extends LinearOpMode
         lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
+
         bazim = hardwareMap.get(Servo.class, "bazim");
 
 
@@ -121,6 +134,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide1.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
+
 
 
         rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -174,7 +188,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0.01,0.0018,0.135);
+        pidRotate.PIDcon(0.01,0,0);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
@@ -185,11 +199,11 @@ public class Blue2Stone_11229 extends LinearOpMode
 
         RLCPID.PIDcon(0.02,0,0);
 
-        sPID.PIDcon(0.005,0.0009,0.1);
-        ScPID.PIDcon(0.02,0,0.07);
+        sPID.PIDcon(0.14,0,0.15);
+        ScPID.PIDcon(0.01,0,0.1);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.04,0,0);
+        aPID.PIDcon(0.04,0,0.15);
 
 
 
@@ -228,7 +242,6 @@ public class Blue2Stone_11229 extends LinearOpMode
         telemetry.addData("Mode", "running");
         telemetry.update();
 
-        sleep(1000);
 
         // Set up parameters for driving in a straight line.
 
@@ -239,9 +252,16 @@ public class Blue2Stone_11229 extends LinearOpMode
         // drive until end of period.
 
         f = 0;
+        int t = 0;
         while (opModeIsActive() && f == 0)
 
         {
+
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+
+
+
 
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
@@ -252,6 +272,8 @@ public class Blue2Stone_11229 extends LinearOpMode
             if (skystonePostion == 1) caseSSP1();
             else if (skystonePostion == 2) caseSSP2();
             else if (skystonePostion == 3) caseSSP3();
+
+
 
             f++;
 
@@ -369,6 +391,70 @@ public class Blue2Stone_11229 extends LinearOpMode
         resetAngle();
     }
 
+    private void zRotate(double power) {
+        // restart imu angle tracking.
+
+
+
+        // if degrees > 359 we cap at 359 with same sign as original degrees.
+
+
+        // start pid controller. PID controller will monitor the turn angle with respect to the
+        // target angle and reduce power as we approach the target angle. This is to prevent the
+        // robots momentum from overshooting the turn after we turn off the power. The PID controller
+        // reports onTarget() = true when the difference between turn angle and target angle is within
+        // 1% of target (tolerance) which is about 1 degree. This helps prevent overshoot. Overshoot is
+        // dependant on the motor and gearing configuration, starting power, weight of the robot and the
+        // on target tolerance. If the controller overshoots, it will reverse the sign of the output
+        // turning the robot back toward the setpoint value.
+
+        pidRotate.reset();
+        pidRotate.setSetPoint(0);
+        pidRotate.setOutputRange(0, power);
+
+
+
+        pidRotate.setSensorValue(getAngle());
+        pidRotate.calculate();
+
+        if (getAngle() < 0) {
+
+            do {
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                lDrive1.setPower(-power);
+                lDrive2.setPower(-power);
+                rDrive1.setPower(power);
+                rDrive2.setPower(power);
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
+        } else
+            do {
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                lDrive1.setPower(-power);
+                lDrive2.setPower(-power);
+                rDrive1.setPower(power);
+                rDrive2.setPower(power);
+
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
+
+
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+
+
+        rotation = getAngle();
+
+
+        sleep(500);
+
+
+    }
+
     private void driveInches(double inches ,double minimumP ,double maximumP){
         if (inches > 0){
             forwardInches(inches,minimumP,maximumP);
@@ -386,7 +472,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         dLPID.reset();
         dRPID.reset();
         RLCPID.reset();
-        resetAngle();
+
 
         double exelerate = 0.05;
 
@@ -417,7 +503,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         dLPID.setOutputRange(minimumP , maximumP);
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.04,0.04);
+        aPID.setOutputRange(-0.08,0.08);
 
         RLCPID.setSetPoint(0);
         RLCPID.setOutputRange(-0.2,0.2);
@@ -455,7 +541,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
             telemetry.addData("first coraction",coraction);
-            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
             RLCPID.setSensorValue(-slide1.getCurrentPosition()/ SticksPerInch);
@@ -475,23 +561,24 @@ public class Blue2Stone_11229 extends LinearOpMode
                 exelerate = exelerate + 0.05;
             }
 
-            lDrive1.setPower(d_Lpower + coraction);
-            lDrive2.setPower(d_Lpower + coraction);
+            lDrive1.setPower(d_Lpower - coraction);
+            lDrive2.setPower(d_Lpower - coraction);
 
-            rDrive1.setPower(d_Rpower - coraction);
-            rDrive2.setPower(d_Rpower - coraction);
-            if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
+            rDrive1.setPower(d_Rpower + coraction);
+            rDrive2.setPower(d_Rpower + coraction);
+            //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
 
             //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
 
 
 
-            telemetry.addData("Spower",Spower);
-            telemetry.addData("Slide power",slide1.getPower());
-            telemetry.addData("R CP",rDrive1.getCurrentPosition()/ ticksPerInch);
+            telemetry.addData("rP",rDrive1.getCurrentPosition());
+            telemetry.addData("lP",lDrive1.getCurrentPosition());
+            telemetry.addData("rPow",rDrive1.getPower());
+            telemetry.addData("lPow",lDrive1.getPower());
             telemetry.update();
 
-            sleep(10);
+            sleep(5);
 
 
 
@@ -514,7 +601,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
         dLPID.reset();
         dRPID.reset();
-        resetAngle();
+
 
         RcuurentPosition = 0;
         LcuurentPosition = 0;
@@ -546,7 +633,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.04,0.04);
+        aPID.setOutputRange(-0.08,0.08);
 
         RcuurentPosition = (rDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (lDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -575,7 +662,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
             d_Lpower = dLPID.calculate();
 
-            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
 
@@ -594,16 +681,16 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-            lDrive1.setPower(d_Lpower + coraction);
-            lDrive2.setPower(d_Lpower + coraction);
-            rDrive1.setPower(d_Rpower - coraction);
-            rDrive2.setPower(d_Rpower - coraction);
+            lDrive1.setPower(d_Lpower - coraction);
+            lDrive2.setPower(d_Lpower - coraction);
+            rDrive1.setPower(d_Rpower + coraction);
+            rDrive2.setPower(d_Rpower + coraction);
 
 
 
 
 
-            sleep(15);
+            sleep(5);
 
             telemetry.addData("left position", lDrive2.getCurrentPosition());
             telemetry.addData("right position", rDrive2.getCurrentPosition());
@@ -641,7 +728,8 @@ public class Blue2Stone_11229 extends LinearOpMode
 
         sPID.reset();
         ScPID.reset();
-        resetAngle();
+        SaPID.reset();
+
 
         ScurrentPosition = 0;
 
@@ -666,7 +754,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.02,0.02);
+        ScPID.setOutputRange(-0.08,0.08);
 
         SaPID.setSetPoint(0);
         SaPID.setOutputRange(-0.04,0.04);
@@ -681,7 +769,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-        ScurrentPosition = -slide1.getCurrentPosition()/ SticksPerInch;
+        ScurrentPosition = slide1.getCurrentPosition()/ SticksPerInch;
         sPID.setSensorValue(ScurrentPosition);
         sPID.calculate();
 
@@ -692,13 +780,14 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-            ScurrentPosition = (-slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
+            ScurrentPosition = (slide1.getCurrentPosition())/ SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
             d_Spower = sPID.calculate();
 
             RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
             SaPID.setSensorValue(RcuurentPosition);
             Rpower = SaPID.calculate();
+            h++;
 
             LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
             SaPID.setSensorValue(LcuurentPosition);
@@ -721,13 +810,14 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-            telemetry.addData("slide error", sPID.getError());
-            telemetry.addData("slide CP", ScurrentPosition);
-            telemetry.addData("slide pow", slide1.getPower());
+            telemetry.addData("sError",sPID.getError());
+            telemetry.addData("Sc",slide1.getCurrentPosition());
+
+
 
             telemetry.update();
 
-            sleep(15);
+            sleep(5);
 
 
 
@@ -757,7 +847,8 @@ public class Blue2Stone_11229 extends LinearOpMode
 
         sPID.reset();
         ScPID.reset();
-        resetAngle();
+        SaPID.reset();
+
 
         ScurrentPosition = 0;
 
@@ -781,7 +872,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.02,0.02);
+        ScPID.setOutputRange(-0.05,0.05);
 
         SaPID.setSetPoint(0);
         SaPID.setOutputRange(-0.04,0.04);
@@ -794,7 +885,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-        ScurrentPosition = -slide1.getCurrentPosition()/ SticksPerInch;
+        ScurrentPosition = slide1.getCurrentPosition()/ SticksPerInch;
         sPID.setSensorValue(ScurrentPosition);
         sPID.calculate();
 
@@ -805,7 +896,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-            ScurrentPosition = (-slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
+            ScurrentPosition = (slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
             d_Spower = sPID.calculate();
 
@@ -841,7 +932,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
             telemetry.update();
 
-            sleep(50);
+            sleep(5);
 
 
 
@@ -954,6 +1045,141 @@ public class Blue2Stone_11229 extends LinearOpMode
     }
 
 
+    private void forwardInchesAndcollect(double inches ,double minimumP ,double maximumP) {
+
+        double d_Rpower = 0;
+        double d_Lpower = 0;
+        double Spower = 0;
+
+        dLPID.reset();
+        dRPID.reset();
+        RLCPID.reset();
+
+
+        double exelerate = 0.05;
+
+
+        RcuurentPosition = 0;
+        LcuurentPosition = 0;
+
+        h = 0;
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        dRPID.setSetPoint(inches);
+        dRPID.setOutputRange(minimumP , maximumP);
+
+        dLPID.setSetPoint(inches);
+        dLPID.setOutputRange(minimumP , maximumP);
+
+        aPID.setSetPoint(0);
+        aPID.setOutputRange(-0.08,0.08);
+
+        RLCPID.setSetPoint(0);
+        RLCPID.setOutputRange(-0.2,0.2);
+
+
+        d_RstartPoint = rDrive1.getCurrentPosition();
+
+        d_LstartPoint = lDrive1.getCurrentPosition();
+
+        a_startPoint = getAngle();
+
+
+
+        RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
+        dRPID.setSensorValue(RcuurentPosition);
+        dRPID.calculate();
+
+        LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
+        dLPID.setSensorValue(LcuurentPosition);
+        dLPID.calculate();
+
+
+        while (dRPID.getError() > 0  && dLPID.getError() > 0 && opModeIsActive()) {
+
+
+
+            RcuurentPosition = (rDrive1.getCurrentPosition() / ticksPerInch);
+            dRPID.setSensorValue(RcuurentPosition);
+            d_Rpower = dRPID.calculate();
+
+            LcuurentPosition = (lDrive1.getCurrentPosition()/ ticksPerInch);
+            dLPID.setSensorValue(LcuurentPosition);
+            d_Lpower = dLPID.calculate();
+
+
+
+            telemetry.addData("first coraction",coraction);
+            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            coraction = aPID.calculate();
+
+            RLCPID.setSensorValue(-slide1.getCurrentPosition()/ SticksPerInch);
+            Spower = RLCPID.calculate();
+
+
+            telemetry.addData("second coraction",coraction);
+            telemetry.addData("lpower",d_Lpower);
+            telemetry.addData("rdrive",d_Rpower);
+
+
+            // set power levels.`
+
+            if (exelerate < maximumP && opModeIsActive()){
+                d_Lpower = exelerate;
+                d_Rpower = exelerate;
+                exelerate = exelerate + 0.05;
+            }
+
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
+
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
+
+
+            //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
+
+            //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
+
+
+
+            telemetry.addData("rP",rDrive1.getCurrentPosition());
+            telemetry.addData("lP",lDrive1.getCurrentPosition());
+            telemetry.addData("rPow",rDrive1.getPower());
+            telemetry.addData("lPow",lDrive1.getPower());
+            telemetry.update();
+
+            sleep(5);
+
+
+
+        }
+
+
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+
+        telemetry.addData("motors","off");
+
+
+    }
+
+
 
 
     //init Vuforia
@@ -976,9 +1202,9 @@ public class Blue2Stone_11229 extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.45;
+        tfodParameters.minimumConfidence = 0.3;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET,LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 
 
@@ -990,7 +1216,7 @@ public class Blue2Stone_11229 extends LinearOpMode
     }
 
     private void adjusteSS1(){
-        driveInches(7,0.03,0.3);
+        driveInches(-8.5,0.03,0.3);
     }
 
     private void adjusteSS2(){
@@ -998,31 +1224,38 @@ public class Blue2Stone_11229 extends LinearOpMode
     }
 
     private void adjusteSS3(){
-        driveInches(-7,-0.03,-0.3);
+        driveInches(9,-0.03,-0.3);
     }
 
     private void moveStone(int SP , boolean where){
         if (where){
 
-            if (SP == 1) driveInches(56,0.03,0.35);
-            else if (SP == 2) driveInches(49,0.03,0.35);
-            else if (SP == 3) driveInches(42,0.03,0.35);
+            if (SP == 1) driveInches(59,0.03,0.4);
+            else if (SP == 2) driveInches(55,0.03,0.4);
+            else if (SP == 3) driveInches(44,0.03,0.4);
+            else if (SP == 11) driveInches(83,0.03,0.4);
+            else if (SP == 22) driveInches(86.5,0.03,0.4);
+            else if (SP == 33) driveInches(72.5,0.03,0.4);
 
         }
         else if (!where){
 
-            if (SP == 1) driveInches(-56,0-.03,-0.35);
-            else if (SP == 2) driveInches(-49,-0.03,-0.35);
-            else if (SP == 3) driveInches(-42,-0.03,-0.35);
+            if (SP == 1) driveInches(-59,0.03,0.4);
+            else if (SP == 2) driveInches(-60,0.03,0.4);
+            else if (SP == 3) driveInches(-44,0.03,0.4);
+            else if (SP == 11) driveInches(-60,0.03,0.4);
+            else if (SP == 22) driveInches(-86.5,0.03,0.4);
+            else if (SP == 33) driveInches(-72.5,0.03,0.4);
 
         }
     }
 
     private void takeStone(){
-        slideInches(14,0.03,0.3);
-        bazim.setPosition(0.8);
-        sleep(300);
-        slideInches(-15,0.03,0.3);
+        slideInches(8,0.03,0.4);
+        bazim.setPosition(0);
+        sleep(100);
+        correctAngle();
+        slideInches(-8,0.03,0.4);
     }
 
     private void stopDcMotors(){
@@ -1038,80 +1271,430 @@ public class Blue2Stone_11229 extends LinearOpMode
 
     private void caseSSP1(){
         adjusteSS1();
-        slideInches(29,0.03,0.4);
+        slideInches(29.5,0.03,0.4);
         stopDcMotors();
-        bazim.setPosition(0.85);
-        slideInches(-6,-0.03,0.3);
+        bazim.setPosition(0);
+        sleep(100);
+        slideInches(-12,0.03,0.3);
         stopDcMotors();
+        correctAngle();
         moveStone(1,false);
         stopDcMotors();
-        bazim.setPosition(0);
-        moveStone(2,true);
+        bazim.setPosition(0.65);
+        driveInches(12,0.03,0.5);
         stopDcMotors();
-        takeStone();
-        moveStone(2,false);
-        stopDcMotors();
-        bazim.setPosition(0);
-        moveStone(3,true);
-        stopDcMotors();
-        takeStone();
-        stopDcMotors();
-        moveStone(3,false);
-        driveInches(-6,-0.03,-0.5);
-        stopDcMotors();
+        slide1.setPower(1);
+        sleep(500);
+        slide1.setPower(0);
     }
 
 
     private void caseSSP2(){
         adjusteSS2();
-        slideInches(29,0.03,0.4);
+        slideInches(29.5,0.03,0.6);
         stopDcMotors();
-        bazim.setPosition(0.85);
-        slideInches(-6,-0.03,0.3);
+        bazim.setPosition(0.05);
+        sleep(100);
+        slideInches(-12,0.03,0.3);
         stopDcMotors();
+        correctAngle();
         moveStone(2,false);
         stopDcMotors();
-        bazim.setPosition(0);
-        moveStone(3,true);
+        bazim.setPosition(0.63);
+        slideInches(2.5,0.03,0.3);
+        correctAngle();
+        moveStone(22,true);
+        correctAngle();
         stopDcMotors();
         takeStone();
-        moveStone(3,false);
+        correctAngle();
+        driveInches(-24,0.03,0.4);
         stopDcMotors();
-        bazim.setPosition(0);
-        moveStone(1,true);
+        correctAngle();
+        slideInches(-9,0.03,0.5);
+        correctAngle();
+        driveInches(-60,0.03,0.5);
+        bazim.setPosition(0.63);
+        driveInches(12,0.03,0.5);
         stopDcMotors();
-        takeStone();
-        stopDcMotors();
-        moveStone(1,false);
-        driveInches(-6,-0.03,-0.5);
-        stopDcMotors();
+        slide1.setPower(0.63);
+        sleep(500);
+        slide1.setPower(0);
     }
 
 
     private void caseSSP3(){
         adjusteSS3();
-        slideInches(29,0.03,0.4);
+        slideInches(29.5,0.03,0.4);
         stopDcMotors();
-        bazim.setPosition(0.85);
-        slideInches(-6,-0.03,0.3);
+        bazim.setPosition(0.05);
+        sleep(100);
+        slideInches(-12,0.03,0.3);
         stopDcMotors();
-        moveStone(1,false);
-        stopDcMotors();
-        bazim.setPosition(0);
+        correctAngle();
         moveStone(3,true);
         stopDcMotors();
+        bazim.setPosition(0.63);
+        slideInches(2,0.03,0.3);
+        correctAngle();
+        moveStone(33,false);
+        stopDcMotors();
         takeStone();
-        moveStone(3,false);
+        correctAngle();
+        driveInches(24,0.03,0.4);
         stopDcMotors();
-        bazim.setPosition(0);
-        moveStone(2,true);
+        correctAngle();
+        slideInches(-9,0.03,0.5);
+        correctAngle();
+        driveInches(60,0.03,0.5);
+        bazim.setPosition(0.65);
+        driveInches(-15,0.03,0.5);
         stopDcMotors();
-        takeStone();
-        stopDcMotors();
-        moveStone(2,false);
-        driveInches(-6,-0.03,-0.5);
-        stopDcMotors();
+        slide1.setPower(1);
+        sleep(500);
+        slide1.setPower(0);
     }
+
+
+    public void teleop_11226_A() {
+        ElapsedTime time = new ElapsedTime();
+
+        boolean pinch = false;
+        boolean pushCube = false;
+        //driving motors
+        DcMotor rDrive1 = null;
+        DcMotor rDrive2 = null;
+        DcMotor lDrive1 = null;
+        DcMotor lDrive2 = null;
+        DcMotor slide = null;
+        //elevator
+        DcMotor elevator = null;
+        //collection
+        DcMotor collectRight = null;
+        DcMotor collectLeft = null;
+        Servo pushLeft = null;
+        Servo pushRight = null;
+        //Pinch
+        CRServo hold = null;
+        CRServo turnHold = null;
+        Servo bazim = null;
+        //moving Foundation
+        Servo grabber = null;
+        TouchSensor cubeIn = null;
+        boolean Fast = true;
+        PIDcon ePID = new PIDcon();
+        int elevatorPosition;
+        // problem fixing
+        boolean hold180 = false;
+        double fix = 0;
+        boolean pinchDown = true;
+
+        boolean canTimerWork = true;
+        double lastEp;
+
+        boolean pinchIn = true;
+        //Time timer1 = new Time(2000);
+
+
+    /*class turnHP extends TimerTask {
+        @Override
+        public void run() {
+            turnHold.setPower(1);
+        }
+    }
+
+
+    class turnHM extends TimerTask {
+        @Override
+        public void run() {
+            turnHold.setPower(1);
+            canTimerWork = true;
+        }
+    }
+
+
+    turnHP turnHPlus = new turnHP();
+    turnHM turnHMinus = new turnHM();
+
+
+    Timer timer = new Timer();*/
+
+
+
+        rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
+        rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
+        lDrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
+        lDrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
+        slide = hardwareMap.get(DcMotor.class, "slide");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
+        turnHold = hardwareMap.get(CRServo.class, "turnHold");
+        hold = hardwareMap.get(CRServo.class, "hold");
+        pushLeft = hardwareMap.get(Servo.class, "pushLeft");
+        pushRight = hardwareMap.get(Servo.class, "pushRight");
+        collectRight = hardwareMap.get(DcMotor.class, "collectRight");
+        collectLeft = hardwareMap.get(DcMotor.class, "collectLeft");
+        bazim = hardwareMap.get(Servo.class, "bazim");
+
+        rDrive1.setDirection(DcMotor.Direction.REVERSE);
+        rDrive2.setDirection(DcMotor.Direction.REVERSE);
+        lDrive1.setDirection(DcMotor.Direction.FORWARD);
+        lDrive2.setDirection(DcMotor.Direction.FORWARD);
+        slide.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
+        pushLeft.setDirection(Servo.Direction.FORWARD);
+        pushRight.setDirection(Servo.Direction.REVERSE);
+        collectLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        collectRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        /*pushLeft.setPosition(0);
+        pushRight.setPosition(0);*/
+        bazim.setDirection(Servo.Direction.FORWARD);
+
+        bazim.setPosition(0);
+        pushLeft.setPosition(0);
+        pushRight.setPosition(0);
+
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        waitForStart();
+
+
+//
+        rDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lDrive1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lDrive2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        ePID.PIDcon(0.0001, 0, 0);
+
+        while (opModeIsActive()) {
+
+            //drive
+
+            if (Fast) {
+                if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+                    rDrive1.setPower(gamepad1.left_stick_y - fix);
+                    rDrive2.setPower(gamepad1.left_stick_y - fix);
+                    lDrive1.setPower(gamepad1.left_stick_y - fix);
+                    lDrive2.setPower(gamepad1.left_stick_y - fix);
+                } else if (gamepad1.left_trigger > 0.2) {
+                    rDrive1.setPower(-gamepad1.left_trigger - fix);
+                    rDrive2.setPower(-gamepad1.left_trigger - fix);
+                    lDrive1.setPower(gamepad1.left_trigger + fix);
+                    lDrive2.setPower(gamepad1.left_trigger + fix);
+                } else if (gamepad1.right_trigger > 0.2) {
+                    rDrive1.setPower(gamepad1.right_trigger + fix);
+                    rDrive2.setPower(gamepad1.right_trigger + fix);
+                    lDrive1.setPower(-gamepad1.right_trigger - fix);
+                    lDrive2.setPower(-gamepad1.right_trigger - fix);
+                } else {
+                    rDrive1.setPower(0);
+                    rDrive2.setPower(0);
+                    lDrive1.setPower(0);
+                    lDrive2.setPower(0);
+                }
+            } else {
+                if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
+                    rDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
+                    rDrive2.setPower(gamepad1.left_stick_y / 2 - fix);
+                    lDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
+                    lDrive2.setPower(gamepad1.left_stick_y / 2 - fix);
+                } else if (gamepad1.left_trigger > 0.2) {
+                    rDrive1.setPower(gamepad1.left_trigger / 2 - fix);
+                    rDrive2.setPower(gamepad1.left_trigger / 2 - fix);
+                    lDrive1.setPower(-gamepad1.left_trigger / 2 + fix);
+                    lDrive2.setPower(-gamepad1.left_trigger / 2 + fix);
+                } else if (gamepad1.right_trigger > 0.2) {
+                    rDrive1.setPower(-gamepad1.right_trigger / 2 + fix);
+                    rDrive2.setPower(-gamepad1.right_trigger / 2 + fix);
+                    lDrive1.setPower(gamepad1.right_trigger / 2 - fix);
+                    lDrive2.setPower(gamepad1.right_trigger / 2 - fix);
+                } else {
+                    rDrive1.setPower(0);
+                    rDrive2.setPower(0);
+                    lDrive1.setPower(0);
+                    lDrive2.setPower(0);
+                }
+            }
+
+
+            while (lDrive1.isBusy()) {
+                if (Fast) {
+                    if ((gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) && lDrive2.getPower() != gamepad1.left_stick_y) {
+                        fix = lDrive2.getPower() - gamepad1.left_stick_y;
+                    } else if (gamepad1.left_trigger > 0.2 && rDrive2.getPower() != gamepad1.left_trigger) {
+                        fix = rDrive2.getPower() - gamepad1.left_trigger;
+                    } else if (gamepad1.right_trigger > 0.2 && lDrive2.getPower() != gamepad1.right_trigger) {
+                        fix = lDrive2.getPower() - gamepad1.right_trigger;
+                    } else if (lDrive2.isBusy()) {
+                        fix = lDrive2.getPower();
+                    }
+                } else {
+                    if ((gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) && lDrive2.getPower() * 2 != gamepad1.left_stick_y) {
+                        fix = lDrive2.getPower() - gamepad1.left_stick_y;
+                    } else if (gamepad1.left_trigger > 0.2 && rDrive2.getPower() * 2 != gamepad1.left_trigger) {
+                        fix = rDrive2.getPower() - gamepad1.left_trigger;
+                    } else if (gamepad1.right_trigger > 0.2 && lDrive2.getPower() * 2 != gamepad1.right_trigger) {
+                        fix = lDrive2.getPower() - gamepad1.right_trigger;
+                    } else if (lDrive2.isBusy()) {
+                        fix = lDrive2.getPower();
+                    }
+                }
+            }
+
+
+
+            if (gamepad1.a) {
+                Fast = true;
+            }
+            if (gamepad1.b) {
+                Fast = false;
+            }
+
+
+
+
+
+            if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
+                slide.setPower(gamepad1.right_stick_x);
+            } else {
+                slide.setPower(0);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            if (gamepad2.left_stick_y > 0.2 || gamepad2.left_stick_y < -0.2) {
+                elevator.setPower(gamepad2.right_stick_y);
+            }
+
+            else {
+                elevator.setPower(0);
+            }
+
+
+
+
+
+
+
+            if (gamepad2.a) {
+                pushLeft.setPosition(1);
+                pushRight.setPosition(1);
+            } else if (gamepad2.b) {
+                pushLeft.setPosition(0);
+                pushRight.setPosition(0);
+            } else {
+                pushRight.setPosition(0.23);
+                pushLeft.setPosition(0.23);
+            }
+
+
+            if (gamepad2.x) {
+                pinchDown = true;
+                hold.setPower(-1);
+            } else if (gamepad2.y) {
+                pinchDown = false;
+                hold.setPower(1);
+            } else if (pinchDown) {
+                hold.setPower(0);
+            } else {
+                hold.setPower(1);
+            }
+
+
+
+
+            if (gamepad2.right_stick_x > 0.2) {
+                turnHold.setPower(0.3);
+            } else if (gamepad2.right_stick_x < -0.2) {
+                turnHold.setPower(-0.3);
+            } else{
+                turnHold.setPower(0);
+            }
+
+            if (gamepad2.right_stick_button){
+                elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
+
+
+            if (gamepad2.right_trigger > 0) {
+                collectLeft.setPower(1);
+                collectRight.setPower(1);
+            } else if (gamepad2.left_trigger > 0) {
+                collectLeft.setPower(-1);
+                collectRight.setPower(-1);
+            } else {
+                collectRight.setPower(0);
+                collectLeft.setPower(0);
+            }
+
+            if (gamepad1.x){
+                y++;
+            }
+
+
+
+            /*telemetry.addData("dpad up", gamepad2.dpad_up);
+            telemetry.addData("dpad down", gamepad2.dpad_down);
+            telemetry.addData("dpad right", gamepad2.dpad_right);
+            telemetry.addData("dpad left", gamepad2.dpad_left);
+            //telemetry.addData("timer",timer1.getTime());
+            telemetry.update();*/
+
+
+            telemetry.addData("elevator ticks",elevator.getCurrentPosition());
+            telemetry.update();
+
+
+
+
+            /*if(gamepad2.b){
+                setElevatorPosition(2);
+                turnHold.setPower(1);
+                sleep(2000);
+            }*/
+
+            //turn collection
+
+
+            // Automations
+
+
+        }
+
+    }
+
+
+    private void correctAngle(){
+        zRotate(0.3);
+
+    }
+
+
+
+
+
 
 
 }

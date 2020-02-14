@@ -105,7 +105,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
     private static final String VUFORIA_KEY =
-            "AaccUNH/////AAABmYn6tLCgBE4CqSKq7IgTGXZ12c4zYDZx4hC67z9E4/R6MU+miAuEK7eHb/uLBUKMWc3BjFb6o60eLN2HX+BwNNH7qG954X5k3pZyYb9MkYQsAaZ/IYv3S6+JSXLDpQFuNXM7HpZCHuxdN1TwFli4SYBLp7//JhheDx1N0xWeowWQMP3WuTQnbA8TnUpaug3H7liINUkllw/wJcGDVnUjlhUdpHODdC2cptlTol8STSYN3oZQvgXcW+xJErdVnqS6Wev3WnIPelnYRZXxL1Ui9qJn49C18cQJdZ1duV26nfzJ2UyuR7tGUKTJzPjDVkbfU3z96goS+bvA08r2sjHgFh1wcdgPKMSsRMcASTf7u7PQ";
+            "AVHZDTL/////AAABmQcZurBiA01smn3EpdcPCJpZqB8HZL60ujXKBU3ejemhikdsno1L3+7QKhYWSXEfUl5uWZxBqPJXl6Qj0AG3XKuq/jLKmyLJ67xHlYM/LoVKbxhjxGJJ5stO+21qtYET0KberI6XObNkTmskQ8kLQX7QwLhmllfyhu25bPFWwmVdnGq3jRAxoCNKP9ktqKkqp62Fl39qcvOwCOBPqG0uFMFHwVaNavRHS1f4fnuZXk4QqEDo5e2K9J/sCR/2BvvzdPV3QfTkUPNm/8dfW2nsxCM2E9rpj67CFq9fOAHjY+7tp4o2U/yJbxc5RBr5mZ9/CeQk7zfl9rQv7WrVWevfvHqvb2xMsoqVJGze9rE62AmI";
     private VuforiaLocalizer vuforia;
 
 
@@ -203,7 +203,7 @@ public class Red2Stone_11229 extends LinearOpMode
         ScPID.PIDcon(0.01,0,0.1);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.04,0,0.15);
+        aPID.PIDcon(0.02,0,0.2);
 
 
 
@@ -223,18 +223,18 @@ public class Red2Stone_11229 extends LinearOpMode
 
         // wait for start button.
 
-        //initVuforia();
+        initVuforia();
 
-        //if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-          //  initTfod();
-        //} else {
-          //  telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        //}
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
 
-        //if (tfod != null) {
-          //  tfod.activate();
+        if (tfod != null) {
+            tfod.activate();
 
-        //}
+        }
 
 
         waitForStart();
@@ -257,6 +257,9 @@ public class Red2Stone_11229 extends LinearOpMode
 
         {
 
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+            caseSSP3();
 
 
 
@@ -275,9 +278,9 @@ public class Red2Stone_11229 extends LinearOpMode
 
         }
 
-        //if (tfod != null) {
-          //  tfod.shutdown();
-        //}
+        if (tfod != null) {
+            tfod.shutdown();
+        }
         // Use PID with imu input to drive in a straight line.
 
     }
@@ -449,7 +452,7 @@ public class Red2Stone_11229 extends LinearOpMode
         sleep(500);
 
 
-        resetAngle();
+
     }
 
     private void driveInches(double inches ,double minimumP ,double maximumP){
@@ -844,6 +847,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
         sPID.reset();
         ScPID.reset();
+        SaPID.reset();
 
 
         ScurrentPosition = 0;
@@ -1200,7 +1204,7 @@ public class Red2Stone_11229 extends LinearOpMode
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minimumConfidence = 0.3;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_SECOND_ELEMENT);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET,LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 
 
@@ -1212,7 +1216,7 @@ public class Red2Stone_11229 extends LinearOpMode
     }
 
     private void adjusteSS1(){
-        driveInches(-8.5,0.03,0.3);
+        driveInches(8.5,0.03,0.3);
     }
 
     private void adjusteSS2(){
@@ -1220,7 +1224,7 @@ public class Red2Stone_11229 extends LinearOpMode
     }
 
     private void adjusteSS3(){
-        driveInches(9,-0.03,-0.3);
+        driveInches(-9,0.03,0.3);
     }
 
     private void moveStone(int SP , boolean where){
@@ -1228,30 +1232,30 @@ public class Red2Stone_11229 extends LinearOpMode
 
             if (SP == 1) driveInches(59,0.03,0.4);
             else if (SP == 2) driveInches(55,0.03,0.4);
-            else if (SP == 3) driveInches(40,0.03,0.4);
+            else if (SP == 3) driveInches(44,0.03,0.4);
             else if (SP == 11) driveInches(83,0.03,0.4);
-            else if (SP == 22) driveInches(80.5,0.03,0.4);
-            else if (SP == 33) driveInches(64,0.03,0.4);
+            else if (SP == 22) driveInches(86.5,0.03,0.4);
+            else if (SP == 33) driveInches(72.5,0.03,0.4);
 
         }
         else if (!where){
 
-            if (SP == 1) driveInches(-59,0-.03,-0.4);
-            else if (SP == 2) driveInches(-60,-0.03,-0.4);
-            else if (SP == 3) driveInches(-44,-0.03,-0.4);
-            else if (SP == 11) driveInches(-60,0-.03,-0.4);
-            else if (SP == 22) driveInches(-79.5,-0.03,-0.4);
-            else if (SP == 33) driveInches(-66.5,-0.03,-0.4);
+            if (SP == 1) driveInches(-59,0.03,0.4);
+            else if (SP == 2) driveInches(-60,0.03,0.4);
+            else if (SP == 3) driveInches(-44,0.03,0.4);
+            else if (SP == 11) driveInches(-60,0.03,0.4);
+            else if (SP == 22) driveInches(-86.5,0.03,0.4);
+            else if (SP == 33) driveInches(-72.5,0.03,0.4);
 
         }
     }
 
     private void takeStone(){
-        slideInches(-8,-0.03,-0.4);
-        bazim.setPosition(0.25);
-        sleep(200);
-        correctAngle();
         slideInches(8,0.03,0.4);
+        bazim.setPosition(0.05);
+        sleep(100);
+        correctAngle();
+        slideInches(-8,0.03,0.4);
     }
 
     private void stopDcMotors(){
@@ -1267,37 +1271,19 @@ public class Red2Stone_11229 extends LinearOpMode
 
     private void caseSSP1(){
         adjusteSS1();
-        slideInches(-28,-0.03,-0.4);
+        slideInches(29.5,0.03,0.4);
         stopDcMotors();
-        bazim.setPosition(0.25);
-        sleep(50);
-        slideInches(12,0.03,0.3);
-        stopDcMotors();
-        correctAngle();
-        moveStone(1,true);
-        stopDcMotors();
-        bazim.setPosition(1);
-        slideInches(-4,-0.03,0.4);
-        correctAngle();
-        moveStone(2,false);
-        stopDcMotors();
-        takeStone();
-        correctAngle();
-        moveStone(2,true);
-        stopDcMotors();
-        bazim.setPosition(1);
-        correctAngle();
-        moveStone(3,false);
-        stopDcMotors();
-        takeStone();
+        bazim.setPosition(0.05);
+        sleep(100);
+        slideInches(-12,0.03,0.3);
         stopDcMotors();
         correctAngle();
-        moveStone(3,true);
-        bazim.setPosition(1);
-        correctAngle();
-        driveInches(-12,-0.03,-0.5);
+        moveStone(1,false);
         stopDcMotors();
-        slide1.setPower(-1);
+        bazim.setPosition(0.63);
+        driveInches(12,0.03,0.5);
+        stopDcMotors();
+        slide1.setPower(1);
         sleep(500);
         slide1.setPower(0);
     }
@@ -1305,32 +1291,33 @@ public class Red2Stone_11229 extends LinearOpMode
 
     private void caseSSP2(){
         adjusteSS2();
-        slideInches(-27,-0.03,-0.4);
+        slideInches(29.5,0.03,0.6);
         stopDcMotors();
-        bazim.setPosition(0.25);
+        bazim.setPosition(0.05);
         sleep(100);
-        slideInches(12,0.03,0.3);
+        slideInches(-12,0.03,0.3);
         stopDcMotors();
         correctAngle();
-        moveStone(2,true);
+        moveStone(2,false);
         stopDcMotors();
-        bazim.setPosition(1);
-        slideInches(-2.5,0.03,0.3);
+        bazim.setPosition(0.63);
+        slideInches(2.5,0.03,0.3);
         correctAngle();
-        moveStone(22,false);
+        moveStone(22,true);
+        correctAngle();
         stopDcMotors();
         takeStone();
         correctAngle();
-        driveInches(24,0.03,0.4);
+        driveInches(-24,0.03,0.4);
         stopDcMotors();
         correctAngle();
-        slideInches(9,0.03,0.5);
+        slideInches(-9,0.03,0.5);
         correctAngle();
-        driveInches(49,0.03,0.5);
-        bazim.setPosition(1);
-        driveInches(-12,-0.03,-0.5);
+        driveInches(-60,0.03,0.5);
+        bazim.setPosition(0.63);
+        driveInches(12,0.03,0.5);
         stopDcMotors();
-        slide1.setPower(-1);
+        slide1.setPower(0.63);
         sleep(500);
         slide1.setPower(0);
     }
@@ -1338,32 +1325,32 @@ public class Red2Stone_11229 extends LinearOpMode
 
     private void caseSSP3(){
         adjusteSS3();
-        slideInches(-28.5,-0.03,-0.4);
+        slideInches(29.5,0.03,0.4);
         stopDcMotors();
-        bazim.setPosition(0.25);
-        sleep(50);
-        slideInches(12,0.03,0.3);
+        bazim.setPosition(0.05);
+        sleep(100);
+        slideInches(-12,0.03,0.3);
         stopDcMotors();
         correctAngle();
-        moveStone(3,true);
+        moveStone(3,false);
         stopDcMotors();
-        bazim.setPosition(1);
-        slideInches(-4,0.03,0.3);
+        bazim.setPosition(0.63);
+        slideInches(2,0.03,0.3);
         correctAngle();
-        moveStone(33,false);
+        moveStone(33,true);
         stopDcMotors();
         takeStone();
         correctAngle();
-        driveInches(24,0.03,0.4);
+        driveInches(-24,0.03,0.4);
         stopDcMotors();
         correctAngle();
-        slideInches(9,0.03,0.5);
+        slideInches(-9,0.03,0.5);
         correctAngle();
-        driveInches(40,0.03,0.5);
-        bazim.setPosition(1);
-        driveInches(-12,-0.03,-0.5);
+        driveInches(-60,0.03,0.5);
+        bazim.setPosition(0.65);
+        driveInches(15,0.03,0.5);
         stopDcMotors();
-        slide1.setPower(-1);
+        slide1.setPower(1);
         sleep(500);
         slide1.setPower(0);
     }
@@ -1700,13 +1687,9 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
     private void correctAngle(){
-        rotate((-(int) getAngle()),0.3,true);
+        zRotate(0.3);
 
     }
-
-
-
-
 
 
 

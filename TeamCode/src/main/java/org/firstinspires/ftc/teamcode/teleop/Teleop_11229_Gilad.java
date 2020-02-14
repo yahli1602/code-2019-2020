@@ -163,9 +163,10 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }
 
             if (gamepad2.x){
-                bazim.setPosition(0.75);
+                bazim.setPosition(0.05);
+
             }else if (gamepad2.b){
-                bazim.setPosition(0);
+                bazim.setPosition(0.63);
             }
 
 
@@ -177,6 +178,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             telemetry.addData("teleop_11226_A ticks",elevator.getCurrentPosition());
             telemetry.addData("slide ticks",slide.getCurrentPosition());
             telemetry.addData("elevator ticks:", elevator.getCurrentPosition());
+            telemetry.addData("bazim p",bazim.getPosition());
             telemetry.update();
 
 
