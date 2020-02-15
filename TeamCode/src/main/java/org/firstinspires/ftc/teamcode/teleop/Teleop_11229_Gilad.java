@@ -20,12 +20,13 @@ public class Teleop_11229_Gilad extends LinearOpMode {
     private DcMotor lDrive1 = null;
     private DcMotor lDrive2 = null;
     private DcMotor slide = null;
-    //teleop_11226_A
+    //elevator
     private DcMotor elevator = null;
 
     //collection
     private Servo collectRight = null;
     private Servo collectLeft = null;
+    private Servo capStone = null;
 
 
     private Servo bazim = null;
@@ -47,6 +48,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         collectRight = hardwareMap.get(Servo.class, "collectRight");
         collectLeft = hardwareMap.get(Servo.class, "collectLeft");
         bazim = hardwareMap.get(Servo.class,"bazim");
+        capStone = hardwareMap.get(Servo.class, "capStone");
 
         rDrive1.setDirection(DcMotor.Direction.REVERSE);
         rDrive2.setDirection(DcMotor.Direction.REVERSE);
@@ -108,20 +110,20 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             //Drop cube on plate
             else if (gamepad2.y && gamepad1.atRest()) {
                 collectRight.setPosition(0.8);
-                collectLeft.setPosition(0.6);
-                rDrive1.setPower(0.5);
-                rDrive2.setPower(0.5);
-                lDrive1.setPower(0.5);
-                lDrive2.setPower(0.5);
+                collectLeft.setPosition(0.8);
+                rDrive1.setPower(0.2);
+                rDrive2.setPower(0.2);
+                lDrive1.setPower(0.2);
+                lDrive2.setPower(0.2);
 
             }
             else if (gamepad2.a && gamepad1.atRest()) {
                 collectRight.setPosition(0.8);
-                collectLeft.setPosition(0.6);
-                rDrive1.setPower(0.45);
-                rDrive2.setPower(0.45);
-                lDrive1.setPower(0.45);
-                lDrive2.setPower(0.45);
+                collectLeft.setPosition(0.8);
+                rDrive1.setPower(0.3);
+                rDrive2.setPower(0.3);
+                lDrive1.setPower(0.3);
+                lDrive2.setPower(0.3);
             } else {
                 rDrive1.setPower(0);
                 rDrive2.setPower(0);
@@ -154,7 +156,7 @@ public class Teleop_11229_Gilad extends LinearOpMode {
                 collectRight.setPosition(0.2);
                 collectLeft.setPosition(0.2);
             } else if (gamepad2.left_trigger > 0.2) {
-                collectLeft.setPosition(0.6);
+                collectLeft.setPosition(0.8);
                 collectRight.setPosition(0.8);
 
             } else {
@@ -168,14 +170,20 @@ public class Teleop_11229_Gilad extends LinearOpMode {
             }else if (gamepad2.b){
                 bazim.setPosition(0.63);
             }
+            if (gamepad2.dpad_up){
+                capStone.setPosition(0);
+            }
+            else {
+                capStone.setPosition(0.9);
+            }
 
 
-            if (gamepad2.dpad_up) setElevatorPosition(1);
-            else if (gamepad2.dpad_left) setElevatorPosition(2);
-            else if (gamepad2.dpad_down) setElevatorPosition(3);
+
+
+            if (gamepad2.dpad_down) setElevatorPosition(1);
 
             telemetry.addData("SP",slide.getPower());
-            telemetry.addData("teleop_11226_A ticks",elevator.getCurrentPosition());
+            telemetry.addData("elevator power",elevator.getPower());
             telemetry.addData("slide ticks",slide.getCurrentPosition());
             telemetry.addData("elevator ticks:", elevator.getCurrentPosition());
             telemetry.addData("bazim p",bazim.getPosition());
@@ -190,9 +198,9 @@ public class Teleop_11229_Gilad extends LinearOpMode {
         ePID.setSetPoint(ticks);
         ePID.setOutputRange(-0.7, 0.7);
 
-        ePID.setSensorValue(ticks);
+        ePID.setSensorValue(elevator.getCurrentPosition());
         ePID.calculate();
-        while ((ePID.getError() < -10 && opModeIsActive()) || (ePID.getError() > 10 && opModeIsActive())) {
+        while ((ePID.getError() < -20 && opModeIsActive()) || (ePID.getError() > 20 && opModeIsActive())) {
             ePID.setSensorValue(elevator.getCurrentPosition());
             elevator.setPower(ePID.calculate());
         }
@@ -201,9 +209,8 @@ public class Teleop_11229_Gilad extends LinearOpMode {
     private void setElevatorPosition(int ep) {
         double ticks;
 
-        if (ep == 1) ticks = 0;
-        else if (ep == 2) ticks = -577;
-        else if (ep == 3) ticks = -1526;
+        if (ep == 1) ticks = -470;
+
         else ticks = 0;
 
         elevatorHight(ticks);

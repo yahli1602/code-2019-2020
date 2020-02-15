@@ -48,6 +48,8 @@ public class PIDcon {
         return m_kD;
     }
 
+    public double getDerivative(){return derivative;}
+
     public void setSetPoint(double setpoint){
         m_setpoint = setpoint;
     }

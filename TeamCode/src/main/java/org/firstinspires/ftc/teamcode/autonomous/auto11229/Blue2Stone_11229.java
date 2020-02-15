@@ -203,7 +203,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         ScPID.PIDcon(0.01,0,0.1);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.04,0,0.15);
+        aPID.PIDcon(0.012,0,0.005);
 
 
 
@@ -263,6 +263,9 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
+            caseSSP2();
+
+            /*
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
             if (updatedRecognitions.size() > 0){
@@ -272,6 +275,8 @@ public class Blue2Stone_11229 extends LinearOpMode
             if (skystonePostion == 1) caseSSP1();
             else if (skystonePostion == 2) caseSSP2();
             else if (skystonePostion == 3) caseSSP3();
+
+             */
 
 
 
@@ -1224,7 +1229,7 @@ public class Blue2Stone_11229 extends LinearOpMode
     }
 
     private void adjusteSS3(){
-        driveInches(9,-0.03,-0.3);
+        driveInches(9,0.03,0.3);
     }
 
     private void moveStone(int SP , boolean where){
@@ -1234,7 +1239,7 @@ public class Blue2Stone_11229 extends LinearOpMode
             else if (SP == 2) driveInches(55,0.03,0.4);
             else if (SP == 3) driveInches(44,0.03,0.4);
             else if (SP == 11) driveInches(83,0.03,0.4);
-            else if (SP == 22) driveInches(86.5,0.03,0.4);
+            else if (SP == 22) driveInches(84,0.03,0.4);
             else if (SP == 33) driveInches(72.5,0.03,0.4);
 
         }
@@ -1244,7 +1249,7 @@ public class Blue2Stone_11229 extends LinearOpMode
             else if (SP == 2) driveInches(-60,0.03,0.4);
             else if (SP == 3) driveInches(-44,0.03,0.4);
             else if (SP == 11) driveInches(-60,0.03,0.4);
-            else if (SP == 22) driveInches(-86.5,0.03,0.4);
+            else if (SP == 22) driveInches(-84,0.03,0.4);
             else if (SP == 33) driveInches(-72.5,0.03,0.4);
 
         }
@@ -1278,10 +1283,10 @@ public class Blue2Stone_11229 extends LinearOpMode
         slideInches(-12,0.03,0.3);
         stopDcMotors();
         correctAngle();
-        moveStone(1,false);
+        moveStone(1,true);
         stopDcMotors();
         bazim.setPosition(0.65);
-        driveInches(12,0.03,0.5);
+        driveInches(-12,0.03,0.5);
         stopDcMotors();
         slide1.setPower(1);
         sleep(500);
@@ -1298,24 +1303,25 @@ public class Blue2Stone_11229 extends LinearOpMode
         slideInches(-12,0.03,0.3);
         stopDcMotors();
         correctAngle();
-        moveStone(2,false);
+        moveStone(2,true);
         stopDcMotors();
         bazim.setPosition(0.63);
         slideInches(2.5,0.03,0.3);
         correctAngle();
-        moveStone(22,true);
+        moveStone(22,false);
         correctAngle();
         stopDcMotors();
         takeStone();
         correctAngle();
-        driveInches(-24,0.03,0.4);
+        driveInches(24,0.03,0.4);
         stopDcMotors();
         correctAngle();
-        slideInches(-9,0.03,0.5);
+        slideInches(-13,0.03,0.5);
         correctAngle();
-        driveInches(-60,0.03,0.5);
+        driveInches(60,0.03,0.5);
         bazim.setPosition(0.63);
-        driveInches(12,0.03,0.5);
+        correctAngle();
+        driveInches(-12,0.03,0.5);
         stopDcMotors();
         slide1.setPower(0.63);
         sleep(500);
@@ -1348,7 +1354,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         correctAngle();
         driveInches(60,0.03,0.5);
         bazim.setPosition(0.65);
-        driveInches(-15,0.03,0.5);
+        driveInches(-12,0.03,0.5);
         stopDcMotors();
         slide1.setPower(1);
         sleep(500);

@@ -203,7 +203,7 @@ public class Red2Stone_11229 extends LinearOpMode
         ScPID.PIDcon(0.01,0,0.1);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.02,0,0.2);
+        aPID.PIDcon(0.012,0,0.005);
 
 
 
@@ -259,7 +259,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-            caseSSP3();
+            caseSSP2();
 
 
             //h
@@ -504,7 +504,7 @@ public class Red2Stone_11229 extends LinearOpMode
         dLPID.setOutputRange(minimumP , maximumP);
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.08,0.08);
+        aPID.setOutputRange(-0.2,0.2);
 
         RLCPID.setSetPoint(0);
         RLCPID.setOutputRange(-0.2,0.2);
@@ -577,6 +577,8 @@ public class Red2Stone_11229 extends LinearOpMode
             telemetry.addData("lP",lDrive1.getCurrentPosition());
             telemetry.addData("rPow",rDrive1.getPower());
             telemetry.addData("lPow",lDrive1.getPower());
+            telemetry.addData("angle",getAngle());
+            telemetry.addData("derivative",aPID.getDerivative() * aPID.getKD());
             telemetry.update();
 
             sleep(5);

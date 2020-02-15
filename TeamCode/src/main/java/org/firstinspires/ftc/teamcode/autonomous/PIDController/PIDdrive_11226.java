@@ -262,6 +262,8 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
+            driveInches(72,0.03,0.5);
+
             /*
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 

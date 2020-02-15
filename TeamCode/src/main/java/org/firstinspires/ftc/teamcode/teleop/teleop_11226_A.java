@@ -99,7 +99,7 @@ public class teleop_11226_A extends LinearOpMode {
         lDrive1.setDirection(DcMotor.Direction.FORWARD);
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        elevator.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
         pushLeft.setDirection(Servo.Direction.FORWARD);
         pushRight.setDirection(Servo.Direction.REVERSE);
         collectLeft.setDirection(DcMotorSimple.Direction.REVERSE);
