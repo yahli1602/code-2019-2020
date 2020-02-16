@@ -1188,7 +1188,7 @@ public class Blue2Stone_11229 extends LinearOpMode
     }
 
 
-    //init the TensorFlow
+    //init the TensorFlow1
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
