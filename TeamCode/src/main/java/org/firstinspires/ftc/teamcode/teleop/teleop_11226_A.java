@@ -109,8 +109,8 @@ public class teleop_11226_A extends LinearOpMode {
         bazim.setDirection(Servo.Direction.FORWARD);
 
         bazim.setPosition(0.70);
-        pushLeft.setPosition(0.215);
-        pushRight.setPosition(0.215);
+        pushLeft.setPosition(0);
+        pushRight.setPosition(0);
 
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -294,8 +294,8 @@ public class teleop_11226_A extends LinearOpMode {
             }
             else {
 
-                pushRight.setPosition(0.22);
-                pushLeft.setPosition(0.22);
+                pushRight.setPosition(0.215);
+                pushLeft.setPosition(0.215);
             }
 
 

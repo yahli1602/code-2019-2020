@@ -1336,9 +1336,9 @@ public class Blue2Stone_11229 extends LinearOpMode
         correctAngle();
         slideInches(-9,0.03,0.5);
         correctAngle();
-        driveInches(85,0.03,0.5);
+        driveInches(60,0.03,0.5);
         bazim.setPosition(0.65);
-        driveInches(-37,0.03,0.5);
+        driveInches(-12,0.03,0.5);
         stopDcMotors();
         slide1.setPower(1);
         sleep(500);
