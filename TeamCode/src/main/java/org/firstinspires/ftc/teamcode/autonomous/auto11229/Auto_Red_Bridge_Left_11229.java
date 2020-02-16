@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.autonomous.imageProsessing.TensorFlow;
 
 import java.util.List;
 
-@Autonomous(name = "Auto 11229 blue bridge wall", group = "11229 Stone")
+@Autonomous(name = "Auto 11229 red bridge wall left", group = "11229 Stone")
 
 public class Auto_Red_Bridge_Left_11229 extends LinearOpMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();

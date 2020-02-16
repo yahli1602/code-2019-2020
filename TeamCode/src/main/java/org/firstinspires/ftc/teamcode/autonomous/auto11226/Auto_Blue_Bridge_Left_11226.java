@@ -23,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.autonomous.PIDController.PIDcon;
 
-@Autonomous(name = "Auto Park 11226 blue Build and red stones", group = "PID")
+@Autonomous(name = "Auto 11226 blue bridge left", group = "PID")
 
 public class Auto_Blue_Bridge_Left_11226 extends LinearOpMode {
     DcMotor ldrive1, ldrive2, rdrive1, rdrive2, slide1, elevator;
