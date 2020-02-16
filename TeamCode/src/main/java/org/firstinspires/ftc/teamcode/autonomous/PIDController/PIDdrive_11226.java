@@ -259,16 +259,13 @@ public class PIDdrive_11226 extends LinearOpMode
         while (opModeIsActive() && f == 0)
 
         {
+            driveInches(72,0.03,0.4);
+            /*List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
 
-
-            driveInches(72,0.03,0.5);
-
-            /*
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
             if (updatedRecognitions.size() > 0){
-                skystonePostion = seeObj(updatedRecognitions);
+                skystonePostion = seeThreeObj(updatedRecognitions);
             }
 
             if (skystonePostion == 1) caseSSP1();
@@ -1002,7 +999,8 @@ public class PIDdrive_11226 extends LinearOpMode
         return skyStoneP;
     }
 
-    private int seeThreeObj(List<Recognition> Recognitions2){
+    private int seeThreeObj(List<Recognition> Recognitions){
+
 
         int skyStoneP = 0;
 
@@ -1010,42 +1008,32 @@ public class PIDdrive_11226 extends LinearOpMode
         double Stone1X = 0;
         double Stone2X = 0;
 
-        if (Recognitions2.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions2.get(0).getLeft();
-        }else if (Recognitions2.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions2.get(0).getLeft();
+        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+            skyStoneX = Recognitions.get(0).getLeft();
         }
 
-
-        if (Recognitions2.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions2.get(1).getLeft();
-
-        }else if (Recognitions2.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
-
-            if (Stone1X != 0) {
-
-                Stone2X = Recognitions2.get(1).getLeft();
-            } else if (Stone1X == 0) {
-                Stone1X = Recognitions2.get(1).getLeft();
+        if (Recognitions.size() == 2){
+            if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+                skyStoneX = Recognitions.get(1).getLeft();
+            }
+        }
+        if (Recognitions.size() == 3){
+            if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                skyStoneX = Recognitions.get(2).getLeft();
             }
         }
 
-        if (Recognitions2.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions2.get(2).getLeft();
-        }else if (Recognitions2.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone2X = Recognitions2.get(2).getLeft();
-        }
 
 
-        if (skyStoneX < Stone1X && skyStoneX < Stone2X){
-            skyStoneP = 1;
-        }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+        if (skyStoneX < 140){
             skyStoneP = 3;
-        }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
+        }else if (skyStoneX > 400){
+            skyStoneP = 1;
+        }else{
             skyStoneP = 2;
         }
 
-        return skyStoneP;
+        return skystonePostion;
     }
 
 

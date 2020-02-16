@@ -75,9 +75,9 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
 
 
 
-    private float skyStoneX = 0;
-    private float Stone1X = 0;
-    private float Stone2X = 0;
+    private double skyStoneX = 0;
+    private double Stone1X = 0;
+    private double Stone2X = 0;
     int skystonePostion;
     int Stone1Postion;
     int Stone2Postion;
@@ -187,15 +187,10 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
                         }
 
                         //find out the skystone location if it sees 3 cubes
-                        if (updatedRecognitions.size() == 3){
-                            seeSkystone = -1;
-                            seeStone1 = -1;
-                            seeStone2 = -1;
+                        if (updatedRecognitions.size() > 0){
+                            skystonePostion = seeThreeObj(updatedRecognitions);
+                        }
 
-                            if (seeSkystone == -1 && seeStone1 == -1 && seeStone2 == -1){
-
-
-                                skystonePostion = seeThreeObj(updatedRecognitions);
 
 
                                 /*if (updatedRecognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
@@ -232,14 +227,11 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
                                 }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
                                     skystonePostion = 2;
                                 }*/
-                                telemetry.addData("skyStone position",skystonePostion);
-                                telemetry.addData("skyStoneX:",skyStoneX);
-                                telemetry.addData("Stone1X:",Stone1X);
-                                telemetry.addData("Stone2X:",Stone2X);
-                            }
+                        telemetry.addData("skyStone position",skystonePostion);
+                        telemetry.addData("skyStoneX:",skyStoneX);
+                        telemetry.addData("Stone1X:",Stone1X);
+                        telemetry.addData("Stone2X:",Stone2X);
 
-
-                        }
 
                         //hopefully find out the skystone location if it sees only 2 stones(it has a chance of 2:1 secesseding
                         /*if (updatedRecognitions.size() == 2){
@@ -302,7 +294,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.3;
+        tfodParameters.minimumConfidence = 0.35;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
@@ -310,38 +302,28 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
     //if see 3 diffrent objects
     private int seeThreeObj(List<Recognition> Recognitions){
 
-        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(0).getLeft();
-        }else if (Recognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions.get(0).getLeft();
         }
 
-
-        if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(1).getLeft();
-
-        }else if (Recognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
-
-            if (Stone1X != 0) {
-
-                Stone2X = Recognitions.get(1).getLeft();
-            } else if (Stone1X == 0) {
-                Stone1X = Recognitions.get(1).getLeft();
+        if (Recognitions.size() == 2){
+            if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+                skyStoneX = Recognitions.get(1).getLeft();
+            }
+        }
+        if (Recognitions.size() == 3){
+            if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                skyStoneX = Recognitions.get(2).getLeft();
             }
         }
 
-        if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions.get(2).getLeft();
-        }else if (Recognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone2X = Recognitions.get(2).getLeft();
-        }
 
 
-        if (skyStoneX < Stone1X && skyStoneX < Stone2X){
-            skystonePostion = 1;
-        }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+        if (skyStoneX < 140){
             skystonePostion = 3;
-        }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
+        }else if (skyStoneX > 400){
+            skystonePostion = 1;
+        }else{
             skystonePostion = 2;
         }
 

@@ -258,25 +258,20 @@ public class Blue2Stone_11229 extends LinearOpMode
         {
 
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+            FtcDashboard.getInstance().startCameraStream(vuforia, 0);
 
 
-
-
-
-            caseSSP2();
-
-            /*
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
             if (updatedRecognitions.size() > 0){
-                skystonePostion = seeObj(updatedRecognitions);
+                skystonePostion = seeThreeObj(updatedRecognitions);
             }
 
             if (skystonePostion == 1) caseSSP1();
             else if (skystonePostion == 2) caseSSP2();
             else if (skystonePostion == 3) caseSSP3();
 
-             */
+
 
 
 
@@ -1003,7 +998,8 @@ public class Blue2Stone_11229 extends LinearOpMode
         return skyStoneP;
     }
 
-    private int seeThreeObj(List<Recognition> Recognitions2){
+    private int seeThreeObj(List<Recognition> Recognitions){
+
 
         int skyStoneP = 0;
 
@@ -1011,42 +1007,32 @@ public class Blue2Stone_11229 extends LinearOpMode
         double Stone1X = 0;
         double Stone2X = 0;
 
-        if (Recognitions2.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions2.get(0).getLeft();
-        }else if (Recognitions2.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions2.get(0).getLeft();
+        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+            skyStoneX = Recognitions.get(0).getLeft();
         }
 
-
-        if (Recognitions2.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions2.get(1).getLeft();
-
-        }else if (Recognitions2.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
-
-            if (Stone1X != 0) {
-
-                Stone2X = Recognitions2.get(1).getLeft();
-            } else if (Stone1X == 0) {
-                Stone1X = Recognitions2.get(1).getLeft();
+        if (Recognitions.size() == 2){
+            if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+                skyStoneX = Recognitions.get(1).getLeft();
+            }
+        }
+        if (Recognitions.size() == 3){
+            if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                skyStoneX = Recognitions.get(2).getLeft();
             }
         }
 
-        if (Recognitions2.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions2.get(2).getLeft();
-        }else if (Recognitions2.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone2X = Recognitions2.get(2).getLeft();
-        }
 
 
-        if (skyStoneX < Stone1X && skyStoneX < Stone2X){
-            skyStoneP = 1;
-        }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+        if (skyStoneX < 140){
             skyStoneP = 3;
-        }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
+        }else if (skyStoneX > 400){
+            skyStoneP = 1;
+        }else{
             skyStoneP = 2;
         }
 
-        return skyStoneP;
+        return skystonePostion;
     }
 
 
@@ -1238,8 +1224,8 @@ public class Blue2Stone_11229 extends LinearOpMode
             if (SP == 1) driveInches(59,0.03,0.4);
             else if (SP == 2) driveInches(55,0.03,0.4);
             else if (SP == 3) driveInches(44,0.03,0.4);
-            else if (SP == 11) driveInches(83,0.03,0.4);
-            else if (SP == 22) driveInches(84,0.03,0.4);
+            else if (SP == 11) driveInches(87.5,0.03,0.4);
+            else if (SP == 22) driveInches(79.5,0.03,0.4);
             else if (SP == 33) driveInches(72.5,0.03,0.4);
 
         }
@@ -1248,8 +1234,8 @@ public class Blue2Stone_11229 extends LinearOpMode
             if (SP == 1) driveInches(-59,0.03,0.4);
             else if (SP == 2) driveInches(-60,0.03,0.4);
             else if (SP == 3) driveInches(-44,0.03,0.4);
-            else if (SP == 11) driveInches(-60,0.03,0.4);
-            else if (SP == 22) driveInches(-84,0.03,0.4);
+            else if (SP == 11) driveInches(-87.5,0.03,0.4);
+            else if (SP == 22) driveInches(-79.5,0.03,0.4);
             else if (SP == 33) driveInches(-72.5,0.03,0.4);
 
         }
@@ -1318,14 +1304,15 @@ public class Blue2Stone_11229 extends LinearOpMode
         correctAngle();
         slideInches(-13,0.03,0.5);
         correctAngle();
-        driveInches(60,0.03,0.5);
+        driveInches(65,0.03,0.5);
         bazim.setPosition(0.63);
         correctAngle();
-        driveInches(-12,0.03,0.5);
+        driveInches(-17,0.03,0.5);
         stopDcMotors();
         slide1.setPower(0.63);
         sleep(500);
         slide1.setPower(0);
+
     }
 
 
