@@ -263,19 +263,22 @@ public class Blue2Stone_11229 extends LinearOpMode
 
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-            if (updatedRecognitions.size() > 0){
+            if (updatedRecognitions.size() >= 1){
                 skystonePostion = seeThreeObj(updatedRecognitions);
             }
 
-            if (skystonePostion == 1) caseSSP1();
-            else if (skystonePostion == 2) caseSSP2();
-            else if (skystonePostion == 3) caseSSP3();
-
-
-
-
-
-            f++;
+            if (skystonePostion == 1){
+                caseSSP1();
+                f++;
+            }
+            else if (skystonePostion == 2){
+                caseSSP2();
+                f++;
+            }
+            else if (skystonePostion == 3){
+                caseSSP3();
+                f++;
+            }
 
         }
 
@@ -1193,7 +1196,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.35;
+        tfodParameters.minimumConfidence = 0.6;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET,LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }

@@ -75,7 +75,7 @@ public class Red2Stone_11229 extends LinearOpMode
     double ScurrentPosition = 0;
 
 
-    int skystonePostion;
+    int skystonePostion = 0;
     int Stone1Postion;
     int Stone2Postion;
     int seeSkystone = 0;
@@ -264,13 +264,22 @@ public class Red2Stone_11229 extends LinearOpMode
                 skystonePostion = seeThreeObj(updatedRecognitions);
             }
 
-            if (skystonePostion == 1) caseSSP1();
-            else if (skystonePostion == 2) caseSSP2();
-            else if (skystonePostion == 3) caseSSP3();
+            if (skystonePostion == 1){
+                caseSSP1();
+                f++;
+            }
+            else if (skystonePostion == 2){
+                caseSSP2();
+                f++;
+            }
+            else if (skystonePostion == 3){
+                caseSSP3();
+                f++;
+            }
 
 
 
-            f++;
+
 
         }
 
@@ -1150,7 +1159,7 @@ public class Red2Stone_11229 extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.35;
+        tfodParameters.minimumConfidence = 0.6;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET,LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }

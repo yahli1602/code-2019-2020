@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous.PIDController;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -206,7 +208,7 @@ public class PIDdrive_11226 extends LinearOpMode
         ScPID.PIDcon(0.08,0,0.9);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.04,0,0);
+        aPID.PIDcon(0.036,0,0);
 
 
 
@@ -259,6 +261,8 @@ public class PIDdrive_11226 extends LinearOpMode
         while (opModeIsActive() && f == 0)
 
         {
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+            FtcDashboard.getInstance().startCameraStream(vuforia, 0);
             driveInches(72,0.03,0.4);
             /*List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
@@ -505,7 +509,7 @@ public class PIDdrive_11226 extends LinearOpMode
         dLPID.setOutputRange(minimumP , maximumP);
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.08,0.08);
+        aPID.setOutputRange(-0.2,0.2);
 
         RLCPID.setSetPoint(0);
         RLCPID.setOutputRange(-0.2,0.2);
