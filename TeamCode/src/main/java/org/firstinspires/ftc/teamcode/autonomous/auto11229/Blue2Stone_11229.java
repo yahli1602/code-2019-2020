@@ -235,6 +235,11 @@ public class Blue2Stone_11229 extends LinearOpMode
             tfod.activate();
 
         }
+        List<Recognition> updatedRecognitions2 = tfod.getUpdatedRecognitions();
+        if (updatedRecognitions2.size() > 0){
+            telemetry.addData("camera state:","ready");
+            telemetry.update();
+        }
 
 
         waitForStart();

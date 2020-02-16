@@ -247,7 +247,7 @@ public class PIDdrive_11226 extends LinearOpMode
         telemetry.addData("Mode", "running");
         telemetry.update();
 
-        sleep(1000);
+
 
         // Set up parameters for driving in a straight line.
 
@@ -261,24 +261,26 @@ public class PIDdrive_11226 extends LinearOpMode
         while (opModeIsActive() && f == 0)
 
         {
+
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
             FtcDashboard.getInstance().startCameraStream(vuforia, 0);
-            caseSSP2();
-            /*List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
+            skystonePostion = seeThreeObj(updatedRecognitions);
 
-            if (updatedRecognitions.size() > 0){
-                skystonePostion = seeThreeObj(updatedRecognitions);
+            if (skystonePostion == 1){
+                caseSSP1();
+                f++;
             }
-
-            if (skystonePostion == 1) caseSSP1();
-            else if (skystonePostion == 2) caseSSP2();
-            else if (skystonePostion == 3) caseSSP3();
-
-             */
-
-            f++;
+            else if (skystonePostion == 2){
+                caseSSP2();
+                f++;
+            }
+            else if (skystonePostion == 3){
+                caseSSP3();
+                f++;
+            }
 
         }
 
@@ -853,7 +855,6 @@ public class PIDdrive_11226 extends LinearOpMode
 
         sPID.reset();
         ScPID.reset();
-        SaPID.reset();
 
 
         ScurrentPosition = 0;
@@ -1038,7 +1039,7 @@ public class PIDdrive_11226 extends LinearOpMode
             skyStoneP = 2;
         }
 
-        return skystonePostion;
+        return skyStoneP;
     }
 
 
@@ -1201,7 +1202,7 @@ public class PIDdrive_11226 extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.3;
+        tfodParameters.minimumConfidence = 0.6;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_SECOND_ELEMENT);
     }
@@ -1223,7 +1224,7 @@ public class PIDdrive_11226 extends LinearOpMode
     }
 
     private void adjusteSS3(){
-        driveInches(9,-0.03,-0.3);
+        driveInches(9,0.03,0.3);
     }
 
     private void moveStone(int SP , boolean where){
@@ -1251,7 +1252,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
     private void takeStone(){
         slideInches(-8,0.03,0.4);
-        bazim.setPosition(0.25);
+        bazim.setPosition(0.2);
         sleep(200);
         correctAngle();
         slideInches(8,0.03,0.4);
@@ -1272,7 +1273,7 @@ public class PIDdrive_11226 extends LinearOpMode
         adjusteSS1();
         slideInches(-28,-0.03,-0.4);
         stopDcMotors();
-        bazim.setPosition(0.25);
+        bazim.setPosition(0.2);
         sleep(50);
         slideInches(12,0.03,0.3);
         stopDcMotors();
@@ -1310,7 +1311,7 @@ public class PIDdrive_11226 extends LinearOpMode
         adjusteSS2();
         slideInches(-27,0.03,0.4);
         stopDcMotors();
-        bazim.setPosition(0.25);
+        bazim.setPosition(0.2);
         sleep(100);
         slideInches(12,0.03,0.3);
         stopDcMotors();
@@ -1343,7 +1344,7 @@ public class PIDdrive_11226 extends LinearOpMode
         adjusteSS3();
         slideInches(-28.5,-0.03,-0.4);
         stopDcMotors();
-        bazim.setPosition(0.25);
+        bazim.setPosition(0.2);
         sleep(50);
         slideInches(12,0.03,0.3);
         stopDcMotors();

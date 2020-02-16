@@ -235,6 +235,11 @@ public class Red2Stone_11229 extends LinearOpMode
             tfod.activate();
 
         }
+        List<Recognition> updatedRecognitions2 = tfod.getUpdatedRecognitions();
+        if (updatedRecognitions2.size() > 0){
+            telemetry.addData("camera state:","ready");
+            telemetry.update();
+        }
 
 
         waitForStart();
@@ -992,7 +997,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
         if (skyStoneX < 140){
             skyStoneP = 3;
-        }else if (skyStoneX > 400){
+        }else if (skyStoneX > 320){
             skyStoneP = 1;
         }else{
             skyStoneP = 2;
@@ -1192,7 +1197,7 @@ public class Red2Stone_11229 extends LinearOpMode
             else if (SP == 3) driveInches(44,0.03,0.4);
             else if (SP == 11) driveInches(83,0.03,0.4);
             else if (SP == 22) driveInches(86.5,0.03,0.4);
-            else if (SP == 33) driveInches(72.5,0.03,0.4);
+            else if (SP == 33) driveInches(74.5,0.03,0.4);
 
         }
         else if (!where){
@@ -1200,9 +1205,9 @@ public class Red2Stone_11229 extends LinearOpMode
             if (SP == 1) driveInches(-59,0.03,0.4);
             else if (SP == 2) driveInches(-60,0.03,0.4);
             else if (SP == 3) driveInches(-44,0.03,0.4);
-            else if (SP == 11) driveInches(-60,0.03,0.4);
+            else if (SP == 11) driveInches(-83,0.03,0.4);
             else if (SP == 22) driveInches(-86.5,0.03,0.4);
-            else if (SP == 33) driveInches(-72.5,0.03,0.4);
+            else if (SP == 33) driveInches(-74.5,0.03,0.4);
 
         }
     }
