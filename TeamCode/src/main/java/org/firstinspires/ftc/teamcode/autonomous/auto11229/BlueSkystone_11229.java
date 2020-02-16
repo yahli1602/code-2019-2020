@@ -23,9 +23,10 @@ import java.util.List;
 @Disabled
 @Autonomous(name="blueSkystone 11229", group="Skystone")
 
-public class BlueSkystone_11229 extends LinearOpMode
+public class
+BlueSkystone_11229 extends LinearOpMode
 {
-    DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
+    DcMotor                  lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
     BNO055IMU               imu;
     Servo                   bazim;
 
