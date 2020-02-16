@@ -253,19 +253,14 @@ public class Blue2Stone_11229 extends LinearOpMode
 
         f = 0;
         int t = 0;
-        while (opModeIsActive() && f == 0)
-
-        {
+        while (opModeIsActive() && f == 0) {
 
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
             FtcDashboard.getInstance().startCameraStream(vuforia, 0);
 
-
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-            if (updatedRecognitions.size() >= 1){
-                skystonePostion = seeThreeObj(updatedRecognitions);
-            }
+            skystonePostion = seeThreeObj(updatedRecognitions);
 
             if (skystonePostion == 1){
                 caseSSP1();
@@ -1007,8 +1002,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         int skyStoneP = 0;
 
         double skyStoneX = 0;
-        double Stone1X = 0;
-        double Stone2X = 0;
+
 
         if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(0).getLeft();
@@ -1035,7 +1029,7 @@ public class Blue2Stone_11229 extends LinearOpMode
             skyStoneP = 2;
         }
 
-        return skystonePostion;
+        return skyStoneP;
     }
 
 
@@ -1246,7 +1240,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
     private void takeStone(){
         slideInches(8,0.03,0.4);
-        bazim.setPosition(0);
+        bazim.setPosition(0.05);
         sleep(100);
         correctAngle();
         slideInches(-8,0.03,0.4);

@@ -204,11 +204,11 @@ public class PIDdrive_11226 extends LinearOpMode
 
         RLCPID.PIDcon(0.02,0,0);
 
-        sPID.PIDcon(0.1,0.0009,0.1);
-        ScPID.PIDcon(0.08,0,0.9);
+        sPID.PIDcon(0.14,0,0.15);
+        ScPID.PIDcon(0.01,0,0.1);
         SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.036,0,0);
+        aPID.PIDcon(0.012,0,0.005);
 
 
 
@@ -263,7 +263,7 @@ public class PIDdrive_11226 extends LinearOpMode
         {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
             FtcDashboard.getInstance().startCameraStream(vuforia, 0);
-            driveInches(72,0.03,0.4);
+            caseSSP2();
             /*List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
 
@@ -547,7 +547,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
             telemetry.addData("first coraction",coraction);
-            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
             RLCPID.setSensorValue(-slide1.getCurrentPosition()/ SticksPerInch);
@@ -567,11 +567,11 @@ public class PIDdrive_11226 extends LinearOpMode
                 exelerate = exelerate + 0.05;
             }
 
-            lDrive1.setPower(d_Lpower + coraction);
-            lDrive2.setPower(d_Lpower + coraction);
+            lDrive1.setPower(d_Lpower - coraction);
+            lDrive2.setPower(d_Lpower - coraction);
 
-            rDrive1.setPower(d_Rpower - coraction);
-            rDrive2.setPower(d_Rpower - coraction);
+            rDrive1.setPower(d_Rpower + coraction);
+            rDrive2.setPower(d_Rpower + coraction);
             //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
 
             //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
@@ -639,7 +639,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.08,0.08);
+        aPID.setOutputRange(-0.2,0.2);
 
         RcuurentPosition = (rDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (lDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -668,7 +668,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
             d_Lpower = dLPID.calculate();
 
-            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
 
@@ -687,10 +687,10 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-            lDrive1.setPower(d_Lpower + coraction);
-            lDrive2.setPower(d_Lpower + coraction);
-            rDrive1.setPower(d_Rpower - coraction);
-            rDrive2.setPower(d_Rpower - coraction);
+            lDrive1.setPower(d_Lpower - coraction);
+            lDrive2.setPower(d_Lpower - coraction);
+            rDrive1.setPower(d_Rpower + coraction);
+            rDrive2.setPower(d_Rpower + coraction);
 
 
 
@@ -853,6 +853,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
         sPID.reset();
         ScPID.reset();
+        SaPID.reset();
 
 
         ScurrentPosition = 0;
@@ -1016,12 +1017,12 @@ public class PIDdrive_11226 extends LinearOpMode
             skyStoneX = Recognitions.get(0).getLeft();
         }
 
-        if (Recognitions.size() == 2){
+        if (Recognitions.size() >= 2){
             if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
                 skyStoneX = Recognitions.get(1).getLeft();
             }
         }
-        if (Recognitions.size() == 3){
+        if (Recognitions.size() >= 3){
             if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
                 skyStoneX = Recognitions.get(2).getLeft();
             }
@@ -1238,18 +1239,18 @@ public class PIDdrive_11226 extends LinearOpMode
         }
         else if (!where){
 
-            if (SP == 1) driveInches(-59,0-.03,-0.4);
-            else if (SP == 2) driveInches(-60,-0.03,-0.4);
-            else if (SP == 3) driveInches(-44,-0.03,-0.4);
-            else if (SP == 11) driveInches(-60,0-.03,-0.4);
-            else if (SP == 22) driveInches(-79.5,-0.03,-0.4);
-            else if (SP == 33) driveInches(-66.5,-0.03,-0.4);
+            if (SP == 1) driveInches(-59,0.03   ,0.4);
+            else if (SP == 2) driveInches(-60,0.03,0.4);
+            else if (SP == 3) driveInches(-44,0.03,0.4);
+            else if (SP == 11) driveInches(-60,0.03,0.4);
+            else if (SP == 22) driveInches(-79.5,0.03,0.4);
+            else if (SP == 33) driveInches(-66.5,0.03,0.4);
 
         }
     }
 
     private void takeStone(){
-        slideInches(-8,-0.03,-0.4);
+        slideInches(-8,0.03,0.4);
         bazim.setPosition(0.25);
         sleep(200);
         correctAngle();
@@ -1307,7 +1308,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
     private void caseSSP2(){
         adjusteSS2();
-        slideInches(-27,-0.03,-0.4);
+        slideInches(-27,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.25);
         sleep(100);
@@ -1330,7 +1331,7 @@ public class PIDdrive_11226 extends LinearOpMode
         correctAngle();
         driveInches(49,0.03,0.5);
         bazim.setPosition(1);
-        driveInches(-12,-0.03,-0.5);
+        driveInches(-12,0.03,0.5);
         stopDcMotors();
         slide1.setPower(-1);
         sleep(500);
