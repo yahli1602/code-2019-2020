@@ -1277,7 +1277,7 @@ public class Red2Stone_11229 extends LinearOpMode
         correctAngle();
         driveInches(-60,0.03,0.5);
         bazim.setPosition(0.63);
-        driveInches(12,0.03,0.5);
+        driveInches(20,0.03,0.5);
         stopDcMotors();
         slide1.setPower(0.63);
         sleep(500);

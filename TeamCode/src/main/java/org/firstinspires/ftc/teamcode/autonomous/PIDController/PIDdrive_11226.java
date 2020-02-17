@@ -241,6 +241,9 @@ public class PIDdrive_11226 extends LinearOpMode
 
         }
 
+        telemetry.addData(">", "Press Play to start op mode");
+        telemetry.update();
+
 
         waitForStart();
 
@@ -258,30 +261,105 @@ public class PIDdrive_11226 extends LinearOpMode
         // drive until end of period.
 
         f = 0;
-        while (opModeIsActive() && f == 0)
+        if (opModeIsActive()) {
+            while (opModeIsActive()) {
+                if (tfod != null) {
+                    // getUpdatedRecognitions() will return null if no new information is available since
+                    // the last time that call was made.
+                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                    if (updatedRecognitions != null) {
+                        telemetry.addData("# Object Detected", updatedRecognitions.size());
+                        // step through the list of recognitions and display boundary info.
+                        int i = 0;
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                    recognition.getLeft(), recognition.getTop());
+                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                    recognition.getRight(), recognition.getBottom());
+                            telemetry.addData("hight:", recognition.getTop() - recognition.getBottom());
 
-        {
 
-            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-            FtcDashboard.getInstance().startCameraStream(vuforia, 0);
+                        }
 
-            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                        //find out the skystone location if it sees 3 cubes
+                        if (updatedRecognitions.size() > 0){
+                            skystonePostion = seeThreeObj(updatedRecognitions);
+                        }
 
-            skystonePostion = seeThreeObj(updatedRecognitions);
 
-            if (skystonePostion == 1){
-                caseSSP1();
-                f++;
+
+                                /*if (updatedRecognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                                    skyStoneX = updatedRecognitions.get(0).getLeft();
+                                }else if (updatedRecognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+                                    Stone1X = updatedRecognitions.get(0).getLeft();
+                                }
+
+
+                                if (updatedRecognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                                    skyStoneX = updatedRecognitions.get(1).getLeft();
+
+                                }else if (updatedRecognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
+
+                                    if (Stone1X != 0) {
+
+                                        Stone2X = updatedRecognitions.get(1).getLeft();
+                                    } else if (Stone1X == 0) {
+                                        Stone1X = updatedRecognitions.get(1).getLeft();
+                                    }
+                                }
+
+                                if (updatedRecognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                                    skyStoneX = updatedRecognitions.get(2).getLeft();
+                                }else if (updatedRecognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
+                                    Stone2X = updatedRecognitions.get(2).getLeft();
+                                }
+
+
+                                if (skyStoneX < Stone1X && skyStoneX < Stone2X){
+                                    skystonePostion = 1;
+                                }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
+                                    skystonePostion = 3;
+                                }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
+                                    skystonePostion = 2;
+                                }*/
+                        telemetry.addData("skyStone position",skystonePostion);
+
+
+
+                        //hopefully find out the skystone location if it sees only 2 stones(it has a chance of 2:1 secesseding
+                        /*if (updatedRecognitions.size() == 2){
+                            if (updatedRecognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                                skyStoneX = updatedRecognitions.get(0).getLeft();
+                            }else if (updatedRecognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
+                                Stone1X = updatedRecognitions.get(0).getLeft();
+                            }
+
+                            if (updatedRecognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                                skyStoneX = updatedRecognitions.get(1).getLeft();
+                            }else if (updatedRecognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)){
+                                Stone1X = updatedRecognitions.get(1).getLeft();
+                            }
+
+                            if (skyStoneX < Stone1X){
+                                skystonePostion = 1;
+                            }else if (skyStoneX > Stone1X) {
+                                skystonePostion = 3;
+
+                            }
+
+                            telemetry.addData("skyStone position",skystonePostion);
+                            telemetry.addData("skyStoneX:",skyStoneX);
+                            telemetry.addData("Stone1X:",Stone1X);
+
+                        }*/
+
+
+
+                        telemetry.update();
+                    }
+                }
             }
-            else if (skystonePostion == 2){
-                caseSSP2();
-                f++;
-            }
-            else if (skystonePostion == 3){
-                caseSSP3();
-                f++;
-            }
-
         }
 
         if (tfod != null) {
@@ -985,7 +1063,6 @@ public class PIDdrive_11226 extends LinearOpMode
 
         if (Recognitions3.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
             skyStoneX = Recognitions3.get(0).getLeft();
-            Stone1X = Recognitions3.get(1).getLeft();
         }else if (Recognitions3.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
             Stone1X = Recognitions3.get(0).getLeft();
             skyStoneX = Recognitions3.get(1).getLeft();
@@ -1018,12 +1095,12 @@ public class PIDdrive_11226 extends LinearOpMode
             skyStoneX = Recognitions.get(0).getLeft();
         }
 
-        if (Recognitions.size() >= 2){
+        if (Recognitions.size() == 2){
             if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
                 skyStoneX = Recognitions.get(1).getLeft();
             }
         }
-        if (Recognitions.size() >= 3){
+        if (Recognitions.size() == 3){
             if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
                 skyStoneX = Recognitions.get(2).getLeft();
             }
@@ -1031,9 +1108,9 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-        if (skyStoneX < 140){
+        if (skyStoneX > 300){
             skyStoneP = 3;
-        }else if (skyStoneX > 400){
+        }else if (skyStoneX < 50){
             skyStoneP = 1;
         }else{
             skyStoneP = 2;
@@ -1240,7 +1317,7 @@ public class PIDdrive_11226 extends LinearOpMode
         }
         else if (!where){
 
-            if (SP == 1) driveInches(-59,0.03   ,0.4);
+            if (SP == 1) driveInches(-59,0.03,0.4);
             else if (SP == 2) driveInches(-60,0.03,0.4);
             else if (SP == 3) driveInches(-44,0.03,0.4);
             else if (SP == 11) driveInches(-60,0.03,0.4);
@@ -1270,8 +1347,9 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
     private void caseSSP1(){
+        slideInches(-25,0.03,0.4);
         adjusteSS1();
-        slideInches(-28,-0.03,-0.4);
+        slideInches(-3,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.2);
         sleep(50);
@@ -1309,7 +1387,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
     private void caseSSP2(){
         adjusteSS2();
-        slideInches(-27,0.03,0.4);
+        slideInches(-28.5,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.2);
         sleep(100);
@@ -1342,7 +1420,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
     private void caseSSP3(){
         adjusteSS3();
-        slideInches(-28.5,-0.03,-0.4);
+        slideInches(-28.5, 0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.2);
         sleep(50);
@@ -1365,7 +1443,7 @@ public class PIDdrive_11226 extends LinearOpMode
         correctAngle();
         driveInches(40,0.03,0.5);
         bazim.setPosition(1);
-        driveInches(-12,-0.03,-0.5);
+        driveInches(-12,0.03,0.5);
         stopDcMotors();
         slide1.setPower(-1);
         sleep(500);
