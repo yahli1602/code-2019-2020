@@ -235,6 +235,11 @@ public class Blue2Stone_11229 extends LinearOpMode
             tfod.activate();
 
         }
+        List<Recognition> updatedRecognitions2 = tfod.getUpdatedRecognitions();
+        if (updatedRecognitions2.size() > 0){
+            telemetry.addData("camera state:","ready");
+            telemetry.update();
+        }
 
 
         waitForStart();
@@ -1023,7 +1028,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
         if (skyStoneX < 140){
             skyStoneP = 3;
-        }else if (skyStoneX > 400){
+        }else if (skyStoneX > 320){
             skyStoneP = 1;
         }else{
             skyStoneP = 2;
@@ -1258,8 +1263,9 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
     private void caseSSP1(){
+        slideInches(26.5,0.03,0.4);
         adjusteSS1();
-        slideInches(29.5,0.03,0.4);
+        slideInches(3,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0);
         sleep(100);
