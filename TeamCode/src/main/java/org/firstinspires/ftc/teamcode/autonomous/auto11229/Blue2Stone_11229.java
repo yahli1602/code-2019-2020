@@ -1223,7 +1223,7 @@ public class Blue2Stone_11229 extends LinearOpMode
     private void moveStone(int SP , boolean where){
         if (where){
 
-            if (SP == 1) driveInches(59,0.03,0.4);
+            if (SP == 1) driveInches(75,0.03,0.4);
             else if (SP == 2) driveInches(55,0.03,0.4);
             else if (SP == 3) driveInches(44,0.03,0.4);
             else if (SP == 11) driveInches(87.5,0.03,0.4);
@@ -1238,7 +1238,7 @@ public class Blue2Stone_11229 extends LinearOpMode
             else if (SP == 3) driveInches(-44,0.03,0.4);
             else if (SP == 11) driveInches(-87.5,0.03,0.4);
             else if (SP == 22) driveInches(-79.5,0.03,0.4);
-            else if (SP == 33) driveInches(-72.5,0.03,0.4);
+            else if (SP == 33) driveInches(-70.5,0.03,0.4);
 
         }
     }
@@ -1265,20 +1265,20 @@ public class Blue2Stone_11229 extends LinearOpMode
     private void caseSSP1(){
         slideInches(26.5,0.03,0.4);
         adjusteSS1();
-        slideInches(3,0.03,0.4);
+        slideInches(4,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0);
         sleep(100);
-        slideInches(-12,0.03,0.3);
+        slideInches(-14,0.03,0.3);
         stopDcMotors();
         correctAngle();
         moveStone(1,true);
         stopDcMotors();
         bazim.setPosition(0.65);
-        driveInches(-12,0.03,0.5);
+        driveInches(-17,0.03,0.5);
         stopDcMotors();
         slide1.setPower(1);
-        sleep(500);
+        sleep(400);
         slide1.setPower(0);
     }
 
@@ -1307,13 +1307,13 @@ public class Blue2Stone_11229 extends LinearOpMode
         correctAngle();
         slideInches(-13,0.03,0.5);
         correctAngle();
-        driveInches(65,0.03,0.5);
+        driveInches(60,0.03,0.5);
         bazim.setPosition(0.63);
         correctAngle();
-        driveInches(-17,0.03,0.5);
+        driveInches(-20,0.03,0.5);
         stopDcMotors();
         slide1.setPower(0.63);
-        sleep(500);
+        sleep(550);
         slide1.setPower(0);
 
     }
@@ -1321,7 +1321,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
     private void caseSSP3(){
         adjusteSS3();
-        slideInches(29.5,0.03,0.4);
+        slideInches(30,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.05);
         sleep(100);
@@ -1342,9 +1342,9 @@ public class Blue2Stone_11229 extends LinearOpMode
         correctAngle();
         slideInches(-9,0.03,0.5);
         correctAngle();
-        driveInches(60,0.03,0.5);
+        driveInches(55,0.03,0.5);
         bazim.setPosition(0.65);
-        driveInches(-12,0.03,0.5);
+        driveInches(-23,0.03,0.5);
         stopDcMotors();
         slide1.setPower(1);
         sleep(500);
