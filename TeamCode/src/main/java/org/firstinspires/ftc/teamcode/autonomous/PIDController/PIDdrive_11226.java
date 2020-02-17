@@ -258,7 +258,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-        // drive until end of period.
+        // drive until end of period
 
         f = 0;
         if (opModeIsActive()) {
