@@ -265,21 +265,22 @@ public class Red2Stone_11229 extends LinearOpMode
 
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-            if (updatedRecognitions.size() > 0){
-                skystonePostion = seeThreeObj(updatedRecognitions);
-            }
+            if (updatedRecognitions != null) {
 
-            if (skystonePostion == 1){
-                caseSSP1();
-                f++;
-            }
-            else if (skystonePostion == 2){
-                caseSSP2();
-                f++;
-            }
-            else if (skystonePostion == 3){
-                caseSSP3();
-                f++;
+                if (updatedRecognitions.size() > 0) {
+                    skystonePostion = seeThreeObj(updatedRecognitions);
+                }
+
+                if (skystonePostion == 1) {
+                    caseSSP1();
+                    f++;
+                } else if (skystonePostion == 2) {
+                    caseSSP2();
+                    f++;
+                } else if (skystonePostion == 3) {
+                    caseSSP3();
+                    f++;
+                }
             }
 
 
@@ -969,42 +970,7 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
 
-    private int seeThreeObj(List<Recognition> Recognitions){
 
-
-        int skyStoneP = 0;
-
-        double skyStoneX = 0;
-        double Stone1X = 0;
-        double Stone2X = 0;
-
-        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
-            skyStoneX = Recognitions.get(0).getLeft();
-        }
-
-        if (Recognitions.size() == 2){
-            if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
-                skyStoneX = Recognitions.get(1).getLeft();
-            }
-        }
-        if (Recognitions.size() == 3){
-            if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-                skyStoneX = Recognitions.get(2).getLeft();
-            }
-        }
-
-
-
-        if (skyStoneX < 140){
-            skyStoneP = 3;
-        }else if (skyStoneX > 320){
-            skyStoneP = 1;
-        }else{
-            skyStoneP = 2;
-        }
-
-        return skystonePostion;
-    }
 
 
     private void forwardInchesAndcollect(double inches ,double minimumP ,double maximumP) {
@@ -1166,7 +1132,50 @@ public class Red2Stone_11229 extends LinearOpMode
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minimumConfidence = 0.6;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET,LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+    }
+
+    //if see 3 diffrent objects
+    private int seeThreeObj(List<Recognition> Recognitions){
+
+        int lastPosition = 0;
+
+        int skyStoneP = 0;
+
+        double skyStoneX = 0;
+
+
+
+
+        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+            skyStoneX = Recognitions.get(0).getLeft();
+        }
+
+        if (Recognitions.size() == 2){
+            if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+                skyStoneX = Recognitions.get(1).getLeft();
+            }
+        }
+        if (Recognitions.size() == 3){
+            if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                skyStoneX = Recognitions.get(2).getLeft();
+            }
+        }
+
+
+
+
+
+        if (skyStoneX < 140){
+            skyStoneP = 1;
+        }else if (skyStoneX > 320){
+            skyStoneP = 3;
+        }else{
+            skyStoneP = 2;
+        }
+        telemetry.addData("skyStoneX",skyStoneX);
+
+        return skyStoneP;
     }
 
 
@@ -1197,7 +1206,7 @@ public class Red2Stone_11229 extends LinearOpMode
             else if (SP == 3) driveInches(44,0.03,0.4);
             else if (SP == 11) driveInches(83,0.03,0.4);
             else if (SP == 22) driveInches(86.5,0.03,0.4);
-            else if (SP == 33) driveInches(74.5,0.03,0.4);
+            else if (SP == 33) driveInches(76.5,0.03,0.4);
 
         }
         else if (!where){
@@ -1207,7 +1216,7 @@ public class Red2Stone_11229 extends LinearOpMode
             else if (SP == 3) driveInches(-44,0.03,0.4);
             else if (SP == 11) driveInches(-83,0.03,0.4);
             else if (SP == 22) driveInches(-86.5,0.03,0.4);
-            else if (SP == 33) driveInches(-74.5,0.03,0.4);
+            else if (SP == 33) driveInches(-76.5,0.03,0.4);
 
         }
     }

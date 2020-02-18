@@ -241,6 +241,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
         }
 
+
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
 
@@ -261,105 +262,40 @@ public class PIDdrive_11226 extends LinearOpMode
         // drive until end of period
 
         f = 0;
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                        telemetry.addData("# Object Detected", updatedRecognitions.size());
-                        // step through the list of recognitions and display boundary info.
-                        int i = 0;
-                        for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                    recognition.getLeft(), recognition.getTop());
-                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                    recognition.getRight(), recognition.getBottom());
-                            telemetry.addData("hight:", recognition.getTop() - recognition.getBottom());
+        while (opModeIsActive() && f == 0)
+
+        {
 
 
-                        }
-
-                        //find out the skystone location if it sees 3 cubes
-                        if (updatedRecognitions.size() > 0){
-                            skystonePostion = seeThreeObj(updatedRecognitions);
-                        }
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
 
-
-                                /*if (updatedRecognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-                                    skyStoneX = updatedRecognitions.get(0).getLeft();
-                                }else if (updatedRecognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-                                    Stone1X = updatedRecognitions.get(0).getLeft();
-                                }
+            telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+            if (updatedRecognitions != null) {
 
 
-                                if (updatedRecognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
-                                    skyStoneX = updatedRecognitions.get(1).getLeft();
+                if (updatedRecognitions.size() > 0) {
+                    skystonePostion = seeThreeObj(updatedRecognitions);
+                }
 
-                                }else if (updatedRecognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)) {
-
-                                    if (Stone1X != 0) {
-
-                                        Stone2X = updatedRecognitions.get(1).getLeft();
-                                    } else if (Stone1X == 0) {
-                                        Stone1X = updatedRecognitions.get(1).getLeft();
-                                    }
-                                }
-
-                                if (updatedRecognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-                                    skyStoneX = updatedRecognitions.get(2).getLeft();
-                                }else if (updatedRecognitions.get(2).getLabel().equals(LABEL_FIRST_ELEMENT)){
-                                    Stone2X = updatedRecognitions.get(2).getLeft();
-                                }
-
-
-                                if (skyStoneX < Stone1X && skyStoneX < Stone2X){
-                                    skystonePostion = 1;
-                                }else if (skyStoneX > Stone1X && skyStoneX > Stone2X){
-                                    skystonePostion = 3;
-                                }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
-                                    skystonePostion = 2;
-                                }*/
-                        telemetry.addData("skyStone position",skystonePostion);
-
-
-
-                        //hopefully find out the skystone location if it sees only 2 stones(it has a chance of 2:1 secesseding
-                        /*if (updatedRecognitions.size() == 2){
-                            if (updatedRecognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-                                skyStoneX = updatedRecognitions.get(0).getLeft();
-                            }else if (updatedRecognitions.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-                                Stone1X = updatedRecognitions.get(0).getLeft();
-                            }
-
-                            if (updatedRecognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)){
-                                skyStoneX = updatedRecognitions.get(1).getLeft();
-                            }else if (updatedRecognitions.get(1).getLabel().equals(LABEL_FIRST_ELEMENT)){
-                                Stone1X = updatedRecognitions.get(1).getLeft();
-                            }
-
-                            if (skyStoneX < Stone1X){
-                                skystonePostion = 1;
-                            }else if (skyStoneX > Stone1X) {
-                                skystonePostion = 3;
-
-                            }
-
-                            telemetry.addData("skyStone position",skystonePostion);
-                            telemetry.addData("skyStoneX:",skyStoneX);
-                            telemetry.addData("Stone1X:",Stone1X);
-
-                        }*/
-
-
-
-                        telemetry.update();
-                    }
+                if (skystonePostion == 1) {
+                    caseSSP1();
+                    f++;
+                } else if (skystonePostion == 2) {
+                    caseSSP2();
+                    f++;
+                } else if (skystonePostion == 3) {
+                    caseSSP3();
+                    f++;
                 }
             }
+
+
+
+
+
+
+
         }
 
         if (tfod != null) {
@@ -1041,47 +977,31 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-    private int seeObj(List<Recognition> Recognitions){
-        int skyStoneP = 0;
-        if (Recognitions.size() == 3) skyStoneP = seeThreeObj(Recognitions);
-        else if (Recognitions.size() == 2) skyStoneP = seeTwoObj(Recognitions);
-        else {
-            skyStoneP = 2;
-        }
+    private void initVuforia() {
 
-        return skyStoneP;
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+
     }
 
-    private int seeTwoObj(List<Recognition> Recognitions3){
 
-        int skyStoneP = 0;
-
-        double skyStoneX = 0;
-        double Stone1X = 0;
-        double Stone2X = 0;
-
-
-        if (Recognitions3.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions3.get(0).getLeft();
-        }else if (Recognitions3.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions3.get(0).getLeft();
-            skyStoneX = Recognitions3.get(1).getLeft();
-        }
-
-
-
-
-
-        if (skyStoneX < Stone1X){
-            skyStoneP = 1;
-        }else if (skyStoneX > Stone1X) {
-            skyStoneP = 3;
-        }
-
-
-        return skyStoneP;
+    //init the TensorFlow
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minimumConfidence = 0.6;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 
+    //if see 3 diffrent objects
     private int seeThreeObj(List<Recognition> Recognitions){
 
 
@@ -1090,6 +1010,8 @@ public class PIDdrive_11226 extends LinearOpMode
         double skyStoneX = 0;
         double Stone1X = 0;
         double Stone2X = 0;
+
+
 
         if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(0).getLeft();
@@ -1108,12 +1030,16 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
+
+
         if (skyStoneX > 300){
             skyStoneP = 3;
-        }else if (skyStoneX < 50){
+        }else if (skyStoneX < 50 && skyStoneX > -3){
             skyStoneP = 1;
-        }else{
+        }else if (skyStoneX > 0){
             skyStoneP = 2;
+        }else if (skyStoneX < -3){
+            skyStoneP = 3;
         }
 
         return skyStoneP;
@@ -1260,29 +1186,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
     //init Vuforia
-    private void initVuforia() {
 
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
-
-
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-
-    }
-
-
-    //init the TensorFlow
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.6;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_SECOND_ELEMENT);
-    }
 
 
     private void goToSkyStone(int SSP){
@@ -1301,28 +1205,28 @@ public class PIDdrive_11226 extends LinearOpMode
     }
 
     private void adjusteSS3(){
-        driveInches(9,0.03,0.3);
+        driveInches(8,0.03,0.3);
     }
 
     private void moveStone(int SP , boolean where){
         if (where){
 
-            if (SP == 1) driveInches(59,0.03,0.4);
-            else if (SP == 2) driveInches(55,0.03,0.4);
-            else if (SP == 3) driveInches(40,0.03,0.4);
-            else if (SP == 11) driveInches(83,0.03,0.4);
-            else if (SP == 22) driveInches(80.5,0.03,0.4);
-            else if (SP == 33) driveInches(64,0.03,0.4);
+            if (SP == 1) driveInches(63,0.03,0.4);
+            else if (SP == 2) driveInches(59,0.03,0.4);
+            else if (SP == 3) driveInches(44,0.03,0.4);
+            else if (SP == 11) driveInches(87,0.03,0.4);
+            else if (SP == 22) driveInches(84.5,0.03,0.4);
+            else if (SP == 33) driveInches(68,0.03,0.4);
 
         }
         else if (!where){
 
-            if (SP == 1) driveInches(-59,0.03,0.4);
-            else if (SP == 2) driveInches(-60,0.03,0.4);
-            else if (SP == 3) driveInches(-44,0.03,0.4);
-            else if (SP == 11) driveInches(-60,0.03,0.4);
-            else if (SP == 22) driveInches(-79.5,0.03,0.4);
-            else if (SP == 33) driveInches(-66.5,0.03,0.4);
+            if (SP == 1) driveInches(-63,0.03,0.4);
+            else if (SP == 2) driveInches(-64,0.03,0.4);
+            else if (SP == 3) driveInches(-48,0.03,0.4);
+            else if (SP == 11) driveInches(-64,0.03,0.4);
+            else if (SP == 22) driveInches(-83.5,0.03,0.4);
+            else if (SP == 33) driveInches(-70.5,0.03,0.4);
 
         }
     }
@@ -1352,32 +1256,15 @@ public class PIDdrive_11226 extends LinearOpMode
         slideInches(-3,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.2);
-        sleep(50);
+        sleep(100);
         slideInches(12,0.03,0.3);
         stopDcMotors();
         correctAngle();
         moveStone(1,true);
         stopDcMotors();
         bazim.setPosition(1);
-        slideInches(-4,-0.03,0.4);
         correctAngle();
-        moveStone(2,false);
-        stopDcMotors();
-        takeStone();
-        correctAngle();
-        moveStone(2,true);
-        stopDcMotors();
-        bazim.setPosition(1);
-        correctAngle();
-        moveStone(3,false);
-        stopDcMotors();
-        takeStone();
-        stopDcMotors();
-        correctAngle();
-        moveStone(3,true);
-        bazim.setPosition(1);
-        correctAngle();
-        driveInches(-12,-0.03,-0.5);
+        driveInches(-16,0.03,0.5);
         stopDcMotors();
         slide1.setPower(-1);
         sleep(500);
@@ -1397,7 +1284,7 @@ public class PIDdrive_11226 extends LinearOpMode
         moveStone(2,true);
         stopDcMotors();
         bazim.setPosition(1);
-        slideInches(-2.5,0.03,0.3);
+        slideInches(-3.5,0.03,0.3);
         correctAngle();
         moveStone(22,false);
         stopDcMotors();
@@ -1408,12 +1295,12 @@ public class PIDdrive_11226 extends LinearOpMode
         correctAngle();
         slideInches(9,0.03,0.5);
         correctAngle();
-        driveInches(49,0.03,0.5);
+        driveInches(53,0.03,0.5);
         bazim.setPosition(1);
-        driveInches(-12,0.03,0.5);
+        driveInches(-16,0.03,0.5);
         stopDcMotors();
         slide1.setPower(-1);
-        sleep(500);
+        sleep(570);
         slide1.setPower(0);
     }
 
@@ -1423,7 +1310,7 @@ public class PIDdrive_11226 extends LinearOpMode
         slideInches(-28.5, 0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.2);
-        sleep(50);
+        sleep(100);
         slideInches(12,0.03,0.3);
         stopDcMotors();
         correctAngle();
@@ -1441,9 +1328,9 @@ public class PIDdrive_11226 extends LinearOpMode
         correctAngle();
         slideInches(9,0.03,0.5);
         correctAngle();
-        driveInches(40,0.03,0.5);
+        driveInches(44,0.03,0.5);
         bazim.setPosition(1);
-        driveInches(-12,0.03,0.5);
+        driveInches(-16,0.03,0.5);
         stopDcMotors();
         slide1.setPower(-1);
         sleep(500);

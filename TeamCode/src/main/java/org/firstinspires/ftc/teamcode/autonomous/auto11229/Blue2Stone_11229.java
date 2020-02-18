@@ -265,19 +265,22 @@ public class Blue2Stone_11229 extends LinearOpMode
 
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
 
-            skystonePostion = seeThreeObj(updatedRecognitions);
+            if (updatedRecognitions != null) {
 
-            if (skystonePostion == 1){
-                caseSSP1();
-                f++;
-            }
-            else if (skystonePostion == 2){
-                caseSSP2();
-                f++;
-            }
-            else if (skystonePostion == 3){
-                caseSSP3();
-                f++;
+                if (updatedRecognitions.size() > 0) {
+                    skystonePostion = seeThreeObj(updatedRecognitions);
+                }
+
+                if (skystonePostion == 1) {
+                    caseSSP1();
+                    f++;
+                } else if (skystonePostion == 2) {
+                    caseSSP2();
+                    f++;
+                } else if (skystonePostion == 3) {
+                    caseSSP3();
+                    f++;
+                }
             }
 
         }
@@ -959,47 +962,6 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-    private int seeObj(List<Recognition> Recognitions){
-        int skyStoneP = 0;
-        if (Recognitions.size() == 3) skyStoneP = seeThreeObj(Recognitions);
-        else if (Recognitions.size() == 2) skyStoneP = seeTwoObj(Recognitions);
-        else {
-            skyStoneP = 2;
-        }
-
-        return skyStoneP;
-    }
-
-    private int seeTwoObj(List<Recognition> Recognitions3){
-
-        int skyStoneP = 0;
-
-        double skyStoneX = 0;
-        double Stone1X = 0;
-        double Stone2X = 0;
-
-
-        if (Recognitions3.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)){
-            skyStoneX = Recognitions3.get(0).getLeft();
-            Stone1X = Recognitions3.get(1).getLeft();
-        }else if (Recognitions3.get(0).getLabel().equals(LABEL_FIRST_ELEMENT)){
-            Stone1X = Recognitions3.get(0).getLeft();
-            skyStoneX = Recognitions3.get(1).getLeft();
-        }
-
-
-
-
-
-        if (skyStoneX < Stone1X){
-            skyStoneP = 1;
-        }else if (skyStoneX > Stone1X) {
-            skyStoneP = 3;
-        }
-
-
-        return skyStoneP;
-    }
 
     private int seeThreeObj(List<Recognition> Recognitions){
 

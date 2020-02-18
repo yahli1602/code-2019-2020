@@ -99,7 +99,7 @@ public class teleop_11226_A extends LinearOpMode {
         lDrive1.setDirection(DcMotor.Direction.FORWARD);
         lDrive2.setDirection(DcMotor.Direction.FORWARD);
         slide.setDirection(DcMotor.Direction.FORWARD);
-        elevator.setDirection(DcMotorSimple.Direction.FORWARD);
+        elevator.setDirection(DcMotorSimple.Direction.REVERSE);
         pushLeft.setDirection(Servo.Direction.FORWARD);
         pushRight.setDirection(Servo.Direction.REVERSE);
         collectLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -154,6 +154,13 @@ public class teleop_11226_A extends LinearOpMode {
                     lDrive1.setPower(0);
                     lDrive2.setPower(0);
                 }
+
+
+                if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
+                    slide.setPower(gamepad1.right_stick_x);
+                } else {
+                    slide.setPower(0);
+                }
             } else {
                 if (gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) {
                     rDrive1.setPower(gamepad1.left_stick_y / 2 - fix);
@@ -176,6 +183,12 @@ public class teleop_11226_A extends LinearOpMode {
                     lDrive1.setPower(0);
                     lDrive2.setPower(0);
                 }
+
+                if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
+                    slide.setPower(gamepad1.right_stick_x / 2);
+                } else {
+                    slide.setPower(0);
+                }
             }
 
 
@@ -190,6 +203,8 @@ public class teleop_11226_A extends LinearOpMode {
                     } else if (lDrive2.isBusy()) {
                         fix = lDrive2.getPower();
                     }
+
+
                 } else {
                     if ((gamepad1.left_stick_y > 0.2 || gamepad1.left_stick_y < -0.2) && lDrive2.getPower() * 2 != gamepad1.left_stick_y) {
                         fix = lDrive2.getPower() - gamepad1.left_stick_y;
@@ -216,20 +231,14 @@ public class teleop_11226_A extends LinearOpMode {
 
 
 
-            if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
-                slide.setPower(gamepad1.right_stick_x);
-            } else {
-                slide.setPower(0);
-            }
 
 
-            if (gamepad1.dpad_left){
+
+            if (gamepad2.a){
                 bazim.setPosition(1);
-            }else if (gamepad1.dpad_up){
-                bazim.setPosition(0.5);
-            }else if (gamepad1.dpad_down){
+            }else if (gamepad2.dpad_down){
                 bazim.setPosition(0.25);
-            }else if (gamepad1.dpad_right){
+            }else if (gamepad2.b){
                 bazim.setPosition(0.75);
             }
 

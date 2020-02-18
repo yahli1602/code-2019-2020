@@ -302,37 +302,47 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
     //if see 3 diffrent objects
     private int seeThreeObj(List<Recognition> Recognitions){
 
+        int lastPosition = 0;
 
         int skyStoneP = 0;
 
         double skyStoneX = 0;
-        double Stone1X = 0;
-        double Stone2X = 0;
+
+
+
 
         if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
-            skyStoneX = Recognitions.get(0).getLeft();
+            skyStoneX = Recognitions.get(0).getRight();
         }
 
         if (Recognitions.size() == 2){
             if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
-                skyStoneX = Recognitions.get(1).getLeft();
+                skyStoneX = Recognitions.get(1).getRight();
             }
         }
         if (Recognitions.size() == 3){
             if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-                skyStoneX = Recognitions.get(2).getLeft();
+                skyStoneX = Recognitions.get(2).getRight();
             }
         }
 
 
 
-        if (skyStoneX > 300){
+
+
+        if (skyStoneX == 0) {
+            skyStoneP = lastPosition;
+        }else if (skyStoneX < 350){
             skyStoneP = 3;
-        }else if (skyStoneX < 50){
+            lastPosition = 3;
+        }else if (skyStoneX > 600){
             skyStoneP = 1;
+            lastPosition = 1;
         }else{
             skyStoneP = 2;
+            lastPosition = 2;
         }
+        telemetry.addData("skyStoneX",skyStoneX);
 
         return skyStoneP;
     }
