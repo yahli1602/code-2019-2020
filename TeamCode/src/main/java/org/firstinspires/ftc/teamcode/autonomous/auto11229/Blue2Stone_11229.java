@@ -189,7 +189,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
         pidRotate.PIDcon(0.01,0,0);
-
+//*
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
 
