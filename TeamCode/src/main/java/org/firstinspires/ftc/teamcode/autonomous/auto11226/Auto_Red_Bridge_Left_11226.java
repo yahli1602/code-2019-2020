@@ -23,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.autonomous.PIDController.PIDcon;
 
-@Autonomous(name = "Auto 11226 red bridge left", group = "PID")
+@Autonomous(name = "Auto 11226 rBridge bStones", group = "PID")
 
 public class Auto_Red_Bridge_Left_11226 extends LinearOpMode {
     DcMotor ldrive1, ldrive2, rdrive1, rdrive2, slide1, elevator;
@@ -91,8 +91,7 @@ public class Auto_Red_Bridge_Left_11226 extends LinearOpMode {
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-
-        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
         cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
@@ -195,8 +194,9 @@ public class Auto_Red_Bridge_Left_11226 extends LinearOpMode {
         int q = 0;
         while (opModeIsActive() && q == 0) {
             //sleep(20000);
-            slideInches(-46, -0.4, 0.4);
-            driveInches(60, -0.4, 0.4);
+            slideInches(35, 0.4, 0.4);
+            zRotate(0.3);
+            driveInches(50, 0.4, 0.4);
             q++;
         }
         // Use PID with imu input to drive in a straight line.
@@ -239,11 +239,73 @@ public class Auto_Red_Bridge_Left_11226 extends LinearOpMode {
         return globalAngle;
     }
 
-    /**
-     * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
-     *
-     * @param degrees Degrees to turn, + is left - is right
-     */
+
+
+    private void zRotate(double power) {
+        // restart imu angle tracking.
+
+
+
+        // if degrees > 359 we cap at 359 with same sign as original degrees.
+
+
+        // start pid controller. PID controller will monitor the turn angle with respect to the
+        // target angle and reduce power as we approach the target angle. This is to prevent the
+        // robots momentum from overshooting the turn after we turn off the power. The PID controller
+        // reports onTarget() = true when the difference between turn angle and target angle is within
+        // 1% of target (tolerance) which is about 1 degree. This helps prevent overshoot. Overshoot is
+        // dependant on the motor and gearing configuration, starting power, weight of the robot and the
+        // on target tolerance. If the controller overshoots, it will reverse the sign of the output
+        // turning the robot back toward the setpoint value.
+
+        pidRotate.reset();
+        pidRotate.setSetPoint(0);
+        pidRotate.setOutputRange(0, power);
+
+
+
+        pidRotate.setSensorValue(getAngle());
+        pidRotate.calculate();
+
+        if (getAngle() < 0) {
+
+            do {
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                ldrive1.setPower(-power);
+                ldrive2.setPower(-power);
+                rdrive1.setPower(power);
+                rdrive2.setPower(power);
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
+        } else
+            do {
+                pidRotate.setSensorValue(getAngle());
+                power = pidRotate.calculate();
+                ldrive1.setPower(-power);
+                ldrive2.setPower(-power);
+                rdrive1.setPower(power);
+                rdrive2.setPower(power);
+
+
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
+
+
+        rdrive1.setPower(0);
+        rdrive2.setPower(0);
+        ldrive1.setPower(0);
+        ldrive2.setPower(0);
+
+
+        rotation = getAngle();
+
+
+        sleep(500);
+
+
+        resetAngle();
+    }
+
     private void rotate(int degrees, double power) {
         // restart imu angle tracking.
         resetAngle();

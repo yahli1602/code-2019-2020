@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.autonomous.auto11229;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.autonomous.imageProsessing.TensorFlow;
 
 import java.util.List;
 //
+@Disabled
 @Autonomous(name="BlueStone 11229 2", group="Stone")
 
 public class Blue2Stone_11229_2 extends LinearOpMode

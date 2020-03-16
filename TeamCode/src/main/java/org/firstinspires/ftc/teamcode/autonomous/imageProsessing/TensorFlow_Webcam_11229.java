@@ -73,8 +73,6 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
     private TouchSensor stoneIn = null;*/
 
 
-
-
     private double skyStoneX = 0;
     private double Stone1X = 0;
     private double Stone2X = 0;
@@ -187,7 +185,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
                         }
 
                         //find out the skystone location if it sees 3 cubes
-                        if (updatedRecognitions.size() > 0){
+                        if (updatedRecognitions.size() > 0) {
                             skystonePostion = seeThreeObj(updatedRecognitions);
                         }
 
@@ -227,10 +225,10 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
                                 }else if (skyStoneX > Stone1X && skyStoneX < Stone2X || skyStoneX < Stone1X && skyStoneX > Stone2X) {
                                     skystonePostion = 2;
                                 }*/
-                        telemetry.addData("skyStone position",skystonePostion);
-                        telemetry.addData("skyStoneX:",skyStoneX);
-                        telemetry.addData("Stone1X:",Stone1X);
-                        telemetry.addData("Stone2X:",Stone2X);
+                        telemetry.addData("skyStone position", skystonePostion);
+                        telemetry.addData("skyStoneX:", skyStoneX);
+                        telemetry.addData("Stone1X:", Stone1X);
+                        telemetry.addData("Stone2X:", Stone2X);
 
 
                         //hopefully find out the skystone location if it sees only 2 stones(it has a chance of 2:1 secesseding
@@ -259,7 +257,6 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
                             telemetry.addData("Stone1X:",Stone1X);
 
                         }*/
-
 
 
                         telemetry.update();
@@ -294,7 +291,7 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.6;
+        tfodParameters.minimumConfidence = 0.45;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
@@ -312,17 +309,17 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
 
 
         if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
-            skyStoneX = Recognitions.get(0).getRight();
+            skyStoneX = Recognitions.get(0).getLeft();
         }
 
         if (Recognitions.size() == 2){
             if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
-                skyStoneX = Recognitions.get(1).getRight();
+                skyStoneX = Recognitions.get(1).getLeft();
             }
         }
         if (Recognitions.size() == 3){
             if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
-                skyStoneX = Recognitions.get(2).getRight();
+                skyStoneX = Recognitions.get(2).getLeft();
             }
         }
 
@@ -330,17 +327,16 @@ public class TensorFlow_Webcam_11229 extends LinearOpMode {
 
 
 
-        if (skyStoneX == 0) {
-            skyStoneP = lastPosition;
-        }else if (skyStoneX < 350){
+
+        if (skyStoneX < 8){
             skyStoneP = 3;
-            lastPosition = 3;
-        }else if (skyStoneX > 600){
+        }
+        else if (skyStoneX < 140){
             skyStoneP = 1;
-            lastPosition = 1;
+        }else if (skyStoneX > 320){
+            skyStoneP = 3;
         }else{
             skyStoneP = 2;
-            lastPosition = 2;
         }
         telemetry.addData("skyStoneX",skyStoneX);
 

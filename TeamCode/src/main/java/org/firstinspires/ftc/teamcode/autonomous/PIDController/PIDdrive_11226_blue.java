@@ -275,7 +275,7 @@ public class PIDdrive_11226_blue extends LinearOpMode
 
 
                 if (updatedRecognitions.size() > 0) {
-                    skystonePostion = seeThreeObj(updatedRecognitions);
+                    skystonePostion = seeThreeObj(updatedRecognitions,0,0);
                 }
 
                 if (skystonePostion == 1) {
@@ -1147,55 +1147,55 @@ public class PIDdrive_11226_blue extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.4;
+        tfodParameters.minimumConfidence = 0.35;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 
     //if see 3 diffrent objects
-    private int seeThreeObj(List<Recognition> Recognitions){
+    private int seeThreeObj(List<Recognition> Recognitions, int lastPosition, double skyStoneX) {
 
-        int lastPosition = 0;
 
         int skyStoneP = 0;
 
-        double skyStoneX = 0;
 
+        double skyStoneW;
 
+        double Stone1X = 0;
+        double Stone2X = 0;
 
 
         if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
             skyStoneX = Recognitions.get(0).getRight();
+            skyStoneW = Recognitions.get(0).getWidth();
         }
-
-        if (Recognitions.size() == 2){
+        if (Recognitions.size() > 1) {
             if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
                 skyStoneX = Recognitions.get(1).getRight();
+                skyStoneW = Recognitions.get(1).getWidth();
             }
         }
-        if (Recognitions.size() == 3){
-            if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+        if (Recognitions.size() > 2) {
+            if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)) {
                 skyStoneX = Recognitions.get(2).getRight();
+                skyStoneW = Recognitions.get(2).getWidth();
             }
         }
 
-
-
-
-
-        if (skyStoneX == 0) {
-            skyStoneP = lastPosition;
-        }else if (skyStoneX < 350){
-            skyStoneP = 3;
-            lastPosition = 3;
-        }else if (skyStoneX > 600){
+        if (skyStoneX > 550) {
             skyStoneP = 1;
             lastPosition = 1;
-        }else{
+        } else if (skyStoneX < 400) {
+            skyStoneP = 3;
+            lastPosition = 3;
+        } else {
             skyStoneP = 2;
             lastPosition = 2;
         }
-        telemetry.addData("skyStoneX",skyStoneX);
+        telemetry.addData("skyStoneX", skyStoneX);
+
+
+
 
         return skyStoneP;
     }
@@ -1228,8 +1228,8 @@ public class PIDdrive_11226_blue extends LinearOpMode
             else if (SP == 2) driveInches(55,0.03,0.4);
             else if (SP == 3) driveInches(40,0.03,0.4);
             else if (SP == 11) driveInches(83,0.03,0.4);
-            else if (SP == 22) driveInches(84,0.03,0.4);
-            else if (SP == 33) driveInches(67,0.03,0.4);
+            else if (SP == 22) driveInches(84.5,0.03,0.4);
+            else if (SP == 33) driveInches(68,0.03,0.4);
 
         }
         else if (!where){
@@ -1238,8 +1238,8 @@ public class PIDdrive_11226_blue extends LinearOpMode
             else if (SP == 2) driveInches(-60,0.03,0.4);
             else if (SP == 3) driveInches(-44,0.03,0.4);
             else if (SP == 11) driveInches(-60,0.03,0.4);
-            else if (SP == 22) driveInches(-84,0.03,0.4);
-            else if (SP == 33) driveInches(-67,0.03,0.4);
+            else if (SP == 22) driveInches(-84.5,0.03,0.4);
+            else if (SP == 33) driveInches(-68,0.03,0.4);
 
         }
     }
@@ -1304,7 +1304,7 @@ public class PIDdrive_11226_blue extends LinearOpMode
         stopDcMotors();
         takeStone();
         correctAngle();
-        driveInches(-24,0.03,0.4);
+        driveInches(-30,0.03,0.4);
         stopDcMotors();
         correctAngle();
         slideInches(9,0.03,0.5);
@@ -1339,14 +1339,14 @@ public class PIDdrive_11226_blue extends LinearOpMode
         stopDcMotors();
         takeStone();
         correctAngle();
-        driveInches(-24,0.03,0.4);
+        driveInches(-30,0.03,0.4);
         stopDcMotors();
         correctAngle();
         slideInches(9,0.03,0.5);
         correctAngle();
         driveInches(-40,0.03,0.5);
         bazim.setPosition(1);
-        driveInches(12,0.03,0.5);
+        driveInches(14,0.03,0.5);
         stopDcMotors();
         slide1.setPower(-1);
         sleep(500);

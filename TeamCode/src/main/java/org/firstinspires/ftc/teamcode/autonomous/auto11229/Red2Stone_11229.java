@@ -1130,7 +1130,7 @@ public class Red2Stone_11229 extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.6;
+        tfodParameters.minimumConfidence = 0.45;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
@@ -1166,7 +1166,11 @@ public class Red2Stone_11229 extends LinearOpMode
 
 
 
-        if (skyStoneX < 140){
+
+        if (skyStoneX < 8){
+            skyStoneP = 3;
+        }
+        else if (skyStoneX < 140){
             skyStoneP = 1;
         }else if (skyStoneX > 320){
             skyStoneP = 3;
@@ -1206,7 +1210,7 @@ public class Red2Stone_11229 extends LinearOpMode
             else if (SP == 3) driveInches(44,0.03,0.4);
             else if (SP == 11) driveInches(83,0.03,0.4);
             else if (SP == 22) driveInches(86.5,0.03,0.4);
-            else if (SP == 33) driveInches(76.5,0.03,0.4);
+            else if (SP == 33) driveInches(71.5,0.03,0.4);
 
         }
         else if (!where){
@@ -1216,7 +1220,7 @@ public class Red2Stone_11229 extends LinearOpMode
             else if (SP == 3) driveInches(-44,0.03,0.4);
             else if (SP == 11) driveInches(-83,0.03,0.4);
             else if (SP == 22) driveInches(-86.5,0.03,0.4);
-            else if (SP == 33) driveInches(-76.5,0.03,0.4);
+            else if (SP == 33) driveInches(-71.5,0.03,0.4);
 
         }
     }

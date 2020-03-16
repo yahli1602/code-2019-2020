@@ -988,7 +988,8 @@ public class Blue2Stone_11229 extends LinearOpMode
 
 
 
-        if (skyStoneX < 140){
+
+        else if (skyStoneX < 140){
             skyStoneP = 3;
         }else if (skyStoneX > 320){
             skyStoneP = 1;
@@ -1157,7 +1158,7 @@ public class Blue2Stone_11229 extends LinearOpMode
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.6;
+        tfodParameters.minimumConfidence = 0.4;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET,LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
@@ -1171,7 +1172,7 @@ public class Blue2Stone_11229 extends LinearOpMode
     }
 
     private void adjusteSS1(){
-        driveInches(-8.5,0.03,0.3);
+        driveInches(-7,0.03,0.3);
     }
 
     private void adjusteSS2(){
@@ -1179,7 +1180,7 @@ public class Blue2Stone_11229 extends LinearOpMode
     }
 
     private void adjusteSS3(){
-        driveInches(9,0.03,0.3);
+        driveInches(8,0.03,0.3);
     }
 
     private void moveStone(int SP , boolean where){
@@ -1192,6 +1193,8 @@ public class Blue2Stone_11229 extends LinearOpMode
             else if (SP == 22) driveInches(79.5,0.03,0.4);
             else if (SP == 33) driveInches(72.5,0.03,0.4);
 
+
+
         }
         else if (!where){
 
@@ -1200,7 +1203,7 @@ public class Blue2Stone_11229 extends LinearOpMode
             else if (SP == 3) driveInches(-44,0.03,0.4);
             else if (SP == 11) driveInches(-87.5,0.03,0.4);
             else if (SP == 22) driveInches(-79.5,0.03,0.4);
-            else if (SP == 33) driveInches(-70.5,0.03,0.4);
+            else if (SP == 33) driveInches(-71.5,0.03,0.4);
 
         }
     }
@@ -1247,7 +1250,7 @@ public class Blue2Stone_11229 extends LinearOpMode
 
     private void caseSSP2(){
         adjusteSS2();
-        slideInches(29.5,0.03,0.6);
+        slideInches(29.5,0.03,0.4);
         stopDcMotors();
         bazim.setPosition(0.05);
         sleep(100);

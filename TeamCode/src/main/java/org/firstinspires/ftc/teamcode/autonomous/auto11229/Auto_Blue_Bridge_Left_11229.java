@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.autonomous.imageProsessing.TensorFlow;
 
 import java.util.List;
 
-@Autonomous(name = "Auto 11229 blue bridge left 11229", group = "11229 Stone")
+@Autonomous(name = "Auto 11229 bBridge rStones", group = "11229 Stone")
 
 public class Auto_Blue_Bridge_Left_11229 extends LinearOpMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -214,8 +214,8 @@ public class Auto_Blue_Bridge_Left_11229 extends LinearOpMode {
         int t = 0;
         while (opModeIsActive() && f == 0) {
             //sleep(20000);
-            slideInches(46, -0.4, 0.4);
-            driveInches(60, -0.4, 0.4);
+            slideInches(35, -0.4, 0.4);
+            driveInches(50, -0.4, 0.4);
             f++;
         }
 

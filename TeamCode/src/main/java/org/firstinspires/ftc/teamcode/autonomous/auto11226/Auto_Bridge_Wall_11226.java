@@ -14,6 +14,7 @@ package org.firstinspires.ftc.teamcode.autonomous.auto11226;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -22,8 +23,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.autonomous.PIDController.PIDcon;
-
-@Autonomous(name = "Auto 11226 bridge wall", group = "PID")
+@Disabled
+@Autonomous(name = "Auto 11226 Drive forward", group = "PID")
 
 public class Auto_Bridge_Wall_11226 extends LinearOpMode {
     DcMotor ldrive1, ldrive2, rdrive1, rdrive2, slide1, elevator;
@@ -91,8 +92,7 @@ public class Auto_Bridge_Wall_11226 extends LinearOpMode {
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-
-        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
         /*collectRight = hardwareMap.get(Servo.class, "collect right");
         collectLeft = hardwareMap.get(Servo.class, "collect left");
         cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
@@ -195,7 +195,7 @@ public class Auto_Bridge_Wall_11226 extends LinearOpMode {
         int q = 0;
         while (opModeIsActive() && q == 0) {
             //sleep(20000);
-            driveInches(60, -0.4, 0.4);
+            driveInches(50, -0.4, 0.4);
             q++;
         }
         // Use PID with imu input to drive in a straight line.

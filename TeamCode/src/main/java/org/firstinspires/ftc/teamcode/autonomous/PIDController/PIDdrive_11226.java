@@ -275,7 +275,7 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
                 if (updatedRecognitions.size() > 0) {
-                    skystonePostion = seeThreeObj(updatedRecognitions);
+                    skystonePostion = seeThreeObj(updatedRecognitions,0,0);
                 }
 
                 if (skystonePostion == 1) {
@@ -1002,12 +1002,12 @@ public class PIDdrive_11226 extends LinearOpMode
     }
 
     //if see 3 diffrent objects
-    private int seeThreeObj(List<Recognition> Recognitions){
+    private int seeThreeObj(List<Recognition> Recognitions, int lastPosition, double skyStoneX){
 
 
         int skyStoneP = 0;
 
-        double skyStoneX = 0;
+
         double Stone1X = 0;
         double Stone2X = 0;
 
@@ -1032,14 +1032,24 @@ public class PIDdrive_11226 extends LinearOpMode
 
 
 
-        if (skyStoneX > 300){
+        if (skyStoneX == 0){
+            skyStoneP = lastPosition;
+        }
+
+        else if (skyStoneX > 300){
             skyStoneP = 3;
-        }else if (skyStoneX < 50 && skyStoneX > -3){
+            lastPosition = 3;
+        }else if (skyStoneX < 50 && skyStoneX > 0){
             skyStoneP = 1;
+            lastPosition = 1;
         }else if (skyStoneX > 0){
             skyStoneP = 2;
-        }else if (skyStoneX < -3){
+            lastPosition = 2;
+        }else if (skyStoneX < 1){
             skyStoneP = 3;
+            lastPosition = 3;
+        }else{
+            skyStoneP = 2;
         }
 
         return skyStoneP;
@@ -1205,7 +1215,7 @@ public class PIDdrive_11226 extends LinearOpMode
     }
 
     private void adjusteSS3(){
-        driveInches(8,0.03,0.3);
+        driveInches(8.5,0.03,0.3);
     }
 
     private void moveStone(int SP , boolean where){
@@ -1216,7 +1226,7 @@ public class PIDdrive_11226 extends LinearOpMode
             else if (SP == 3) driveInches(44,0.03,0.4);
             else if (SP == 11) driveInches(87,0.03,0.4);
             else if (SP == 22) driveInches(84.5,0.03,0.4);
-            else if (SP == 33) driveInches(68,0.03,0.4);
+            else if (SP == 33) driveInches(71,0.03,0.4);
 
         }
         else if (!where){
@@ -1226,7 +1236,7 @@ public class PIDdrive_11226 extends LinearOpMode
             else if (SP == 3) driveInches(-48,0.03,0.4);
             else if (SP == 11) driveInches(-64,0.03,0.4);
             else if (SP == 22) driveInches(-83.5,0.03,0.4);
-            else if (SP == 33) driveInches(-70.5,0.03,0.4);
+            else if (SP == 33) driveInches(-68.5,0.03,0.4);
 
         }
     }
@@ -1295,9 +1305,9 @@ public class PIDdrive_11226 extends LinearOpMode
         correctAngle();
         slideInches(9,0.03,0.5);
         correctAngle();
-        driveInches(53,0.03,0.5);
+        driveInches(56,0.03,0.5);
         bazim.setPosition(1);
-        driveInches(-16,0.03,0.5);
+        driveInches(-19,0.03,0.5);
         stopDcMotors();
         slide1.setPower(-1);
         sleep(570);
@@ -1328,9 +1338,9 @@ public class PIDdrive_11226 extends LinearOpMode
         correctAngle();
         slideInches(9,0.03,0.5);
         correctAngle();
-        driveInches(44,0.03,0.5);
+        driveInches(47,0.03,0.5);
         bazim.setPosition(1);
-        driveInches(-16,0.03,0.5);
+        driveInches(-21,0.03,0.5);
         stopDcMotors();
         slide1.setPower(-1);
         sleep(500);

@@ -14,6 +14,7 @@ package org.firstinspires.ftc.teamcode.autonomous.auto11226;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -22,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.autonomous.PIDController.PIDcon;
-
+@Disabled
 @Autonomous(name = "Auto Park 11226 Red Build and Blue stones", group = "PID")
 
 public class auto_park_11226_red_build_blue_stones extends LinearOpMode {
@@ -90,12 +91,19 @@ public class auto_park_11226_red_build_blue_stones extends LinearOpMode {
         ldrive1 = hardwareMap.get(DcMotor.class, "lDrive1");
         ldrive2 = hardwareMap.get(DcMotor.class, "lDrive2");
         slide1 = hardwareMap.get(DcMotor.class, "slide");
-        elevator = hardwareMap.get(DcMotor.class, "teleop_11226_A");
-        /*collectRight = hardwareMap.get(Servo.class, "collect right");
-        collectLeft = hardwareMap.get(Servo.class, "collect left");
-        cubeIn = hardwareMap.get(TouchSensor.class, "cube in");*/
+        elevator = hardwareMap.get(DcMotor.class, "elevator");
 
-        ePID.PIDcon(0.1, 0, 0);
+
+
+
+        rdrive1.setDirection(DcMotor.Direction.FORWARD);
+        rdrive2.setDirection(DcMotor.Direction.FORWARD);
+        ldrive1.setDirection(DcMotor.Direction.REVERSE);
+        ldrive2.setDirection(DcMotor.Direction.REVERSE);
+        slide1.setDirection(DcMotor.Direction.FORWARD);
+        elevator.setDirection(DcMotor.Direction.FORWARD);
+
+
 
         rdrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -104,14 +112,6 @@ public class auto_park_11226_red_build_blue_stones extends LinearOpMode {
         slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        rdrive1.setDirection(DcMotor.Direction.REVERSE);
-        rdrive2.setDirection(DcMotor.Direction.REVERSE);
-        ldrive1.setDirection(DcMotor.Direction.FORWARD);
-        ldrive2.setDirection(DcMotor.Direction.FORWARD);
-        slide1.setDirection(DcMotor.Direction.FORWARD);
-
-        elevator.setDirection(DcMotor.Direction.REVERSE);
 
         rdrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rdrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -195,7 +195,7 @@ public class auto_park_11226_red_build_blue_stones extends LinearOpMode {
         while (opModeIsActive() && q == 0) {
 
 
-            sleep(20000);
+
             slideInches(30, 0.03, 1);
             q++;
 

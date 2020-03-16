@@ -26,20 +26,22 @@ import org.firstinspires.ftc.teamcode.autonomous.imageProsessing.TensorFlow;
 
 import java.util.List;
 
-@Autonomous(name = "Auto 11229 bridge wall", group = "11229 Stone")
+@Autonomous(name="auto park 1229 drive forward", group="auto 11229")
 
-public class Auto_Bridge_Wall_11229 extends LinearOpMode {
+public class Auto_Bridge_Wall_11229 extends LinearOpMode
+{
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
-    DcMotor lDrive1, lDrive2, rDrive1, rDrive2, slide1, elevator;
-    BNO055IMU imu;
-    Servo bazim;
+    DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
+    BNO055IMU               imu;
+    Servo                   bazim;
 
 
-    Orientation lastAngles = new Orientation();
-    double globalAngle, rotation;
-    boolean aButton, bButton, touched;
+
+    Orientation             lastAngles = new Orientation();
+    double                  globalAngle, rotation;
+    boolean                 aButton, bButton, touched;
 
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
@@ -73,7 +75,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
     double ScurrentPosition = 0;
 
 
-    int skystonePostion;
+    int skystonePostion = 0;
     int Stone1Postion;
     int Stone2Postion;
     int seeSkystone = 0;
@@ -81,8 +83,8 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
     int seeStone2 = 0;
     boolean canSeeSkystone = false;
 
-    double d_Rpower = 0;
-    double d_Lpower = 0;
+    double  d_Rpower = 0;
+    double  d_Lpower = 0;
 
     int h = 0;
     int f = 0;
@@ -93,16 +95,26 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
     private final double ticksPerRevolution = 28;
 
     private final double ticksPerSpin = ticksPerRevolution * 26.6666666666666666666666666666666666666666666666666666666666666666;
-    private final double ticksPerInch = 1 / perimeter * ticksPerSpin;
+    private final double ticksPerInch = 1 / perimeter* ticksPerSpin;
 
     private final double SticksPerSpin = ticksPerRevolution * 40;
-    private final double SticksPerInch = 1 / perimeter * SticksPerSpin;
+    private final double SticksPerInch = 1 / perimeter* SticksPerSpin;
 
     // called when init button is  pressed.
 
 
+
+    private static final String VUFORIA_KEY =
+            "AVHZDTL/////AAABmQcZurBiA01smn3EpdcPCJpZqB8HZL60ujXKBU3ejemhikdsno1L3+7QKhYWSXEfUl5uWZxBqPJXl6Qj0AG3XKuq/jLKmyLJ67xHlYM/LoVKbxhjxGJJ5stO+21qtYET0KberI6XObNkTmskQ8kLQX7QwLhmllfyhu25bPFWwmVdnGq3jRAxoCNKP9ktqKkqp62Fl39qcvOwCOBPqG0uFMFHwVaNavRHS1f4fnuZXk4QqEDo5e2K9J/sCR/2BvvzdPV3QfTkUPNm/8dfW2nsxCM2E9rpj67CFq9fOAHjY+7tp4o2U/yJbxc5RBr5mZ9/CeQk7zfl9rQv7WrVWevfvHqvb2xMsoqVJGze9rE62AmI";
+    private VuforiaLocalizer vuforia;
+
+
+    private TFObjectDetector tfod;
+
+
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() throws InterruptedException
+    {
 
 
         rDrive1 = hardwareMap.get(DcMotor.class, "rDrive1");
@@ -115,12 +127,14 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         bazim = hardwareMap.get(Servo.class, "bazim");
 
 
+
         rDrive1.setDirection(DcMotor.Direction.FORWARD);
         rDrive2.setDirection(DcMotor.Direction.FORWARD);
         lDrive1.setDirection(DcMotor.Direction.REVERSE);
         lDrive2.setDirection(DcMotor.Direction.REVERSE);
         slide1.setDirection(DcMotor.Direction.FORWARD);
         elevator.setDirection(DcMotor.Direction.FORWARD);
+
 
 
         rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -151,10 +165,10 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
-        parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.loggingEnabled = false;
+        parameters.mode                = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C 0port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
@@ -163,32 +177,42 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
         imu.initialize(parameters);
 
+
+
+        //if (tfod != null) {
+        //  tfod.activate();
+        //}
+
+
+
         // Set PID proportional value to start reducing power at about 50 degrees of rotation.
         // P by itself may stall before turn completed so we add a bit of I (integral) which
         // causes the PID controller to gently increase power if the turn is not completed.
-        pidRotate.PIDcon(0.01, 0, 0);
+        pidRotate.PIDcon(0.01,0,0);
 
         // Set PID proportional value to produce non-zero correction value when robot veers off
         // straight line. P value controls how sensitive the correction is.
 
 
-        dRPID.PIDcon(0.05, 0, 0);
-        dLPID.PIDcon(0.05, 0, 0);
+        dRPID.PIDcon(0.05,0,0);
+        dLPID.PIDcon(0.05,0,0);
 
-        RLCPID.PIDcon(0.02, 0, 0);
+        RLCPID.PIDcon(0.02,0,0);
 
-        sPID.PIDcon(0.14, 0, 0.15);
-        ScPID.PIDcon(0.01, 0, 0.1);
-        SaPID.PIDcon(0.025, 0, 0);
+        sPID.PIDcon(0.14,0,0.15);
+        ScPID.PIDcon(0.01,0,0.1);
+        SaPID.PIDcon(0.025,0,0);
 
-        aPID.PIDcon(0.012, 0, 0.005);
+        aPID.PIDcon(0.012,0,0.005);
+
 
 
         telemetry.addData("Mode", "calibrating...");
         telemetry.update();
 
         // make sure the imu gyro is calibrated before continuing.
-        while (!isStopRequested() && !imu.isGyroCalibrated()) {
+        while (!isStopRequested() && !imu.isGyroCalibrated())
+        {
             sleep(50);
             idle();
         }
@@ -199,6 +223,25 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
         // wait for start button.
 
+        initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+
+        if (tfod != null) {
+            tfod.activate();
+
+        }
+        List<Recognition> updatedRecognitions2 = tfod.getUpdatedRecognitions();
+        if (updatedRecognitions2.size() > 0){
+            telemetry.addData("camera state:","ready");
+            telemetry.update();
+        }
+
+
         waitForStart();
 
         telemetry.addData("Mode", "running");
@@ -208,16 +251,28 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         // Set up parameters for driving in a straight line.
 
 
+
+
+
         // drive until end of period.
 
         f = 0;
         int t = 0;
-        while (opModeIsActive() && f == 0) {
-            //sleep(20000);
-            driveInches(60, -0.4, 0.4);
+        while (opModeIsActive() && f == 0)
+
+        {
+
+            driveInches(12,0.03,1);
+
             f++;
+
+
+
         }
 
+        if (tfod != null) {
+            tfod.shutdown();
+        }
         // Use PID with imu input to drive in a straight line.
 
     }
@@ -225,7 +280,8 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
     /**
      * Resets the cumulative angle tracking to zero.
      */
-    private void resetAngle() {
+    private void resetAngle()
+    {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         globalAngle = 0;
@@ -233,10 +289,10 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
     /**
      * Get current cumulative angle rotation from last reset.
-     *
      * @return Angle in degrees. + = left, - = right from zero point.
      */
-    private double getAngle() {
+    private double getAngle()
+    {
         // We experimentally determined the Z axis is the axis we want to use for heading angle.
         // We have to process the angle because the imu works in euler angles so the Z axis is
         // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
@@ -259,9 +315,9 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
     }
 
 
-    private void rotate(int degrees, double power, boolean reset) {
+    private void rotate(int degrees, double power,boolean reset) {
         // restart imu angle tracking.
-        if (reset) {
+        if (reset){
             resetAngle();
         }
 
@@ -283,6 +339,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         pidRotate.setOutputRange(0, power);
 
 
+
         pidRotate.setSensorValue(getAngle());
         pidRotate.calculate();
 
@@ -296,7 +353,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
                 rDrive1.setPower(power);
                 rDrive2.setPower(power);
 
-            } while (opModeIsActive() && (Math.abs(getAngle()) < (Math.abs(degrees) - 3)));
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (Math.abs(degrees) - 3 )));
         } else
             do {
                 pidRotate.setSensorValue(getAngle());
@@ -307,7 +364,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
                 rDrive2.setPower(power);
 
 
-            } while (opModeIsActive() && (Math.abs(getAngle()) < (Math.abs(degrees) - 3)));
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (Math.abs(degrees) - 3 )));
 
 
         rDrive1.setPower(0);
@@ -329,6 +386,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         // restart imu angle tracking.
 
 
+
         // if degrees > 359 we cap at 359 with same sign as original degrees.
 
 
@@ -346,6 +404,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         pidRotate.setOutputRange(0, power);
 
 
+
         pidRotate.setSensorValue(getAngle());
         pidRotate.calculate();
 
@@ -359,7 +418,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
                 rDrive1.setPower(power);
                 rDrive2.setPower(power);
 
-            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3)));
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
         } else
             do {
                 pidRotate.setSensorValue(getAngle());
@@ -370,7 +429,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
                 rDrive2.setPower(power);
 
 
-            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3)));
+            } while (opModeIsActive() && (Math.abs(getAngle()) < (0 - 3 )));
 
 
         rDrive1.setPower(0);
@@ -385,17 +444,18 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         sleep(500);
 
 
+
     }
 
-    private void driveInches(double inches, double minimumP, double maximumP) {
-        if (inches > 0) {
-            forwardInches(inches, minimumP, maximumP);
-        } else if (inches < 0) {
-            backInches(inches, minimumP, maximumP);
+    private void driveInches(double inches ,double minimumP ,double maximumP){
+        if (inches > 0){
+            forwardInches(inches,minimumP,maximumP);
+        }else if (inches < 0){
+            backInches(inches,minimumP,maximumP);
         }
     }
 
-    private void forwardInches(double inches, double minimumP, double maximumP) {
+    private void forwardInches(double inches ,double minimumP ,double maximumP) {
 
         double d_Rpower = 0;
         double d_Lpower = 0;
@@ -429,16 +489,16 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
 
         dRPID.setSetPoint(inches);
-        dRPID.setOutputRange(minimumP, maximumP);
+        dRPID.setOutputRange(minimumP , maximumP);
 
         dLPID.setSetPoint(inches);
-        dLPID.setOutputRange(minimumP, maximumP);
+        dLPID.setOutputRange(minimumP , maximumP);
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.08, 0.08);
+        aPID.setOutputRange(-0.2,0.2);
 
         RLCPID.setSetPoint(0);
-        RLCPID.setOutputRange(-0.2, 0.2);
+        RLCPID.setOutputRange(-0.2,0.2);
 
 
         d_RstartPoint = rDrive1.getCurrentPosition();
@@ -448,43 +508,46 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         a_startPoint = getAngle();
 
 
-        RcuurentPosition = rDrive1.getCurrentPosition() / ticksPerInch;
+
+        RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
         dRPID.setSensorValue(RcuurentPosition);
         dRPID.calculate();
 
-        LcuurentPosition = lDrive1.getCurrentPosition() / ticksPerInch;
+        LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
         dLPID.setSensorValue(LcuurentPosition);
         dLPID.calculate();
 
 
-        while (dRPID.getError() > 0 && dLPID.getError() > 0 && opModeIsActive()) {
+        while (dRPID.getError() > 0  && dLPID.getError() > 0 && opModeIsActive()) {
+
 
 
             RcuurentPosition = (rDrive1.getCurrentPosition() / ticksPerInch);
             dRPID.setSensorValue(RcuurentPosition);
             d_Rpower = dRPID.calculate();
 
-            LcuurentPosition = (lDrive1.getCurrentPosition() / ticksPerInch);
+            LcuurentPosition = (lDrive1.getCurrentPosition()/ ticksPerInch);
             dLPID.setSensorValue(LcuurentPosition);
             d_Lpower = dLPID.calculate();
 
 
-            telemetry.addData("first coraction", coraction);
+
+            telemetry.addData("first coraction",coraction);
             aPID.setSensorValue(getAngle());
             coraction = aPID.calculate();
 
-            RLCPID.setSensorValue(-slide1.getCurrentPosition() / SticksPerInch);
+            RLCPID.setSensorValue(-slide1.getCurrentPosition()/ SticksPerInch);
             Spower = RLCPID.calculate();
 
 
-            telemetry.addData("second coraction", coraction);
-            telemetry.addData("lpower", d_Lpower);
-            telemetry.addData("rdrive", d_Rpower);
+            telemetry.addData("second coraction",coraction);
+            telemetry.addData("lpower",d_Lpower);
+            telemetry.addData("rdrive",d_Rpower);
 
 
             // set power levels.`
 
-            if (exelerate < maximumP && opModeIsActive()) {
+            if (exelerate < maximumP && opModeIsActive()){
                 d_Lpower = exelerate;
                 d_Rpower = exelerate;
                 exelerate = exelerate + 0.05;
@@ -500,13 +563,17 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
 
 
-            telemetry.addData("rP", rDrive1.getCurrentPosition());
-            telemetry.addData("lP", lDrive1.getCurrentPosition());
-            telemetry.addData("rPow", rDrive1.getPower());
-            telemetry.addData("lPow", lDrive1.getPower());
+
+            telemetry.addData("rP",rDrive1.getCurrentPosition());
+            telemetry.addData("lP",lDrive1.getCurrentPosition());
+            telemetry.addData("rPow",rDrive1.getPower());
+            telemetry.addData("lPow",lDrive1.getPower());
+            telemetry.addData("angle",getAngle());
+            telemetry.addData("derivative",aPID.getDerivative() * aPID.getKD());
             telemetry.update();
 
             sleep(5);
+
 
 
         }
@@ -516,7 +583,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         lDrive2.setPower(0);
         rDrive1.setPower(0);
         rDrive2.setPower(0);
-        telemetry.addData("motors", "off");
+        telemetry.addData("motors","off");
 
 
     }
@@ -547,8 +614,9 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-        dRPID.setOutputRange(minPower, maxPower);
-        dLPID.setOutputRange(minPower, maxPower);
+
+        dRPID.setOutputRange(minPower,maxPower);
+        dLPID.setOutputRange(minPower,maxPower);
 
         dRPID.setSetPoint(inches);
         dLPID.setSetPoint(inches);
@@ -559,7 +627,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
 
         aPID.setSetPoint(0);
-        aPID.setOutputRange(-0.08, 0.08);
+        aPID.setOutputRange(-0.08,0.08);
 
         RcuurentPosition = (rDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
         LcuurentPosition = (lDrive1.getCurrentPosition() - d_RstartPoint) / ticksPerInch;
@@ -569,6 +637,10 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
         dRPID.calculate();
         dLPID.calculate();
+
+
+
+
 
 
         while (dRPID.getError() < 0 && dLPID.getError() < 0 && opModeIsActive()) {
@@ -588,15 +660,28 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             coraction = aPID.calculate();
 
 
+
+
+
+
             telemetry.update();
 
             // set power levels.
+
+
+
+
+
+
 
 
             lDrive1.setPower(d_Lpower - coraction);
             lDrive2.setPower(d_Lpower - coraction);
             rDrive1.setPower(d_Rpower + coraction);
             rDrive2.setPower(d_Rpower + coraction);
+
+
+
 
 
             sleep(5);
@@ -617,15 +702,16 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
     }
 
 
-    private void slideInches(double inches, double minimumPs, double maximumPs) {
-        if (inches > 0) {
-            forwardSlideInches(inches, minimumPs, maximumPs);
-        } else if (inches < 0) {
-            backSlideInches(inches, minimumPs, maximumPs);
+
+    private void slideInches(double inches ,double minimumPs ,double maximumPs){
+        if (inches > 0){
+            forwardSlideInches(inches,minimumPs,maximumPs);
+        }else if (inches < 0){
+            backSlideInches(inches,minimumPs,maximumPs);
         }
     }
 
-    private void forwardSlideInches(double inches, double minimumPs, double maximumPs) {
+    private void forwardSlideInches(double inches ,double minimumPs ,double maximumPs) {
 
         double d_Spower = 0;
         double Rpower = 0;
@@ -642,6 +728,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         ScurrentPosition = 0;
 
 
+
         rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -656,14 +743,18 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
 
         sPID.setSetPoint(inches);
-        sPID.setOutputRange(minimumPs, maximumPs);
+        sPID.setOutputRange(minimumPs,maximumPs);
+
 
 
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.08, 0.08);
+        ScPID.setOutputRange(-0.08,0.08);
 
         SaPID.setSetPoint(0);
-        SaPID.setOutputRange(-0.04, 0.04);
+        SaPID.setOutputRange(-0.04,0.04);
+
+
+
 
 
         s_startPoint = slide1.getCurrentPosition();
@@ -671,30 +762,36 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         sc_startPoint = getAngle();
 
 
-        ScurrentPosition = slide1.getCurrentPosition() / SticksPerInch;
+
+        ScurrentPosition = slide1.getCurrentPosition()/ SticksPerInch;
         sPID.setSensorValue(ScurrentPosition);
         sPID.calculate();
+
+
 
 
         while (sPID.getError() > 0 && opModeIsActive()) {
 
 
-            ScurrentPosition = (slide1.getCurrentPosition()) / SticksPerInch;
+
+            ScurrentPosition = (slide1.getCurrentPosition())/ SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
             d_Spower = sPID.calculate();
 
-            RcuurentPosition = rDrive1.getCurrentPosition() / ticksPerInch;
+            RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
             SaPID.setSensorValue(RcuurentPosition);
             Rpower = SaPID.calculate();
             h++;
 
-            LcuurentPosition = lDrive1.getCurrentPosition() / ticksPerInch;
+            LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
             SaPID.setSensorValue(LcuurentPosition);
             Lpower = SaPID.calculate();
 
 
             ScPID.setSensorValue(getAngle());
             Scoraction = ScPID.calculate();
+
+
 
 
             // set power levels.`
@@ -704,14 +801,19 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             rDrive1.setPower(Rpower + Scoraction);
             rDrive2.setPower(Rpower + Scoraction);
 
+//
 
-            telemetry.addData("sError", sPID.getError());
-            telemetry.addData("Sc", slide1.getCurrentPosition());
+
+            telemetry.addData("sError",sPID.getError());
+            telemetry.addData("Sc",slide1.getCurrentPosition());
+
 
 
             telemetry.update();
 
             sleep(5);
+
+
 
 
         }
@@ -723,12 +825,12 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         rDrive1.setPower(0);
         rDrive2.setPower(0);
 
-        telemetry.addData("motors", "off");
+        telemetry.addData("motors","off");
 
 
     }
 
-    private void backSlideInches(double inches, double minimumPs, double maximumPs) {
+    private void backSlideInches(double inches ,double minimumPs ,double maximumPs) {
 
         double d_Spower = 0;
         double Rpower = 0;
@@ -745,6 +847,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         ScurrentPosition = 0;
 
 
+
         rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -759,14 +862,15 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
 
         sPID.setSetPoint(inches);
-        sPID.setOutputRange(minimumPs, maximumPs);
+        sPID.setOutputRange(minimumPs,maximumPs);
 
 
         ScPID.setSetPoint(0);
-        ScPID.setOutputRange(-0.05, 0.05);
+        ScPID.setOutputRange(-0.05,0.05);
 
         SaPID.setSetPoint(0);
-        SaPID.setOutputRange(-0.04, 0.04);
+        SaPID.setOutputRange(-0.04,0.04);
+
 
 
         s_startPoint = -slide1.getCurrentPosition();
@@ -774,23 +878,27 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         sc_startPoint = getAngle();
 
 
-        ScurrentPosition = slide1.getCurrentPosition() / SticksPerInch;
+
+        ScurrentPosition = slide1.getCurrentPosition()/ SticksPerInch;
         sPID.setSensorValue(ScurrentPosition);
         sPID.calculate();
+
+
 
 
         while (sPID.getError() < 0 && opModeIsActive()) {
 
 
-            ScurrentPosition = (slide1.getCurrentPosition() - s_startPoint) / SticksPerInch;
+
+            ScurrentPosition = (slide1.getCurrentPosition()  - s_startPoint)/ SticksPerInch;
             sPID.setSensorValue(ScurrentPosition);
             d_Spower = sPID.calculate();
 
-            RcuurentPosition = rDrive1.getCurrentPosition() / ticksPerInch;
+            RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
             SaPID.setSensorValue(RcuurentPosition);
             Rpower = SaPID.calculate();
 
-            LcuurentPosition = lDrive1.getCurrentPosition() / ticksPerInch;
+            LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
             SaPID.setSensorValue(LcuurentPosition);
             Lpower = SaPID.calculate();
 
@@ -799,12 +907,17 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             Scoraction = ScPID.calculate();
 
 
+
+
             // set power levels.`
             slide1.setPower(d_Spower);
             lDrive1.setPower(Lpower - Scoraction);
             lDrive2.setPower(Lpower - Scoraction);
             rDrive1.setPower(Rpower + Scoraction);
             rDrive2.setPower(Rpower + Scoraction);
+
+
+
 
 
             telemetry.addData("slide error", sPID.getError());
@@ -816,6 +929,8 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             sleep(5);
 
 
+
+
         }
 
 
@@ -825,10 +940,377 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
         rDrive1.setPower(0);
         rDrive2.setPower(0);
 
-        telemetry.addData("motors", "off");
+        telemetry.addData("motors","off");
 
 
     }
+
+
+
+
+
+
+
+
+
+
+    private void forwardInchesAndcollect(double inches ,double minimumP ,double maximumP) {
+
+        double d_Rpower = 0;
+        double d_Lpower = 0;
+        double Spower = 0;
+
+        dLPID.reset();
+        dRPID.reset();
+        RLCPID.reset();
+
+
+        double exelerate = 0.05;
+
+
+        RcuurentPosition = 0;
+        LcuurentPosition = 0;
+
+        h = 0;
+
+
+        rDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        rDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lDrive2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slide1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        dRPID.setSetPoint(inches);
+        dRPID.setOutputRange(minimumP , maximumP);
+
+        dLPID.setSetPoint(inches);
+        dLPID.setOutputRange(minimumP , maximumP);
+
+        aPID.setSetPoint(0);
+        aPID.setOutputRange(-0.08,0.08);
+
+        RLCPID.setSetPoint(0);
+        RLCPID.setOutputRange(-0.2,0.2);
+
+
+        d_RstartPoint = rDrive1.getCurrentPosition();
+
+        d_LstartPoint = lDrive1.getCurrentPosition();
+
+        a_startPoint = getAngle();
+
+
+
+        RcuurentPosition = rDrive1.getCurrentPosition()/ ticksPerInch;
+        dRPID.setSensorValue(RcuurentPosition);
+        dRPID.calculate();
+
+        LcuurentPosition = lDrive1.getCurrentPosition()/ ticksPerInch;
+        dLPID.setSensorValue(LcuurentPosition);
+        dLPID.calculate();
+
+
+        while (dRPID.getError() > 0  && dLPID.getError() > 0 && opModeIsActive()) {
+
+
+
+            RcuurentPosition = (rDrive1.getCurrentPosition() / ticksPerInch);
+            dRPID.setSensorValue(RcuurentPosition);
+            d_Rpower = dRPID.calculate();
+
+            LcuurentPosition = (lDrive1.getCurrentPosition()/ ticksPerInch);
+            dLPID.setSensorValue(LcuurentPosition);
+            d_Lpower = dLPID.calculate();
+
+
+
+            telemetry.addData("first coraction",coraction);
+            aPID.setSensorValue(LcuurentPosition - RcuurentPosition);
+            coraction = aPID.calculate();
+
+            RLCPID.setSensorValue(-slide1.getCurrentPosition()/ SticksPerInch);
+            Spower = RLCPID.calculate();
+
+
+            telemetry.addData("second coraction",coraction);
+            telemetry.addData("lpower",d_Lpower);
+            telemetry.addData("rdrive",d_Rpower);
+
+
+            // set power levels.`
+
+            if (exelerate < maximumP && opModeIsActive()){
+                d_Lpower = exelerate;
+                d_Rpower = exelerate;
+                exelerate = exelerate + 0.05;
+            }
+
+            lDrive1.setPower(d_Lpower + coraction);
+            lDrive2.setPower(d_Lpower + coraction);
+
+            rDrive1.setPower(d_Rpower - coraction);
+            rDrive2.setPower(d_Rpower - coraction);
+
+
+            //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
+
+            //if (RcuurentPosition < inches * 0.9) slide1.setPower(Spower);
+
+
+
+            telemetry.addData("rP",rDrive1.getCurrentPosition());
+            telemetry.addData("lP",lDrive1.getCurrentPosition());
+            telemetry.addData("rPow",rDrive1.getPower());
+            telemetry.addData("lPow",lDrive1.getPower());
+            telemetry.update();
+
+            sleep(5);
+
+
+
+        }
+
+
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+
+        telemetry.addData("motors","off");
+
+
+    }
+
+
+
+
+    //init Vuforia
+    private void initVuforia() {
+
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+
+    }
+
+
+    //init the TensorFlow
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minimumConfidence = 0.45;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+    }
+
+    //if see 3 diffrent objects
+    private int seeThreeObj(List<Recognition> Recognitions){
+
+        int lastPosition = 0;
+
+        int skyStoneP = 0;
+
+        double skyStoneX = 0;
+
+
+
+
+        if (Recognitions.get(0).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+            skyStoneX = Recognitions.get(0).getLeft();
+        }
+
+        if (Recognitions.size() == 2){
+            if (Recognitions.get(1).getLabel().equals(LABEL_SECOND_ELEMENT)) {
+                skyStoneX = Recognitions.get(1).getLeft();
+            }
+        }
+        if (Recognitions.size() == 3){
+            if (Recognitions.get(2).getLabel().equals(LABEL_SECOND_ELEMENT)){
+                skyStoneX = Recognitions.get(2).getLeft();
+            }
+        }
+
+
+
+
+
+
+        if (skyStoneX < 8){
+            skyStoneP = 3;
+        }
+        else if (skyStoneX < 140){
+            skyStoneP = 1;
+        }else if (skyStoneX > 320){
+            skyStoneP = 3;
+        }else{
+            skyStoneP = 2;
+        }
+        telemetry.addData("skyStoneX",skyStoneX);
+
+        return skyStoneP;
+    }
+
+
+    private void goToSkyStone(int SSP){
+        if (SSP == 1) adjusteSS1();
+        else if (SSP == 2) adjusteSS2();
+        else if (SSP == 3) adjusteSS3();
+
+    }
+
+    private void adjusteSS1(){
+        driveInches(8.5,0.03,0.3);
+    }
+
+    private void adjusteSS2(){
+
+    }
+
+    private void adjusteSS3(){
+        driveInches(-9,0.03,0.3);
+    }
+
+    private void moveStone(int SP , boolean where){
+        if (where){
+
+            if (SP == 1) driveInches(59,0.03,0.4);
+            else if (SP == 2) driveInches(55,0.03,0.4);
+            else if (SP == 3) driveInches(44,0.03,0.4);
+            else if (SP == 11) driveInches(83,0.03,0.4);
+            else if (SP == 22) driveInches(86.5,0.03,0.4);
+            else if (SP == 33) driveInches(71.5,0.03,0.4);
+
+        }
+        else if (!where){
+
+            if (SP == 1) driveInches(-59,0.03,0.4);
+            else if (SP == 2) driveInches(-60,0.03,0.4);
+            else if (SP == 3) driveInches(-44,0.03,0.4);
+            else if (SP == 11) driveInches(-83,0.03,0.4);
+            else if (SP == 22) driveInches(-86.5,0.03,0.4);
+            else if (SP == 33) driveInches(-71.5,0.03,0.4);
+
+        }
+    }
+
+    private void takeStone(){
+        slideInches(8,0.03,0.4);
+        bazim.setPosition(0.05);
+        sleep(100);
+        correctAngle();
+        slideInches(-8,0.03,0.4);
+    }
+
+    private void stopDcMotors(){
+        rDrive1.setPower(0);
+        rDrive2.setPower(0);
+        lDrive1.setPower(0);
+        lDrive2.setPower(0);
+        slide1.setPower(0);
+        sleep(10);
+    }
+
+
+
+    private void caseSSP1(){
+        adjusteSS1();
+        slideInches(29.5,0.03,0.4);
+        stopDcMotors();
+        bazim.setPosition(0.05);
+        sleep(100);
+        slideInches(-12,0.03,0.3);
+        stopDcMotors();
+        correctAngle();
+        moveStone(1,false);
+        stopDcMotors();
+        bazim.setPosition(0.63);
+        driveInches(12,0.03,0.5);
+        stopDcMotors();
+        slide1.setPower(1);
+        sleep(500);
+        slide1.setPower(0);
+    }
+
+
+    private void caseSSP2(){
+        adjusteSS2();
+        slideInches(29.5,0.03,0.6);
+        stopDcMotors();
+        bazim.setPosition(0.05);
+        sleep(100);
+        slideInches(-12,0.03,0.3);
+        stopDcMotors();
+        correctAngle();
+        moveStone(2,false);
+        stopDcMotors();
+        bazim.setPosition(0.63);
+        slideInches(2.5,0.03,0.3);
+        correctAngle();
+        moveStone(22,true);
+        correctAngle();
+        stopDcMotors();
+        takeStone();
+        correctAngle();
+        driveInches(-24,0.03,0.4);
+        stopDcMotors();
+        correctAngle();
+        slideInches(-9,0.03,0.5);
+        correctAngle();
+        driveInches(-60,0.03,0.5);
+        bazim.setPosition(0.63);
+        driveInches(20,0.03,0.5);
+        stopDcMotors();
+        slide1.setPower(0.63);
+        sleep(500);
+        slide1.setPower(0);
+    }
+
+
+    private void caseSSP3(){
+        adjusteSS3();
+        slideInches(29.5,0.03,0.4);
+        stopDcMotors();
+        bazim.setPosition(0.05);
+        sleep(100);
+        slideInches(-12,0.03,0.3);
+        stopDcMotors();
+        correctAngle();
+        moveStone(3,false);
+        stopDcMotors();
+        bazim.setPosition(0.63);
+        slideInches(2,0.03,0.3);
+        correctAngle();
+        moveStone(33,true);
+        stopDcMotors();
+        takeStone();
+        correctAngle();
+        driveInches(-24,0.03,0.4);
+        stopDcMotors();
+        correctAngle();
+        slideInches(-9,0.03,0.5);
+        correctAngle();
+        driveInches(-60,0.03,0.5);
+        bazim.setPosition(0.65);
+        driveInches(15,0.03,0.5);
+        stopDcMotors();
+        slide1.setPower(1);
+        sleep(500);
+        slide1.setPower(0);
+    }
+
 
     public void teleop_11226_A() {
         ElapsedTime time = new ElapsedTime();
@@ -892,6 +1374,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
 
 
     Timer timer = new Timer();*/
+
 
 
         rDrive2 = hardwareMap.get(DcMotor.class, "rDrive2");
@@ -1018,12 +1501,16 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             }
 
 
+
             if (gamepad1.a) {
                 Fast = true;
             }
             if (gamepad1.b) {
                 Fast = false;
             }
+
+
+
 
 
             if (gamepad1.right_stick_x > 0.2 || gamepad1.right_stick_x < 0.2) {
@@ -1033,11 +1520,36 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             if (gamepad2.left_stick_y > 0.2 || gamepad2.left_stick_y < -0.2) {
                 elevator.setPower(gamepad2.right_stick_y);
-            } else {
+            }
+
+            else {
                 elevator.setPower(0);
             }
+
+
+
+
+
 
 
             if (gamepad2.a) {
@@ -1065,18 +1577,21 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             }
 
 
+
+
             if (gamepad2.right_stick_x > 0.2) {
                 turnHold.setPower(0.3);
             } else if (gamepad2.right_stick_x < -0.2) {
                 turnHold.setPower(-0.3);
-            } else {
+            } else{
                 turnHold.setPower(0);
             }
 
-            if (gamepad2.right_stick_button) {
+            if (gamepad2.right_stick_button){
                 elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
+
 
 
             if (gamepad2.right_trigger > 0) {
@@ -1090,7 +1605,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
                 collectLeft.setPower(0);
             }
 
-            if (gamepad1.x) {
+            if (gamepad1.x){
                 y++;
             }
 
@@ -1104,7 +1619,7 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
             telemetry.update();*/
 
 
-            telemetry.addData("elevator ticks", elevator.getCurrentPosition());
+            telemetry.addData("elevator ticks",elevator.getCurrentPosition());
             telemetry.update();
 
 
@@ -1127,10 +1642,11 @@ public class Auto_Bridge_Wall_11229 extends LinearOpMode {
     }
 
 
-    private void correctAngle() {
+    private void correctAngle(){
         zRotate(0.3);
 
     }
+
 
 
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.autonomous.auto11229;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -20,7 +21,7 @@ import org.firstinspires.ftc.teamcode.autonomous.PIDController.PIDcon;
 import java.util.List;
 
 @Autonomous(name="RedStone 11229 statemachine", group="Stone")
-
+@Disabled
 public class Red2Stone_11229_stateMachine<x> extends LinearOpMode
 {
     DcMotor                 lDrive1,lDrive2,rDrive1,rDrive2,slide1,elevator;
